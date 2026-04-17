@@ -822,6 +822,15 @@ a:hover { text-decoration: underline; }
   text-transform: uppercase;
   letter-spacing: .05em;
 }
+/* PDF / A4 export — shrink the center stack so the 3-line block
+   (value + 2 label words) fits comfortably inside the donut hole
+   when the whole page is proportionally scaled down to A4 landscape. */
+.pages.a4-mode .c-donut-center { font-size: 18px; }
+.pages.a4-mode .c-donut-sub    { font-size: 8px; letter-spacing: .04em; }
+@media print {
+  .c-donut-center { font-size: 18px; }
+  .c-donut-sub    { font-size: 8px; letter-spacing: .04em; }
+}
 
 /* Tables ---------------------------------------------------- */
 .table-toolbar {

@@ -146,34 +146,38 @@ var ChartDonut = (function () {
       return false;
     }
 
-    // Center label
-    if (opts.centerValue || opts.centerLabel) {
-      if (opts.centerValue) {
+    // Center label — value on its own line, each word of the sub-label
+    // on its own line below. Kept compact so the whole stack fits
+    // inside the donut hole at A4 (print) sizes.
+    drawCenter(opts.centerValue || (opts.centerLabel ? "" : valueFmt(total)),
+               opts.centerLabel || (opts.centerValue ? "" : "Total"));
+
+    function drawCenter(value, label) {
+      var words = String(label || "").split(/\s+/).filter(Boolean);
+      // Vertically center the whole block. Gap between value and first
+      // sub-word is larger than between sub-words themselves.
+      var VALUE_H = 22;
+      var SUB_H = 12;
+      var totalH = (value ? VALUE_H : 0) + words.length * SUB_H;
+      var top = cy - totalH / 2;
+
+      if (value) {
         var cv = document.createElementNS(svgNS, "text");
-        cv.setAttribute("x", cx); cv.setAttribute("y", cy + (opts.centerLabel ? 0 : 6));
+        cv.setAttribute("x", cx);
+        cv.setAttribute("y", top + VALUE_H - 4);
         cv.setAttribute("class", "c-donut-center");
-        cv.textContent = opts.centerValue;
+        cv.textContent = value;
         svg.appendChild(cv);
       }
-      if (opts.centerLabel) {
+
+      words.forEach(function (w, idx) {
         var cl = document.createElementNS(svgNS, "text");
-        cl.setAttribute("x", cx); cl.setAttribute("y", cy + 16);
+        cl.setAttribute("x", cx);
+        cl.setAttribute("y", top + (value ? VALUE_H : 0) + SUB_H * (idx + 1) - 2);
         cl.setAttribute("class", "c-donut-sub");
-        cl.textContent = opts.centerLabel;
+        cl.textContent = w;
         svg.appendChild(cl);
-      }
-    } else {
-      // default center: total
-      var ct = document.createElementNS(svgNS, "text");
-      ct.setAttribute("x", cx); ct.setAttribute("y", cy + 2);
-      ct.setAttribute("class", "c-donut-center");
-      ct.textContent = valueFmt(total);
-      svg.appendChild(ct);
-      var cs = document.createElementNS(svgNS, "text");
-      cs.setAttribute("x", cx); cs.setAttribute("y", cy + 18);
-      cs.setAttribute("class", "c-donut-sub");
-      cs.textContent = "Total";
-      svg.appendChild(cs);
+      });
     }
 
     container.appendChild(svg);
