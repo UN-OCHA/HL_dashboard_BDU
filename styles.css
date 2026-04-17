@@ -1015,6 +1015,21 @@ table.data td.col-num {
   .overview-head h1 { font-size: 20px; }
   /* Lift map to a reasonable viewing height when stacked. */
   .overview-layout .map-wrap { min-height: 360px; }
+
+  /* Tables: contain horizontal scroll inside the table so 7-col
+     contacts and 5-col leaders rosters never blow out the page
+     width on tablets. See the matching block in the 767 px
+     breakpoint for the reasoning. Scoped to the table itself —
+     we deliberately do NOT set overflow-x on .page here because
+     `.pages.a4-mode .page` already manages its own overflow for
+     export and we don't want to conflict with that. */
+  .page { min-width: 0; max-width: 100%; }
+  .page > table.data {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* Mobile ---------------------------------------------------- */
@@ -1080,10 +1095,33 @@ table.data td.col-num {
   }
   .chart-card h3 { font-size: 11.5px; }
 
-  /* Tables: horizontal scroll instead of layout destruction. */
+  /* Tables: contain horizontal scroll INSIDE the table itself so the
+     page never widens past the viewport. The previous selector
+     (`.page section.page table.data`) never matched because tables
+     are direct children of `section.page`, not nested — so contacts
+     and leaders pages were blowing out the whole mobile layout.
+
+     `display: block` on the <table> detaches it from the table
+     layout algorithm; `overflow-x: auto` + `max-width: 100 %` then
+     give us a self-contained horizontal scroll region. `.page`
+     gets min-width: 0 + max-width: 100 % so it cannot refuse to
+     shrink below the table's natural width and cannot grow past
+     the viewport. We deliberately do NOT set overflow-x on .page
+     itself — `.pages.a4-mode .page` already manages its own
+     overflow for export, and the table's internal scroll is
+     enough to contain the horizontal axis. */
+  .page { min-width: 0; max-width: 100%; }
   table.data { font-size: 11px; }
   table.data th, table.data td { padding: 8px 8px; white-space: nowrap; }
-  .page section.page table.data { display: block; overflow-x: auto; }
+  .page > table.data {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Toolbar sits above the table — keep it inside the page width. */
+  .page > .table-toolbar { flex-wrap: wrap; gap: 8px; }
+  .page > .table-toolbar input.search { flex: 1 1 100%; min-width: 0; }
 
   /* Long-form paragraphs need more room. */
   .overview-block div,
