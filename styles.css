@@ -1,0 +1,1110 @@
+/* =============================================================
+   HL Dashboard — OCHA Humanitarian Leadership Snapshot
+   Design tokens imported from ocha_dataviz_online v2026.x
+   ============================================================= */
+
+:root {
+  /* ── OCHA common-design-system tokens ────────────────────────
+     Mirrors https://un-ocha.github.io/ocha-common-design-system-BDU/.
+     Never hardcode hex anywhere else in this file — always use these. */
+
+  /* UN Blue (signature — use AA variant for any text on white) */
+  --brand-primary:        #009EDB;  /* fills, backgrounds, brand moments    */
+  --brand-primary--text:  #0077B8;  /* text on white (WCAG AA)              */
+  --brand-primary--dark:  #004987;  /* hover / dark accents                 */
+  --brand-primary--light: #64BDEA;  /* tints, focus                         */
+  --brand-primary--navy:  #002E6E;  /* darkest step of UN Blue ramp         */
+  --brand-primary--pale:  #C5DFEF;  /* pale ramp step                       */
+  --brand-primary--ice:   #E3EDF6;  /* ice-pale ramp step                   */
+
+  /* OCHA accent colours — use sparingly. Only WCAG-AA text variants are
+     applied to text on white. Fills can use the original. */
+  --brand-green:          #72BF44;  --brand-green--text:  #27833A;
+  --brand-yellow:         #FFC800;
+  --brand-orange:         #F58220;  --brand-orange--text: #CF3F0B;
+  --brand-red:            #ED1847;  --brand-red--text:    #EB0045;
+  --brand-purple:         #A05FB4;  --brand-purple--text: #733D96;
+  --brand-slate:          #AEA29A;
+  --brand-grey--neutral:  #999999;
+
+  /* Greys (design-system aliases) */
+  --brand-default-text-color: #4D4D4D;
+  --brand-grey--text:     #737373;
+  --brand-grey:           #F2F2F2;  /* surface            */
+  --brand-grey--border:   #BFBFBF;
+  --brand-grey--line:     #E6E6E6;  /* map neighbour fill */
+
+  /* UN Blue 7-step sequential ramp (for choropleth-style tints) */
+  --blue-1: #002E6E;  --blue-2: #004987;  --blue-3: #0074B7;  --blue-4: #009EDB;
+  --blue-5: #64BDEA;  --blue-6: #C5DFEF;  --blue-7: #E3EDF6;
+
+  /* Map-specific (per OCHA map spec) */
+  --map-ocean:     #E1E8F6;
+  --map-coastline: #64BEEB;
+  --map-land:      #E6E6E6;  /* neighbouring country */
+  --map-featured:  #FFFFFF;
+  --map-border-intl:   #8A8C8E;
+  --map-border-admin1: #C7C8CA;
+
+  /* Typography */
+  --font-sans: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  --font-cond: 'Roboto Condensed', var(--font-sans);
+  --font-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Text roles */
+  --text:        var(--brand-default-text-color); /* body */
+  --text-muted:  var(--brand-grey--text);
+  --text-dim:    var(--brand-grey--neutral);
+  --text-strong: #1A1A1A;
+  --text-inv:    #FFFFFF;
+  --text-brand:  var(--brand-primary--text);      /* text links on white  */
+  --text-title:  var(--brand-primary--navy);      /* page / section titles */
+
+  /* Surfaces — canvas is pure white everywhere on screen. Only KPI
+     cards, highlight cards and page-note sidebars sit on `--bg-soft`
+     to give them mild contrast against the white. */
+  --bg-page:    #FFFFFF;           /* page background (was #F4F6F8)  */
+  --bg-paper:   #FFFFFF;           /* inside of .page                */
+  --bg-soft:    #F6F9FC;           /* subtle surface for accent cards */
+  --border:     #E6EAEF;
+  --border-soft:#EEF2F6;
+  --border-rule:#E1E8EF;           /* slightly warmer for section rules */
+
+  /* A4 LANDSCAPE at 96 DPI (297mm × 210mm) */
+  --page-w: 1123px;
+  --page-h: 794px;
+  --page-pad: 36px;
+
+  /* Elevation */
+  --shadow-1: 0 1px 3px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
+  --shadow-2: 0 4px 14px rgba(0,0,0,.08), 0 10px 30px rgba(0,0,0,.05);
+}
+
+/* Local Roboto (so PDFs render correctly offline).
+   If Roboto files are missing, the system falls back gracefully. */
+@font-face {
+  font-family: 'Roboto';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: local('Roboto'), url('assets/fonts/Roboto-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Roboto';
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: local('Roboto Medium'), url('assets/fonts/Roboto-Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Roboto';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: local('Roboto Bold'), url('assets/fonts/Roboto-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Roboto Condensed';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: local('Roboto Condensed'), url('assets/fonts/RobotoCondensed-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Roboto Condensed';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: local('Roboto Condensed Bold'), url('assets/fonts/RobotoCondensed-Bold.woff2') format('woff2');
+}
+
+/* Reset ---------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font-sans);
+  /* Default body size — 1 em. Browsers default to 16 px root, so this
+     is the standard readable size. Everything else on the page is sized
+     in relative `em` multiples against this. */
+  font-size: 1em;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+/* A4 (print + PNG export) drops the root to 13 px so the compact
+   layout fits an A4 landscape sheet. */
+h1, h2, h3, h4, p, ul, ol { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+a { color: var(--brand-primary--text); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* App topbar (screen only) ----------------------------------- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px;
+  box-shadow: var(--shadow-1);
+}
+.topbar .brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.topbar .brand h1 {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: .01em;
+}
+.topbar .brand .sub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.topbar-actions {
+  display: flex;
+  gap: 8px;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.btn:hover { background: var(--bg-soft); border-color: #CCD1D7; }
+.btn.primary {
+  color: #fff;
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+.btn.primary:hover { background: var(--brand-primary--text); border-color: var(--brand-primary--text); }
+
+/* Pages container ------------------------------------------
+   Single continuous white surface that holds every section. Wider
+   side gutters at larger viewports give the content room to breathe.
+   A4 / print mode overrides below restore the per-page card look. */
+.pages {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: clamp(20px, 3vw, 40px) clamp(20px, 6vw, 72px);
+  max-width: 1500px;
+  margin: 0 auto;
+  background: var(--bg-paper);
+}
+
+/* Page ------------------------------------------------------
+   On screen the page is FLUID — it grows to whatever width the reader
+   has, with a comfortable max so line-length doesn't become unreadable.
+   The page ONLY becomes exact A4-landscape dimensions when:
+     • the browser is printing (`@media print` below), or
+     • JS toggles `.pages.a4-mode` on the container before exporting
+       a PNG — see `app/export.js`.
+*/
+.page {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  min-height: auto;
+  padding: clamp(48px, 5vw, 72px) 0;   /* generous vertical rhythm */
+  background: transparent;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  /* Darker, slightly heavier page-to-page separator than the lighter
+     --border-rule used inside each page (page-head underline etc). */
+  border-top: 2px solid #A9B6C2;
+}
+.page:first-child { border-top: 0; padding-top: clamp(8px, 1vw, 16px); }
+.page:last-child  { padding-bottom: clamp(24px, 3vw, 40px); }
+
+/* ── A4 export mode ──
+   Strategy: keep the ENTIRE fluid layout unchanged (same paddings,
+   typography, grid, gaps). To fit each section on one A4 landscape
+   sheet:
+     • JS wraps each `.page`'s content in a `.page-inner` div on
+       `beforeprint` / PNG export.
+     • `.page-inner` renders at natural fluid dimensions — 1500 ×
+       1061 (same 1.414 aspect ratio as A4 landscape).
+     • CSS `transform: scale(0.7487)` shrinks the inner down to
+       1123 × 794 px; the outer `.page` stays locked at exact A4
+       landscape dimensions with `overflow: hidden`.
+   Using pure `transform: scale` (not `zoom`) because `zoom` is
+   inconsistently honoured by browser print pipelines (Safari drops
+   it entirely). `transform` + fixed outer box is reliable. */
+.pages.a4-mode {
+  gap: 20px;
+  padding: 20px;
+  background: #F4F6F8;       /* tint so white A4 cards read as sheets */
+  max-width: none;
+}
+.pages.a4-mode .page {
+  /* Outer box = exact A4 landscape. */
+  width: 1123px;
+  max-width: 1123px;
+  height: 794px;
+  min-height: 794px;
+  max-height: 794px;
+  padding: 0;
+  overflow: hidden;
+  margin: 0 auto;
+  background: var(--bg-paper);
+  box-shadow: var(--shadow-1);
+  border-top: 0;
+  position: relative;
+}
+.pages.a4-mode .page > .page-inner {
+  /* Inner = natural fluid size, scaled down to fit. */
+  width: 1500px;
+  height: 1061px;
+  padding: clamp(48px, 5vw, 72px) clamp(40px, 4vw, 64px);
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.7487);
+  transform-origin: top left;
+  box-sizing: border-box;
+}
+
+.page-png-btn {
+  display: none;            /* hidden in the continuous on-screen view */
+}
+.pages.a4-mode .page-png-btn {
+  display: inline-flex;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  opacity: 0;
+  transition: opacity .15s;
+  z-index: 5;
+}
+.pages.a4-mode .page:hover .page-png-btn { opacity: 1; }
+
+/* Page header band (on each page) --------------------------- */
+.page-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 14px;
+  margin-bottom: 28px;
+  position: relative;
+}
+/* Short accent underline — more editorial than a full-width rule. */
+.page-head::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 48px;
+  height: 3px;
+  background: var(--brand-primary);
+}
+.page-head .title {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--text-title);
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+.page-head .meta {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Page 1 — Overview ---------------------------------------- */
+.overview-head {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 28px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border-rule);
+  position: relative;
+}
+.overview-head::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 64px;
+  height: 3px;
+  background: var(--brand-primary);
+}
+.overview-head .logo {
+  height: 40px;
+  width: auto;
+}
+.overview-head .kicker {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.overview-head h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-title);
+  letter-spacing: .02em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+.overview-head .date {
+  margin-left: auto;
+  text-align: right;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.overview-head .date strong { color: var(--text); font-size: 13px; }
+
+/* Overview layout — single 12-column grid, same structure on fluid
+   and A4 so the dashboard reads the same way everywhere:
+     top row     → map (span 9)  |  KPIs (span 3, stacked)
+     bottom row  → Overview (6)  |  Leadership on the move (6) */
+.overview-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 32px 24px;
+  min-height: 0;
+}
+.overview-layout .map-wrap             { grid-column: span 9; grid-row: 1; min-height: 0; }
+.overview-layout .kpi-col              { grid-column: span 3; grid-row: 1; }
+.overview-layout .overview-block--overview { grid-column: span 6; grid-row: 2; }
+.overview-layout .overview-block--lotm     { grid-column: span 6; grid-row: 2; }
+
+.overview-layout .map-wrap {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.overview-layout .map-wrap .map-container { flex: 1 1 auto; min-height: 0; }
+
+/* OVERVIEW + LEADERSHIP ON THE MOVE sidebar ----------------- */
+.overview-text {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;                  /* generous gap between the two blocks */
+  min-height: 0;
+  padding-left: 8px;
+}
+.overview-block {
+  padding: 20px 22px;
+  background: var(--bg-soft);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.overview-block h3 {
+  font-size: .875em;                /* 14 px @ 1em root — still caps-style meta */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--brand-primary--text);
+  border-bottom: 2px solid var(--brand-primary);
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+}
+.overview-block div {
+  font-size: 1em;          /* body text must be at least 1em on screen */
+  line-height: 1.55;
+  color: var(--text);
+}
+/* A4 export scales everything down to fit the 1123 × 794 sheet. */
+.overview-block div p { margin: 0 0 6px; }
+.overview-block div p:last-child { margin-bottom: 0; }
+.overview-block div strong { color: var(--text-strong); }
+
+/* KPI column — 5 small rectangles stacked vertically inside the
+   3-col sidebar on the right of the map (same on fluid and A4). */
+.overview-layout .kpi-col {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-auto-rows: 1fr;
+  gap: 10px;
+  align-content: stretch;
+}
+
+/* KPIs ------------------------------------------------------ */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin: 14px 0 20px;
+}
+.kpi {
+  background: var(--bg-soft);
+  border-left: 3px solid var(--brand-primary);
+  padding: 10px 14px;
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 2px 12px;
+  min-height: 0;
+  border-radius: 3px;
+}
+.kpi .kpi-icon {
+  grid-row: 1 / span 2;
+  align-self: center;
+  justify-self: center;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.kpi .kpi-icon svg { width: 100%; height: 100%; display: block; }
+.kpi .kpi-icon svg path,
+.kpi .kpi-icon svg circle,
+.kpi .kpi-icon svg polygon { fill: var(--brand-primary); }
+.kpi .value { grid-column: 2; grid-row: 1; }
+.kpi .label {
+  grid-column: 2;
+  grid-row: 2;
+  margin-top: 2px;
+  font-size: 9.5px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--text-muted);
+}
+.kpi .unit  { font-size: 11px; }
+.kpi .value {
+  font-family: var(--font-cond);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-title);
+}
+.kpi .unit {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--brand-primary--text);
+}
+.kpi .label {
+  margin-top: 6px;
+  font-size: 10.5px;
+  line-height: 1.3;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+/* Map ------------------------------------------------------- */
+.map-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.map-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+}
+.map-container svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Zoom controls — top-right, subtle, reveal-on-hover */
+.map-zoom-ctrls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0.6;
+  transition: opacity .15s;
+}
+.map-container:hover .map-zoom-ctrls { opacity: 1; }
+.map-zoom-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font: 600 14px/1 var(--font-sans);
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.map-zoom-btn:hover {
+  background: var(--bg-soft);
+  border-color: var(--brand-primary);
+  color: var(--brand-primary--text);
+}
+/* Neighbouring country / landmass fill per OCHA map spec. International
+   boundaries show through via the coloured stroke. */
+.map-country {
+  fill: var(--map-land);
+  stroke: var(--map-border-intl);
+  stroke-width: .6;
+  transition: filter .15s;
+}
+.map-country.has-leader {
+  cursor: pointer;
+  stroke: #fff;
+  stroke-width: .8;
+}
+.map-country.has-leader:hover {
+  filter: brightness(.92);
+}
+.map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  padding-top: 10px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.map-legend .swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+  border: 1px solid var(--brand-grey--border);
+}
+/* "+ DHC" diamond swatch — mirrors the map overlay marker. */
+.map-legend .swatch-diamond {
+  background: transparent;
+  border: none;
+  position: relative;
+}
+.map-legend .swatch-diamond::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  background: #002E6E;
+  border: 1px solid #fff;
+  transform: rotate(45deg);
+}
+.map-tooltip {
+  position: fixed;
+  pointer-events: none;
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-2);
+  padding: 8px 10px;
+  font-size: 11.5px;
+  border-radius: 4px;
+  z-index: 100;
+  max-width: 220px;
+}
+.map-label {
+  font-size: 9px;           /* at default zoom; JS rescales on zoom */
+  font-weight: 700;
+  font-family: var(--font-cond);
+  letter-spacing: .03em;
+  fill: var(--text-strong);
+  paint-order: stroke;
+}
+.map-label-halo {
+  font-size: 9px;
+  font-weight: 700;
+  font-family: var(--font-cond);
+  letter-spacing: .03em;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 3.5;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+.map-tooltip .t-country { font-weight: 700; color: var(--text-title); }
+.map-tooltip .t-pos { color: var(--text-muted); font-size: 10.5px; }
+.map-tooltip[hidden] { display: none; }
+
+/* Page 2 — Highlights -------------------------------------- */
+.highlight-card {
+  background: var(--brand-primary--ice);
+  border-left: 4px solid var(--brand-primary);
+  padding: 24px 28px;
+  margin-bottom: 28px;
+  font-size: 1em;
+  line-height: 1.6;
+}
+.highlight-card h3 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--brand-primary--dark);
+  margin-bottom: 8px;
+}
+/* 12-column grid: 4 framework blocks arranged as 2 × 2 (6 col each). */
+.framework {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+  margin-top: 28px;
+  margin-bottom: 22px;
+}
+.framework .framework-item { grid-column: span 6; }
+.framework-item {
+  border-top: 3px solid var(--brand-primary);
+  padding: 10px 12px;
+  background: var(--bg-soft);
+}
+.framework-item h4 {
+  font-size: .875em;      /* 14 px @ 1em — caps meta, still reads as a section label */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--brand-primary--text);
+  margin-bottom: 10px;
+}
+.framework-item p { font-size: 1em; color: var(--text); line-height: 1.6; }
+
+.highlight-links {
+  font-size: 1em;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+.highlight-links a { color: var(--brand-primary--text); font-weight: 500; }
+
+/* Pages 3 & 4 — charts + sidebar narrative layout, 12-column grid:
+     charts span 9 col, observations sidebar spans 3 col. */
+.page-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 32px 24px;
+  min-height: 0;
+}
+.page-body > .chart-grid { grid-column: span 9; }
+.page-body > .page-note  { grid-column: span 3; }
+.page-note {
+  background: var(--bg-soft);
+  border-left: 4px solid var(--brand-primary);
+  padding: 28px 28px;
+  font-size: 1em;
+  line-height: 1.6;
+  color: var(--text);
+  min-height: 0;
+  border-radius: 4px;
+}
+.page-note h3 {
+  font-size: .875em;       /* 14 px @ 1em root */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--brand-primary--text);
+  margin-bottom: 12px;
+}
+.page-note div p { margin: 0 0 6px; }
+.page-note div p:last-child { margin-bottom: 0; }
+
+/* Pages 3-4 — Chart grid (now lives inside .page-body) ------ */
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 32px;
+  min-height: 0;
+}
+/* Slide 3: 4 charts in a 2 × 2 grid, matching the PPT layout. */
+.chart-grid.characteristics {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+/* Slide 4: two rows, one chart each (stacked). */
+.chart-grid.trends {
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(2, 1fr);
+}
+.chart-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-soft);
+  padding: 22px 24px;
+  border-radius: 6px;
+  min-height: 0;
+  background: #fff;
+}
+.chart-card h3 {
+  font-size: 1em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text-title);
+  margin-bottom: 12px;
+}
+.chart-card .chart {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+.chart-card .chart svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 8px;
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+.chart-legend .swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  vertical-align: middle;
+  border-radius: 1px;
+}
+/* Per-chart source + as-of line (OCHA requirement) */
+.chart-source {
+  margin-top: 6px;
+  font-size: 9.5px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* Map disclaimer — mandatory on any OCHA map showing boundaries */
+.map-disclaimer {
+  margin-top: 4px;
+  font-size: 9.5px;
+  font-style: italic;
+  color: var(--brand-slate);
+  line-height: 1.35;
+}
+
+/* SVG chart shared styles */
+.c-axis-line { stroke: var(--border); stroke-width: 1; }
+.c-tick-line { stroke: var(--border-soft); stroke-width: .5; }
+.c-tick-label { font-size: 10px; fill: var(--text-muted); }
+.c-axis-label { font-size: 10px; fill: var(--text-muted); }
+.c-value-label { font-size: 10px; fill: var(--text); font-weight: 500; }
+.c-bar { transition: opacity .15s; }
+.c-line { fill: none; stroke-width: 2; }
+.c-point { stroke: #fff; stroke-width: 1.5; }
+.c-donut-center {
+  font-family: var(--font-cond);
+  font-size: 24px;
+  font-weight: 700;
+  text-anchor: middle;
+  fill: var(--text-title);
+}
+.c-donut-sub {
+  font-size: 10px;
+  text-anchor: middle;
+  fill: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+/* Tables ---------------------------------------------------- */
+.table-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.table-toolbar input.search {
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  width: 220px;
+}
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1em;
+}
+table.data th {
+  text-align: left;
+  padding: 7px 8px;
+  font-weight: 700;
+  color: var(--text-inv);
+  background: var(--brand-primary);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  position: sticky;
+  top: 0;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+table.data th:hover { background: var(--brand-primary--text); }
+table.data th.sort-asc::after  { content: ' ▴'; }
+table.data th.sort-desc::after { content: ' ▾'; }
+table.data td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border-soft);
+  vertical-align: top;
+}
+table.data tbody tr:nth-child(even) td { background: var(--bg-soft); }
+table.data tbody tr:hover td { background: var(--brand-primary--ice); }
+table.data td a { color: var(--brand-primary--text); }
+table.data td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.td-missing { color: var(--brand-grey--border); font-style: italic; }
+.td-sub     { color: var(--text-muted); font-size: 10.5px; }
+/* PPT-style numeric row index column on the Leaders table. */
+table.data th.col-num,
+table.data td.col-num {
+  width: 32px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+/* Page 8 — Resources --------------------------------------- */
+.resources {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);       /* 12-col grid, each section spans 4 */
+  gap: 28px 24px;
+}
+.resources > *    { grid-column: span 4; }
+.resources h3 {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--brand-primary--text);
+  border-bottom: 2px solid var(--brand-primary);
+  padding-bottom: 6px;
+  margin-bottom: 14px;
+}
+.resources li {
+  font-size: 1em;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-soft);
+  line-height: 1.5;
+}
+/* A4 mode: keep the old compact size so the resources page fits one sheet. */
+
+/* Page footer -----------------------------------------------
+   Only visible in A4 mode + print — page numbers don't make sense in
+   the continuous on-screen view. Pinned to the OUTER `.page` (the
+   1123 × 794 A4 frame) so every page's footer is at the same visual
+   offset from the sheet bottom. Lives outside `.page-inner` so the
+   scale transform doesn't affect its anchor. */
+.page-foot { display: none; }
+.pages.a4-mode .page > .page-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: absolute;
+  left: 40px;
+  right: 40px;
+  bottom: 18px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-soft);
+  font-size: 10px;
+  color: var(--text-dim);
+  z-index: 2;
+}
+.page-foot .brand-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.page-foot .page-num::before { content: 'p. '; }
+
+/* Empty / error states -------------------------------------- */
+.data-error {
+  padding: 12px 14px;
+  background: #FFF4F3;
+  border: 1px solid var(--brand-red);
+  border-radius: 4px;
+  color: #8C1A13;
+  font-size: 12px;
+}
+
+/* Responsive ------------------------------------------------
+   Three tiers:
+     • > 1163 px — desktop A4 landscape (default; nothing overridden)
+     • 768–1163 px — tablet: A4 dimensions released, columns collapse
+     • < 768 px — mobile: everything stacks, bigger tap targets,
+                   smaller headings, map gets the full width of the viewport
+*/
+
+/* Tablet ---------------------------------------------------- */
+@media screen and (max-width: 1163px) {
+  .pages { padding: 12px; gap: 14px; }
+  .page {
+    width: 100%;
+    max-width: 100%;
+    min-height: 0;
+    padding: 20px;
+  }
+  /* Release the fixed A4-landscape lock on the overview page so content
+     can grow vertically for readability. */
+  .page[data-page="overview"] {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
+  /* Layout collapse */
+  .overview-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+    gap: 18px;
+  }
+  .overview-layout .map-wrap,
+  .overview-layout .kpi-col,
+  .overview-layout .overview-block--overview,
+  .overview-layout .overview-block--lotm { grid-column: 1 / -1; }
+  .overview-layout .kpi-col {
+    grid-template-columns: repeat(5, 1fr);
+    grid-auto-rows: auto;
+  }
+  .page-body {
+    grid-template-columns: 1fr;
+  }
+  .page-note {
+    max-height: none;
+  }
+  /* Charts keep a 2-column layout on tablets but flatter rows. */
+  .chart-grid.characteristics {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+    gap: 14px;
+  }
+  .chart-grid.characteristics .chart-card,
+  .chart-grid.trends .chart-card { min-height: 260px; }
+  .chart-grid.trends {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  .resources { grid-template-columns: repeat(2, 1fr); }
+  .overview-head { flex-wrap: wrap; }
+  .overview-head .date { margin-left: 0; text-align: left; width: 100%; }
+  .overview-head h1 { font-size: 20px; }
+  /* Lift map to a reasonable viewing height when stacked. */
+  .overview-layout .map-wrap { min-height: 360px; }
+}
+
+/* Mobile ---------------------------------------------------- */
+@media screen and (max-width: 767px) {
+  body { font-size: 14px; }
+  .topbar { padding: 8px 12px; gap: 8px; flex-wrap: wrap; }
+  .topbar .brand h1 { font-size: 14px; }
+  .topbar .brand .sub { font-size: 11px; }
+  .topbar-actions { gap: 6px; flex: 1 1 auto; justify-content: flex-end; }
+  .btn { padding: 8px 10px; font-size: 11.5px; }
+  .pages { padding: 10px; gap: 12px; }
+  .page {
+    padding: 16px;
+    border-radius: 4px;
+  }
+
+  /* Typography trims for a phone-friendly read. */
+  .overview-head h1 { font-size: 18px; letter-spacing: .01em; }
+  .overview-head .date { font-size: 11px; }
+  .page-head .title { font-size: 15px; }
+  .page-head .meta { font-size: 10.5px; }
+
+  /* All grids collapse to single column. */
+  .overview-layout,
+  .page-body,
+  .chart-grid,
+  .chart-grid.characteristics,
+  .chart-grid.trends,
+  .framework,
+  .resources {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto !important;
+    gap: 12px;
+  }
+  .overview-layout .map-wrap,
+  .overview-layout .kpi-col,
+  .overview-layout .overview-block--overview,
+  .overview-layout .overview-block--lotm { grid-column: 1 / -1 !important; grid-row: auto !important; }
+
+  /* KPIs: 2 columns + wider cards */
+  .overview-layout .kpi-col {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-auto-rows: auto !important;
+    gap: 8px;
+  }
+  .kpi {
+    grid-template-columns: 36px 1fr;
+    min-height: 56px;
+    padding: 10px 12px;
+  }
+  .kpi .value { font-size: 22px; }
+  .kpi .label { font-size: 10.5px; }
+
+  /* Map: full-width card with a comfortable minimum height. */
+  .overview-layout .map-wrap { min-height: 300px; }
+  .map-zoom-ctrls { opacity: 1; }   /* always visible on touch  */
+  .map-zoom-btn { width: 36px; height: 36px; font-size: 18px; }
+
+  /* Charts: taller cards so the SVG stays legible. */
+  .chart-grid.characteristics .chart-card,
+  .chart-grid.trends .chart-card {
+    min-height: 240px;
+  }
+  .chart-card h3 { font-size: 11.5px; }
+
+  /* Tables: horizontal scroll instead of layout destruction. */
+  table.data { font-size: 11px; }
+  table.data th, table.data td { padding: 8px 8px; white-space: nowrap; }
+  .page section.page table.data { display: block; overflow-x: auto; }
+
+  /* Long-form paragraphs need more room. */
+  .overview-block div,
+  .page-note div,
+  .framework-item p { font-size: 12.5px; line-height: 1.5; }
+
+  /* The per-page PNG export button is desktop-only. */
+  .page-png-btn { display: none; }
+}
+
+/* Print — the layout itself is driven by `.pages.a4-mode` (added by
+   export.js on `beforeprint`). This block only adds the @page rule,
+   hides the on-screen chrome, and installs page-break hints. */
+@media print {
+  @page { size: A4 landscape; margin: 0; }
+  html, body { background: #fff; }
+  .topbar, .btn, .table-toolbar input.search { display: none !important; }
+
+  /* Make sure every section starts on its own physical sheet. */
+  .pages.a4-mode { padding: 0 !important; gap: 0 !important; background: #fff !important; }
+  .pages.a4-mode .page {
+    box-shadow: none !important;
+    page-break-after: always;
+    break-after: page;
+    page-break-inside: avoid;
+    break-inside: avoid-page;
+  }
+  .pages.a4-mode .page:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+  table.data th { position: static; }
+}

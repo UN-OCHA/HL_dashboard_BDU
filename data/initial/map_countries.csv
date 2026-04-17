@@ -1,0 +1,28 @@
+iso3,country,primary_role,has_dhc
+AFG,Afghanistan,DSRSG/RC/HC,no
+BFA,Burkina Faso,RC/HC,no
+CMR,Cameroon,RC/HC,no
+CAF,Central African Republic,DSRSG/RC/HC,no
+TCD,Chad,RC/HC,no
+COL,Colombia,RC/HC,no
+COD,Democratic Republic of the Congo,DSRSG/RC/HC,no
+ERI,Eritrea,RC/HC,no
+ETH,Ethiopia,RC/HC,no
+HTI,Haiti,DSRSG/RC/HC,no
+IRQ,Iraq,DSRSG/RC/HC,no
+LBN,Lebanon,DSC/RC/HC,no
+MLI,Mali,RC/HC,no
+MOZ,Mozambique,RC/HC,no
+MMR,Myanmar,RC/HC,no
+NER,Niger,RC/HC,no
+NGA,Nigeria,RC/HC,no
+PSE,OPT,DSC/RC/HC,yes
+PAK,Pakistan,RC/HC,no
+SOM,Somalia,DSRSG/RC/HC,no
+SSD,South Sudan,DSRSG/RC/HC,no
+SDN,Sudan,RC/HC,yes
+SYR,Syrian Arab Republic,RC/HC,no
+UKR,Ukraine,RC/HC,no
+VEN,Venezuela,RC/HC,no
+YEM,Yemen,RC/HC,no
+ZWE,Zimbabwe,RC/HC,no
