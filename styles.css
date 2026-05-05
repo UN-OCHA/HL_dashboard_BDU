@@ -290,19 +290,27 @@
 }
 
 /* ── Hero band (Page 1 only) ────────────────────────────────
-   Navy gradient that opens the dashboard. Lives at the top of
-   the first .page so it ships with A4 sheet 1 in print and
-   scrolls naturally on web. The hero fills the .page width
-   (.page itself is 0 horizontal padding); on screen the .pages
-   container's padding gives the hero a slight inset, which we
-   accept as "magazine-cover with a frame" rather than fighting
-   to escape it. */
+   Navy gradient that opens the dashboard. Lives inside Page 1
+   so it ships with A4 sheet 1 in print, but on screen it breaks
+   out to 100 vw via the standard "negative-margin to viewport"
+   trick — gives a true editorial full-bleed regardless of
+   .pages padding. In `.pages.a4-mode` (PDF export) we cancel
+   the break-out below so the hero sits inside the A4 sheet. */
 .hero {
   position: relative;
-  padding: 32px 0 48px;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding: 40px 0 56px;
   background: linear-gradient(180deg, var(--hero-from) 0%, var(--hero-to) 100%);
   color: #fff;
   overflow: hidden;
+}
+/* In A4 / print mode, hero stays inside its .page-inner box. */
+.pages.a4-mode .hero {
+  width: auto;
+  margin-left: 0;
+  margin-right: 0;
 }
 /* Fine vertical-grid texture in the hero — purely decorative,
    pulled almost imperceptible. Uses repeating-linear-gradient
@@ -321,8 +329,14 @@
 }
 .hero__shell {
   position: relative;
-  max-width: 1320px;
+  /* No content max-width on screen — let the hero breathe across
+     wider monitors. A4 / print mode tightens this below. */
+  max-width: none;
   margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 72px);
+}
+.pages.a4-mode .hero__shell {
+  max-width: none;
   padding: 0 56px;
 }
 
@@ -515,6 +529,13 @@ body {
   background: var(--bg-page);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* The Page-1 hero uses `width: 100vw` + negative margins to break
+     out of its container and become a true full-bleed band. On some
+     browsers 100vw includes the vertical scrollbar width and causes
+     a few pixels of horizontal scroll on the body. Clipping here is
+     safe because nothing legitimately scrolls horizontally — wide
+     tables scroll inside their own container. */
+  overflow-x: hidden;
 }
 /* A4 (print + PNG export) drops the root to 13 px so the compact
    layout fits an A4 landscape sheet. */
@@ -586,9 +607,13 @@ a:hover { text-decoration: underline; }
   flex-direction: column;
   align-items: stretch;
   gap: 0;
-  padding: clamp(20px, 3vw, 40px) clamp(20px, 6vw, 72px);
-  max-width: 1500px;
-  margin: 0 auto;
+  /* v2: fluid + full-width on screen — no max-width cap so the
+     dashboard feels editorial / dynamic. Tighter horizontal padding
+     than v1; .hero breaks out to 100vw inside Page 1 anyway.
+     `.pages.a4-mode` below resets all of this for export. */
+  padding: 0 clamp(16px, 3vw, 56px);
+  max-width: none;
+  margin: 0;
   background: var(--bg-paper);
 }
 
@@ -1132,6 +1157,12 @@ a:hover { text-decoration: underline; }
   gap: 32px;
   min-height: 0;
 }
+/* v2: when .chart-grid is a direct child of .page (no longer wrapped
+   inside .page-body), let it take the available vertical space so the
+   chart cards stretch nicely between section-head and observation. */
+.page > .chart-grid { flex: 1; }
+/* v2: observation callout sits right under the chart grid. Auto height. */
+.page > .observation { flex: 0 0 auto; }
 /* Slide 3: 4 charts in a 2 × 2 grid, matching the PPT layout. */
 .chart-grid.characteristics {
   grid-template-columns: repeat(2, 1fr);

@@ -9,33 +9,33 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=1778005321" />
+  <link rel="stylesheet" href="styles.css?v=1778006531" />
 
   <!-- Export libraries (PNG + PDF). Self-hosted in vendor/ so the PDF export
        works even when offline and isn't blocked on a third-party CDN. -->
-  <script src="vendor/html2canvas.min.js?v=1778005321" defer></script>
-  <script src="vendor/jspdf.umd.min.js?v=1778005321" defer></script>
+  <script src="vendor/html2canvas.min.js?v=1778006531" defer></script>
+  <script src="vendor/jspdf.umd.min.js?v=1778006531" defer></script>
 
   <!-- Charts (small purpose-built SVG renderers) -->
-  <script src="app/charts/chart-hbar.js?v=1778005321" defer></script>
-  <script src="app/charts/chart-donut.js?v=1778005321" defer></script>
-  <script src="app/charts/chart-line.js?v=1778005321" defer></script>
-  <script src="app/charts/chart-stacked-col.js?v=1778005321" defer></script>
+  <script src="app/charts/chart-hbar.js?v=1778006531" defer></script>
+  <script src="app/charts/chart-donut.js?v=1778006531" defer></script>
+  <script src="app/charts/chart-line.js?v=1778006531" defer></script>
+  <script src="app/charts/chart-stacked-col.js?v=1778006531" defer></script>
 
   <!-- App modules -->
-  <script src="app/config.js?v=1778005321" defer></script>
-  <script src="app/csv-parser.js?v=1778005321" defer></script>
-  <script src="app/sheets-loader.js?v=1778005321" defer></script>
-  <script src="app/render/header.js?v=1778005321" defer></script>
-  <script src="app/render/kpis.js?v=1778005321" defer></script>
-  <script src="app/render/map.js?v=1778005321" defer></script>
-  <script src="app/render/highlights.js?v=1778005321" defer></script>
-  <script src="app/render/charts.js?v=1778005321" defer></script>
-  <script src="app/render/tables.js?v=1778005321" defer></script>
-  <script src="app/render/resources.js?v=1778005321" defer></script>
-  <script src="app/render/footer.js?v=1778005321" defer></script>
-  <script src="app/export.js?v=1778005321" defer></script>
-  <script src="app/main.js?v=1778005321" defer></script>
+  <script src="app/config.js?v=1778006531" defer></script>
+  <script src="app/csv-parser.js?v=1778006531" defer></script>
+  <script src="app/sheets-loader.js?v=1778006531" defer></script>
+  <script src="app/render/header.js?v=1778006531" defer></script>
+  <script src="app/render/kpis.js?v=1778006531" defer></script>
+  <script src="app/render/map.js?v=1778006531" defer></script>
+  <script src="app/render/highlights.js?v=1778006531" defer></script>
+  <script src="app/render/charts.js?v=1778006531" defer></script>
+  <script src="app/render/tables.js?v=1778006531" defer></script>
+  <script src="app/render/resources.js?v=1778006531" defer></script>
+  <script src="app/render/footer.js?v=1778006531" defer></script>
+  <script src="app/export.js?v=1778006531" defer></script>
+  <script src="app/main.js?v=1778006531" defer></script>
 </head>
 <body>
 
@@ -153,39 +153,57 @@
 
     <!-- Page 3 — Leadership characteristics (4 charts) -->
     <section class="page" data-page="characteristics" data-page-num="3">
-      <div class="page-head">
-        <div class="title">Leadership Characteristics</div>
-        <div class="meta">Current composition</div>
+      <div class="section-head">
+        <div class="section-head__body">
+          <div class="section-head__kicker">Data visualisation</div>
+          <h2 class="section-head__title">Leadership characteristics</h2>
+          <div class="section-head__dek">Composition of the cohort by role, grade, agency of origin, and gender.</div>
+        </div>
       </div>
 
-      <div class="page-body">
-        <div class="chart-grid characteristics">
-          <!-- Exact mirror of PPT slides 3 and 4. -->
-          <div class="chart-card">
-            <h3>Country of origin by grade</h3>
-            <div class="chart" id="chart-country-by-grade"></div>
-            <div class="chart-source" data-source-for="country_by_grade">Source: OCHA HLS</div>
+      <div class="chart-grid characteristics">
+        <!-- Exact mirror of PPT slides 3 and 4. -->
+        <div class="chart-card">
+          <div class="chart-card__head">
+            <h3 class="chart-card__title">Country of origin by grade</h3>
+            <span class="chart-card__tag">Fig. 3.1</span>
           </div>
-          <div class="chart-card">
-            <h3>Grade and gender</h3>
-            <div class="chart" id="chart-gender-by-grade"></div>
-            <div class="chart-source" data-source-for="gender_by_grade">Source: OCHA HLS</div>
-          </div>
-          <div class="chart-card">
-            <h3>Leadership roles (%)</h3>
-            <div class="chart" id="chart-roles"></div>
-            <div class="chart-source" data-source-for="roles_donut">Source: OCHA HLS</div>
-          </div>
-          <div class="chart-card">
-            <h3>Agency of origin</h3>
-            <div class="chart" id="chart-agency"></div>
-            <div class="chart-source" data-source-for="agency_donut">Source: OCHA HLS</div>
-          </div>
+          <div class="chart" id="chart-country-by-grade"></div>
+          <div class="chart-source" data-source-for="country_by_grade">Source: OCHA HLS</div>
         </div>
-        <aside class="page-note">
-          <h3>Observations</h3>
-          <div id="note-characteristics">—</div>
-        </aside>
+        <div class="chart-card">
+          <div class="chart-card__head">
+            <h3 class="chart-card__title">Grade and gender</h3>
+            <span class="chart-card__tag">Fig. 3.2</span>
+          </div>
+          <div class="chart" id="chart-gender-by-grade"></div>
+          <div class="chart-source" data-source-for="gender_by_grade">Source: OCHA HLS</div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card__head">
+            <h3 class="chart-card__title">Leadership roles (%)</h3>
+            <span class="chart-card__tag">Fig. 3.3</span>
+          </div>
+          <div class="chart" id="chart-roles"></div>
+          <div class="chart-source" data-source-for="roles_donut">Source: OCHA HLS</div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card__head">
+            <h3 class="chart-card__title">Agency of origin</h3>
+            <span class="chart-card__tag">Fig. 3.4</span>
+          </div>
+          <div class="chart" id="chart-agency"></div>
+          <div class="chart-source" data-source-for="agency_donut">Source: OCHA HLS</div>
+        </div>
+      </div>
+
+      <!-- Observation callout: replaces the right-side narrative sidebar
+           with a full-width call-out beneath the chart grid (more
+           editorial, less spreadsheet-y). The #note-characteristics ID
+           is unchanged so render/highlights.js still populates it. -->
+      <div class="observation">
+        <div class="observation__kicker">Observations</div>
+        <div class="observation__body" id="note-characteristics">—</div>
       </div>
 
       <div class="page-foot"><span class="brand-foot">OCHA · HLS</span><span class="page-num">3</span></div>
@@ -194,28 +212,36 @@
 
     <!-- Page 4 — Leadership trends (2 stacked-column charts) -->
     <section class="page" data-page="trends" data-page-num="4">
-      <div class="page-head">
-        <div class="title">Leadership Trends</div>
-        <div class="meta">1992 – present</div>
+      <div class="section-head">
+        <div class="section-head__body">
+          <div class="section-head__kicker">Long-term trends</div>
+          <h2 class="section-head__title">Long-term trends · 1992 → present</h2>
+          <div class="section-head__dek">Composition of humanitarian leadership over three decades.</div>
+        </div>
       </div>
 
-      <div class="page-body">
-        <div class="chart-grid trends">
-          <div class="chart-card">
-            <h3>Gender of humanitarian leaders, 1992 – present (%)</h3>
-            <div class="chart" id="chart-gender-trends"></div>
-            <div class="chart-source" data-source-for="gender_trends">Source: OCHA HLS</div>
+      <div class="chart-grid trends">
+        <div class="chart-card">
+          <div class="chart-card__head">
+            <h3 class="chart-card__title">Gender — share of cohort</h3>
+            <span class="chart-card__tag">Fig. 4.1</span>
           </div>
-          <div class="chart-card">
-            <h3>Regional origin of humanitarian leaders, 1992 – present (%)</h3>
-            <div class="chart" id="chart-region-trends"></div>
-            <div class="chart-source" data-source-for="region_trends">Source: OCHA HLS</div>
-          </div>
+          <div class="chart" id="chart-gender-trends"></div>
+          <div class="chart-source" data-source-for="gender_trends">Source: OCHA HLS</div>
         </div>
-        <aside class="page-note">
-          <h3>Observations</h3>
-          <div id="note-trends">—</div>
-        </aside>
+        <div class="chart-card">
+          <div class="chart-card__head">
+            <h3 class="chart-card__title">Region — share of cohort</h3>
+            <span class="chart-card__tag">Fig. 4.2</span>
+          </div>
+          <div class="chart" id="chart-region-trends"></div>
+          <div class="chart-source" data-source-for="region_trends">Source: OCHA HLS</div>
+        </div>
+      </div>
+
+      <div class="observation">
+        <div class="observation__kicker">Observations</div>
+        <div class="observation__body" id="note-trends">—</div>
       </div>
 
       <div class="page-foot"><span class="brand-foot">OCHA · HLS</span><span class="page-num">4</span></div>
