@@ -492,6 +492,10 @@
   grid-template-rows: minmax(0, 1.5fr) minmax(0, 1fr);
   gap: 28px 24px;
   margin-top: 28px;
+  /* Re-pad horizontally because .page--hero has padding: 0 (so the
+     hero band can break out to the viewport edge). Match the same
+     clamp() used by other .page sections so prose lines up. */
+  padding: 0 clamp(20px, 4vw, 72px) clamp(40px, 4vw, 60px);
   flex: 1;
   min-height: 0;
 }
@@ -527,6 +531,49 @@
 /* When .page--hero is the FIRST page, drop its top padding so the hero
    sits flush against the top of the screen / A4 sheet. */
 .page--hero { padding-top: 0 !important; }
+
+/* ── Mega-footer (web only) ─────────────────────────────────
+   Full-width navy band that closes the dashboard on screen.
+   Hidden in print + A4 export — the per-page .page-foot
+   handles PDF page-numbering. */
+.mega-footer {
+  background: var(--brand-primary--navy);
+  color: #fff;
+  padding: 36px 0 32px;
+  margin-top: 0;
+}
+.mega-footer__shell {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 72px);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.mega-footer__brand {
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: .04em;
+  color: #fff;
+}
+.mega-footer__meta {
+  font-family: var(--font-cond);
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  text-align: right;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+
+/* Hide mega-footer in A4 export and print — the per-page foot
+   keeps page numbers in the PDF. The web view shows the mega
+   footer instead of repeating the small page foot at the bottom. */
+.pages.a4-mode ~ .mega-footer { display: none; }
+@media print { .mega-footer { display: none !important; } }
 
 /* End of v2 primitives ===================================== */
 
@@ -622,11 +669,12 @@ a:hover { text-decoration: underline; }
   flex-direction: column;
   align-items: stretch;
   gap: 0;
-  /* v2: fluid + full-width on screen — no max-width cap so the
-     dashboard feels editorial / dynamic. Tighter horizontal padding
-     than v1; .hero breaks out to 100vw inside Page 1 anyway.
-     `.pages.a4-mode` below resets all of this for export. */
-  padding: 0 clamp(16px, 3vw, 56px);
+  /* v2: container has NO horizontal padding so each .page can host
+     its own alternating background (white / warm-paper) that runs
+     edge-to-edge across the viewport. Each .page provides its own
+     horizontal padding instead. `.pages.a4-mode` below resets to
+     the per-sheet model for PDF export. */
+  padding: 0;
   max-width: none;
   margin: 0;
   background: var(--bg-paper);
@@ -646,7 +694,11 @@ a:hover { text-decoration: underline; }
   max-width: none;
   margin: 0;
   min-height: auto;
-  padding: clamp(48px, 5vw, 72px) 0;   /* generous vertical rhythm */
+  /* v2: each .page now provides BOTH its own vertical rhythm AND
+     its own horizontal padding (.pages no longer pads). This lets
+     alternating warm-paper backgrounds fill the viewport edge-to-
+     edge while inner content stays comfortably inset. */
+  padding: clamp(48px, 5vw, 72px) clamp(20px, 4vw, 72px);
   background: transparent;
   box-shadow: none;
   display: flex;
@@ -654,6 +706,12 @@ a:hover { text-decoration: underline; }
   /* Darker, slightly heavier page-to-page separator than the lighter
      --border-rule used inside each page (page-head underline etc). */
   border-top: 2px solid #A9B6C2;
+}
+/* Alternating warm-paper / white rhythm on screen — Page 2, 4, 6 sit
+   on warm bg, Page 1, 3, 5, 7 on white. Inverted in `.pages.a4-mode`
+   so PDF sheets stay clean white. */
+.pages > .page:nth-child(even) {
+  background: var(--ocha-warm-bg);
 }
 .page:first-child { border-top: 0; padding-top: clamp(8px, 1vw, 16px); }
 .page:last-child  { padding-bottom: clamp(24px, 3vw, 40px); }

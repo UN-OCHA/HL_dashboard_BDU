@@ -9,33 +9,33 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=1778006764" />
+  <link rel="stylesheet" href="styles.css?v=1778006937" />
 
   <!-- Export libraries (PNG + PDF). Self-hosted in vendor/ so the PDF export
        works even when offline and isn't blocked on a third-party CDN. -->
-  <script src="vendor/html2canvas.min.js?v=1778006764" defer></script>
-  <script src="vendor/jspdf.umd.min.js?v=1778006764" defer></script>
+  <script src="vendor/html2canvas.min.js?v=1778006937" defer></script>
+  <script src="vendor/jspdf.umd.min.js?v=1778006937" defer></script>
 
   <!-- Charts (small purpose-built SVG renderers) -->
-  <script src="app/charts/chart-hbar.js?v=1778006764" defer></script>
-  <script src="app/charts/chart-donut.js?v=1778006764" defer></script>
-  <script src="app/charts/chart-line.js?v=1778006764" defer></script>
-  <script src="app/charts/chart-stacked-col.js?v=1778006764" defer></script>
+  <script src="app/charts/chart-hbar.js?v=1778006937" defer></script>
+  <script src="app/charts/chart-donut.js?v=1778006937" defer></script>
+  <script src="app/charts/chart-line.js?v=1778006937" defer></script>
+  <script src="app/charts/chart-stacked-col.js?v=1778006937" defer></script>
 
   <!-- App modules -->
-  <script src="app/config.js?v=1778006764" defer></script>
-  <script src="app/csv-parser.js?v=1778006764" defer></script>
-  <script src="app/sheets-loader.js?v=1778006764" defer></script>
-  <script src="app/render/header.js?v=1778006764" defer></script>
-  <script src="app/render/kpis.js?v=1778006764" defer></script>
-  <script src="app/render/map.js?v=1778006764" defer></script>
-  <script src="app/render/highlights.js?v=1778006764" defer></script>
-  <script src="app/render/charts.js?v=1778006764" defer></script>
-  <script src="app/render/tables.js?v=1778006764" defer></script>
-  <script src="app/render/resources.js?v=1778006764" defer></script>
-  <script src="app/render/footer.js?v=1778006764" defer></script>
-  <script src="app/export.js?v=1778006764" defer></script>
-  <script src="app/main.js?v=1778006764" defer></script>
+  <script src="app/config.js?v=1778006937" defer></script>
+  <script src="app/csv-parser.js?v=1778006937" defer></script>
+  <script src="app/sheets-loader.js?v=1778006937" defer></script>
+  <script src="app/render/header.js?v=1778006937" defer></script>
+  <script src="app/render/kpis.js?v=1778006937" defer></script>
+  <script src="app/render/map.js?v=1778006937" defer></script>
+  <script src="app/render/highlights.js?v=1778006937" defer></script>
+  <script src="app/render/charts.js?v=1778006937" defer></script>
+  <script src="app/render/tables.js?v=1778006937" defer></script>
+  <script src="app/render/resources.js?v=1778006937" defer></script>
+  <script src="app/render/footer.js?v=1778006937" defer></script>
+  <script src="app/export.js?v=1778006937" defer></script>
+  <script src="app/main.js?v=1778006937" defer></script>
 </head>
 <body>
 
@@ -355,6 +355,20 @@
     </section>
 
   </main>
+
+  <!-- v2 mega-footer — visible on web only. Hidden in print / A4 export
+       so the per-page .page-foot remains the canonical footer in PDF. -->
+  <footer class="mega-footer">
+    <div class="mega-footer__shell">
+      <div class="mega-footer__brand">
+        IASC · OCHA Humanitarian Leadership Section
+      </div>
+      <div class="mega-footer__meta">
+        Maintained by OCHA Brand &amp; Design Unit (BDU)<br>
+        for the Humanitarian Leadership Section (HLS)
+      </div>
+    </div>
+  </footer>
 
   <!-- Floating map tooltip -->
   <div class="map-tooltip" id="map-tooltip" hidden></div>
