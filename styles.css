@@ -553,9 +553,15 @@ img.link-row__trail:hover { opacity: 1; }
   flex: 1;
   min-height: 0;
 }
-.overview-layout--v2 .map-wrap { grid-column: 1 / -1; grid-row: 1; min-height: 0; }
-.overview-layout--v2 .overview-block--overview { grid-column: span 6; grid-row: 2; }
-.overview-layout--v2 .overview-block--lotm     { grid-column: span 6; grid-row: 2; }
+/* Specificity bumped via the chained class selector — the v1
+   rule `.overview-layout .map-wrap { grid-column: span 9 }`
+   sits later in source order with the same (0,2,0) specificity
+   and was winning the cascade. Chaining both classes together
+   gives (0,3,0) so the v2 layout (full-width map, prose row
+   below) is the one that actually applies. */
+.overview-layout.overview-layout--v2 .map-wrap { grid-column: 1 / -1; grid-row: 1; min-height: 0; }
+.overview-layout.overview-layout--v2 .overview-block--overview { grid-column: span 6; grid-row: 2; }
+.overview-layout.overview-layout--v2 .overview-block--lotm     { grid-column: span 6; grid-row: 2; }
 .overview-layout--v2 .map-wrap {
   display: flex;
   flex-direction: column;
