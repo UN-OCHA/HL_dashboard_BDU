@@ -314,17 +314,19 @@
 }
 /* Fine vertical-grid texture in the hero — purely decorative,
    pulled almost imperceptible. Uses repeating-linear-gradient
-   so no extra DOM nodes are needed. */
+   so no extra DOM nodes are needed. Stripe alpha was dropped
+   from 0.04 → 0.015 per design feedback (was reading too active
+   against the navy gradient). */
 .hero::before {
   content: "";
   position: absolute;
   inset: 0;
   background-image: repeating-linear-gradient(
     90deg,
-    rgba(255,255,255,0.04) 0,
-    rgba(255,255,255,0.04) 1px,
+    rgba(255,255,255,0.015) 0,
+    rgba(255,255,255,0.015) 1px,
     transparent 1px,
-    transparent 60px);
+    transparent 80px);
   pointer-events: none;
 }
 .hero__shell {
