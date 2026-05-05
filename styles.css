@@ -559,8 +559,20 @@ img.link-row__trail:hover { opacity: 1; }
 .overview-layout--v2 .map-wrap {
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
-.overview-layout--v2 .map-wrap .map-container { flex: 1 1 auto; min-height: 0; }
+/* Map container matches the world-map.svg's natural aspect ratio
+   (868.5 / 523.77 ≈ 1.66) so when its width grows to fill the
+   shell, its height grows in step. Combined with the map's
+   `preserveAspectRatio="xMinYMid meet"` this guarantees the map
+   image fills the container edge-to-edge — no empty space on
+   the right at any viewport. */
+.overview-layout--v2 .map-wrap .map-container {
+  width: 100%;
+  aspect-ratio: 868.5 / 523.77;
+  height: auto;
+  flex: 0 0 auto;
+}
 .overview-layout--v2 .overview-block {
   background: transparent;
   padding: 0;
