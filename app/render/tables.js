@@ -39,6 +39,33 @@ var RenderTables = (function () {
     var search = document.getElementById(searchId);
     var countEl = countId ? document.getElementById(countId) : null;
 
+    // ── Hide empty columns ──
+    // For a friendlier first-paint when Valijon hasn't yet filled all
+    // columns of a sheet (e.g. emails on the contacts tab are blank
+    // for the first month), drop columns whose data + linked-data
+    // cells are 100 % empty. The TH for that column is also hidden so
+    // the header row stays aligned. Columns auto-reappear when the
+    // sheet starts populating them.
+    cols = cols.filter(function (c) {
+      var anyValue = data.some(function (row) {
+        var v = String(row[c.key] || "").trim();
+        if (v) return true;
+        if (c.linked) {
+          var lv = String(row[c.linked] || "").trim();
+          if (lv) return true;
+        }
+        return false;
+      });
+      var th = table.querySelector('thead th[data-sort="' + c.key + '"]');
+      if (th) th.style.display = anyValue ? "" : "none";
+      return anyValue;
+    });
+    if (cols.length === 0) {
+      // Defensive: every column was empty. Show at least the first
+      // column so the table doesn't collapse to nothing.
+      cols = [cols[0] || { key: "country", label: "Country" }];
+    }
+
     var state = { sortKey: cols[0].key, sortDir: "asc", query: "" };
 
     function redraw() {
