@@ -78,6 +78,18 @@
   /* Elevation */
   --shadow-1: 0 1px 3px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
   --shadow-2: 0 4px 14px rgba(0,0,0,.08), 0 10px 30px rgba(0,0,0,.05);
+
+  /* ── v2 redesign tokens ──────────────────────────────────────
+     Editorial layer added on top of the OCHA design system. These
+     tokens drive the navy hero, the alternating warm-paper / white
+     section rhythm, and the inkier body colour. Every value is a
+     warm-neutral or a re-alias of an existing OCHA blue — no new
+     brand colours. */
+  --ocha-warm-bg:   #F7F6F3;          /* warm-paper alternating section bg */
+  --ocha-warm-rule: #E8E5DE;          /* soft warm separator inside warm-bg */
+  --ocha-ink:       #1A1F2C;          /* slightly inkier body for editorial */
+  --hero-from:      var(--brand-primary--navy);  /* navy 1, hero gradient top */
+  --hero-to:        #003C7D;          /* gradient bottom (warmer than navy) */
 }
 
 /* Local Roboto (so PDFs render correctly offline).
@@ -117,6 +129,166 @@
   font-display: swap;
   src: local('Roboto Condensed Bold'), url('assets/fonts/RobotoCondensed-Bold.woff2') format('woff2');
 }
+
+/* =============================================================
+   v2 redesign primitives
+   -------------------------------------------------------------
+   Shared building blocks introduced for the editorial redesign.
+   Each is a pure CSS recipe — no JS changes required — so any
+   render module can adopt them without touching the others.
+
+   Inventory:
+     .section-head          editorial section heading (kicker + title + dek)
+     .chart-card__head      title + figure tag row inside a chart card
+     .chart-card__title
+     .chart-card__tag
+     .observation           full-width callout under a chart group
+     .observation__kicker
+     .kicker-rule           small uppercase eyebrow with bottom warm-rule
+     .link-row              full-width row with trailing external icon
+     .hero / .hero__*       Page 1 navy gradient hero band (Phase 2 mounts it)
+     .mega-footer           navy bottom bar (Phase 5 mounts it)
+
+   These primitives DO NOT replace existing classes (e.g. `.page-head`,
+   `.chart-card`); they're additive. Phase 2+ will migrate templates
+   onto them while leaving v1 fallbacks intact for safety.
+   ============================================================= */
+
+/* ── section-head — used in place of .page-head where the redesign
+   wants a kicker + condensed title + italic dek rhythm. */
+.section-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+  margin-bottom: 22px;
+}
+.section-head__body {
+  flex: 1;
+  min-width: 0;
+}
+.section-head__kicker {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 11.5px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--blue-3);
+  margin-bottom: 6px;
+}
+.section-head__title {
+  margin: 0;
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: clamp(24px, 3vw, 36px);
+  line-height: 1.05;
+  letter-spacing: -0.012em;
+  color: var(--text-title);
+}
+.section-head__dek {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #4b5563;
+  font-style: italic;
+  max-width: 720px;
+  text-wrap: pretty;
+}
+.section-head__action {
+  flex: 0 0 auto;
+}
+
+/* ── chart-card BEM extensions — sit on top of the existing .chart-card.
+   The plain .chart-card stays available for any caller that doesn't
+   need the figure-tag head pattern. */
+.chart-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-soft);
+  gap: 12px;
+}
+.chart-card__title {
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.005em;
+  color: var(--text-title);
+  margin: 0;
+}
+.chart-card__tag {
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--blue-3);
+  white-space: nowrap;
+}
+
+/* ── observation — call-out callout placed below a chart grid.
+   Warm-paper background + 3 px UN-Blue left rule. The kicker label
+   ("OBSERVATION", "KEY FACT") sits above a 13.5 px prose paragraph. */
+.observation {
+  margin-top: 18px;
+  padding: 16px 20px;
+  background: var(--ocha-warm-bg);
+  border-left: 3px solid var(--brand-primary);
+}
+.observation__kicker {
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text-title);
+  margin-bottom: 6px;
+}
+.observation__body {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #1f2937;
+  text-wrap: pretty;
+}
+.observation__body p { margin: 0 0 8px; }
+.observation__body p:last-child { margin: 0; }
+
+/* ── kicker-rule — small uppercase eyebrow above a prose block,
+   with a bottom rule that sits on the section's warm tint. */
+.kicker-rule {
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text-title);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--ocha-warm-rule);
+}
+
+/* ── link-row — full-width interactive row, used in the Highlights
+   link list and the Resources columns. Trailing space reserved for
+   an external-link or chevron icon. */
+.link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--ocha-warm-rule);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-title);
+  text-decoration: none;
+  cursor: pointer;
+}
+.link-row:hover { color: var(--brand-primary--text); }
+.link-row__trail {
+  margin-left: auto;
+  color: var(--text-muted);
+  flex: 0 0 auto;
+}
+/* End of v2 primitives ===================================== */
 
 /* Reset ---------------------------------------------------- */
 *, *::before, *::after { box-sizing: border-box; }
