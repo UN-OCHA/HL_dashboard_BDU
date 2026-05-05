@@ -329,9 +329,9 @@
 }
 .hero__shell {
   position: relative;
-  /* No content max-width on screen — let the hero breathe across
-     wider monitors. A4 / print mode tightens this below. */
-  max-width: none;
+  /* Content shell — centers hero contents at a comfortable
+     reading max while the navy gradient .hero stays 100 vw. */
+  max-width: 1500px;
   margin: 0 auto;
   padding: 0 clamp(20px, 4vw, 72px);
 }
@@ -712,6 +712,24 @@ a:hover { text-decoration: underline; }
    so PDF sheets stay clean white. */
 .pages > .page:nth-child(even) {
   background: var(--ocha-warm-bg);
+}
+
+/* v2 content shell — centres each .page's CONTENT at a comfortable
+   reading max while the .page BACKGROUND (warm-paper, navy hero,
+   etc.) keeps spanning the full viewport. Same pattern as the
+   Claude Design mockup's `.heroShell`. The .page horizontal padding
+   above kicks in on smaller viewports as the safety gutter. */
+.page > .section-head,
+.page > .chart-grid,
+.page > .observation,
+.page > .table-wrap,
+.page > .highlights-grid,
+.page > .resources,
+.page > .overview-layout--v2 {
+  max-width: 1500px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 .page:first-child { border-top: 0; padding-top: clamp(8px, 1vw, 16px); }
 .page:last-child  { padding-bottom: clamp(24px, 3vw, 40px); }
