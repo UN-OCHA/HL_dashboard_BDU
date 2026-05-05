@@ -9,68 +9,78 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=1778004969" />
+  <link rel="stylesheet" href="styles.css?v=1778005321" />
 
   <!-- Export libraries (PNG + PDF). Self-hosted in vendor/ so the PDF export
        works even when offline and isn't blocked on a third-party CDN. -->
-  <script src="vendor/html2canvas.min.js?v=1778004969" defer></script>
-  <script src="vendor/jspdf.umd.min.js?v=1778004969" defer></script>
+  <script src="vendor/html2canvas.min.js?v=1778005321" defer></script>
+  <script src="vendor/jspdf.umd.min.js?v=1778005321" defer></script>
 
   <!-- Charts (small purpose-built SVG renderers) -->
-  <script src="app/charts/chart-hbar.js?v=1778004969" defer></script>
-  <script src="app/charts/chart-donut.js?v=1778004969" defer></script>
-  <script src="app/charts/chart-line.js?v=1778004969" defer></script>
-  <script src="app/charts/chart-stacked-col.js?v=1778004969" defer></script>
+  <script src="app/charts/chart-hbar.js?v=1778005321" defer></script>
+  <script src="app/charts/chart-donut.js?v=1778005321" defer></script>
+  <script src="app/charts/chart-line.js?v=1778005321" defer></script>
+  <script src="app/charts/chart-stacked-col.js?v=1778005321" defer></script>
 
   <!-- App modules -->
-  <script src="app/config.js?v=1778004969" defer></script>
-  <script src="app/csv-parser.js?v=1778004969" defer></script>
-  <script src="app/sheets-loader.js?v=1778004969" defer></script>
-  <script src="app/render/header.js?v=1778004969" defer></script>
-  <script src="app/render/kpis.js?v=1778004969" defer></script>
-  <script src="app/render/map.js?v=1778004969" defer></script>
-  <script src="app/render/highlights.js?v=1778004969" defer></script>
-  <script src="app/render/charts.js?v=1778004969" defer></script>
-  <script src="app/render/tables.js?v=1778004969" defer></script>
-  <script src="app/render/resources.js?v=1778004969" defer></script>
-  <script src="app/render/footer.js?v=1778004969" defer></script>
-  <script src="app/export.js?v=1778004969" defer></script>
-  <script src="app/main.js?v=1778004969" defer></script>
+  <script src="app/config.js?v=1778005321" defer></script>
+  <script src="app/csv-parser.js?v=1778005321" defer></script>
+  <script src="app/sheets-loader.js?v=1778005321" defer></script>
+  <script src="app/render/header.js?v=1778005321" defer></script>
+  <script src="app/render/kpis.js?v=1778005321" defer></script>
+  <script src="app/render/map.js?v=1778005321" defer></script>
+  <script src="app/render/highlights.js?v=1778005321" defer></script>
+  <script src="app/render/charts.js?v=1778005321" defer></script>
+  <script src="app/render/tables.js?v=1778005321" defer></script>
+  <script src="app/render/resources.js?v=1778005321" defer></script>
+  <script src="app/render/footer.js?v=1778005321" defer></script>
+  <script src="app/export.js?v=1778005321" defer></script>
+  <script src="app/main.js?v=1778005321" defer></script>
 </head>
 <body>
 
-  <!-- Screen-only top bar (hidden in print/export) -->
-  <header class="topbar">
-    <div class="brand">
-      <div>
-        <h1>Humanitarian Leadership Snapshot</h1>
-      </div>
-    </div>
-    <div class="topbar-actions">
-      <button class="btn" id="btn-refresh" title="Reload data from Google Sheet">⟳ Refresh data</button>
-      <button class="btn primary" id="btn-pdf" title="Download the whole report as a multi-page A4 PDF">↓ Download PDF</button>
-    </div>
-  </header>
-
   <main class="pages" id="pages">
 
-    <!-- Page 1 — Overview: header + map (left) + KPIs (right) -->
-    <section class="page" data-page="overview" data-page-num="1">
-      <div class="overview-head">
-        <div>
-          <div class="kicker">Inter-Agency Standing Committee</div>
-          <h1>Humanitarian Leadership Snapshot</h1>
-        </div>
-        <div class="date">
-          <strong id="head-month">—</strong><br>
-          <span>Updated <span id="head-updated">—</span></span>
+    <!-- ─── Page 1 — Hero + Map + Overview prose ───────────────────────────
+         The hero band lives INSIDE Page 1 so it ships as part of the first
+         A4 sheet when exporting (no duplicate markup, no print-mode hack).
+         On screen the .page is fluid and scrolls; in `.pages.a4-mode` the
+         existing wrapper scales the whole thing to A4 landscape. -->
+    <section class="page page--hero" data-page="overview" data-page-num="1">
+
+      <!-- v2 navy gradient hero — replaces the v1 .topbar + .overview-head -->
+      <div class="hero">
+        <div class="hero__shell">
+          <div class="hero__utility">
+            <a class="hero__brand" href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener">
+              <img src="assets/iasc-logo.svg" alt="Inter-Agency Standing Committee" class="hero__logo">
+            </a>
+            <div class="hero__actions">
+              <button class="hero__btn" id="btn-refresh" title="Reload data from Google Sheet">⟳ Refresh</button>
+              <button class="hero__btn hero__btn--primary" id="btn-pdf" title="Download the whole report as a multi-page A4 PDF">↓ Download PDF</button>
+            </div>
+          </div>
+
+          <div class="hero__masthead">
+            <div class="hero__kicker">
+              <span class="hero__kicker-dot" aria-hidden="true"></span>
+              Inter-Agency Standing Committee
+            </div>
+            <h1 class="hero__title">Humanitarian Leadership Snapshot</h1>
+            <div class="hero__subline">
+              <strong id="head-month">—</strong>
+              <span class="hero__sep" aria-hidden="true">·</span>
+              <span>Updated <span id="head-updated">—</span></span>
+            </div>
+          </div>
+
+          <!-- 5 KPIs rendered by render/kpis.js into this rail -->
+          <div class="hero__rail" id="kpi-row"></div>
         </div>
       </div>
 
-      <!-- 12-column grid:
-             top row     → map (9 col) | KPIs (3 col, stacked)
-             bottom row  → Overview (6 col) | Leadership on the move (6 col) -->
-      <div class="overview-layout">
+      <!-- Below the hero: map + prose blocks -->
+      <div class="overview-layout overview-layout--v2">
         <div class="map-wrap">
           <div class="map-container" id="map-container">
             <!-- Static OCHA HL map (assets/world-map.svg). Zoom disabled per design. -->
@@ -83,17 +93,13 @@
           </div>
         </div>
 
-        <div class="kpi-col" id="kpi-row">
-          <!-- KPI cards rendered by render/kpis.js (stacked vertically) -->
-        </div>
-
         <section class="overview-block overview-block--overview">
-          <h3>Overview</h3>
+          <h3 class="kicker-rule">Overview</h3>
           <div id="overview-text">—</div>
         </section>
 
         <section class="overview-block overview-block--lotm">
-          <h3>Leadership on the move</h3>
+          <h3 class="kicker-rule">Leadership on the move</h3>
           <div id="leadership-on-move">—</div>
         </section>
       </div>
