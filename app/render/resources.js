@@ -37,10 +37,11 @@ var RenderResources = (function () {
         var label = document.createElement("span");
         label.textContent = item.label;
         a.appendChild(label);
-        var trail = document.createElement("span");
+        var trail = document.createElement("img");
         trail.className = "link-row__trail";
         trail.setAttribute("aria-hidden", "true");
-        trail.textContent = "↗";
+        trail.src = "assets/icons/link.svg";
+        trail.alt = "";
         a.appendChild(trail);
         col.appendChild(a);
       });

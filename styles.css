@@ -155,12 +155,27 @@
    ============================================================= */
 
 /* ── section-head — used in place of .page-head where the redesign
-   wants a kicker + condensed title + italic dek rhythm. */
+   wants a numbered tab + kicker + condensed title + italic dek
+   rhythm. The 2-digit number sits left of the body block on a 2 px
+   UN-Blue rule (matches the design mockup) — its ordinal also
+   appears in the PDF and Google Sheet so producers and editors
+   can talk in the same vocabulary ("update section 03"). */
 .section-head {
   display: flex;
   align-items: flex-start;
   gap: 22px;
   margin-bottom: 22px;
+}
+.section-head__num {
+  flex: 0 0 auto;
+  min-width: 36px;
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: .16em;
+  color: var(--brand-primary);
+  padding-top: 10px;
+  border-top: 2px solid var(--brand-primary);
 }
 .section-head__body {
   flex: 1;
@@ -179,17 +194,18 @@
   margin: 0;
   font-family: var(--font-cond);
   font-weight: 700;
-  font-size: clamp(24px, 3vw, 36px);
+  font-size: clamp(30px, 3.4vw, 44px);
   line-height: 1.05;
   letter-spacing: -0.012em;
   color: var(--text-title);
 }
 .section-head__dek {
-  margin-top: 6px;
-  font-size: 14px;
+  margin-top: 8px;
+  font-size: 17px;
+  line-height: 1.5;
   color: #4b5563;
   font-style: italic;
-  max-width: 720px;
+  max-width: 820px;
   text-wrap: pretty;
 }
 .section-head__action {
@@ -211,7 +227,7 @@
 .chart-card__title {
   font-family: var(--font-cond);
   font-weight: 700;
-  font-size: 16px;
+  font-size: 20px;
   letter-spacing: -0.005em;
   color: var(--text-title);
   margin: 0;
@@ -226,14 +242,20 @@
   white-space: nowrap;
 }
 
-/* ── observation — call-out callout placed below a chart grid.
-   Warm-paper background + 3 px UN-Blue left rule. The kicker label
-   ("OBSERVATION", "KEY FACT") sits above a 13.5 px prose paragraph. */
+/* ── observation — call-out placed below a chart grid.
+   Outer wrapper participates in the page content shell (so its
+   left + right edges align with chart-grid above); the warm-bg
+   styling lives on .observation__inner so the visible block has
+   its own balanced internal padding regardless of the shell
+   horizontal padding. */
 .observation {
-  margin-top: 18px;
-  padding: 16px 20px;
+  margin-top: 22px;
+  /* No background or border here — those are on .observation__inner. */
+}
+.observation__inner {
   background: var(--ocha-warm-bg);
   border-left: 3px solid var(--brand-primary);
+  padding: 18px 24px;
 }
 .observation__kicker {
   font-family: var(--font-cond);
@@ -245,7 +267,7 @@
   margin-bottom: 6px;
 }
 .observation__body {
-  font-size: 13.5px;
+  font-size: 17px;
   line-height: 1.55;
   color: #1f2937;
   text-wrap: pretty;
@@ -273,10 +295,10 @@
 .link-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 0;
+  gap: 10px;
+  padding: 14px 0;
   border-bottom: 1px solid var(--ocha-warm-rule);
-  font-size: 13.5px;
+  font-size: 16px;
   font-weight: 500;
   color: var(--text-title);
   text-decoration: none;
@@ -285,9 +307,18 @@
 .link-row:hover { color: var(--brand-primary--text); }
 .link-row__trail {
   margin-left: auto;
-  color: var(--text-muted);
   flex: 0 0 auto;
 }
+/* Where .link-row__trail is the OCHA Link icon <img>, render it
+   small + muted. (SVG uses currentColor but <img> fixes the colour
+   to the SVG's intrinsic UN-Blue, which sits well in the link list
+   without further treatment.) */
+img.link-row__trail {
+  width: 12px;
+  height: 12px;
+  opacity: .7;
+}
+img.link-row__trail:hover { opacity: 1; }
 
 /* ── Hero band (Page 1 only) ────────────────────────────────
    Navy gradient that opens the dashboard. Lives inside Page 1
@@ -380,6 +411,23 @@
   border-color: var(--brand-primary);
 }
 .hero__btn--primary:hover { background: #00B0EE; }
+/* OCHA-icon glyph inside hero buttons. <img> renders white via the
+   filter trick (since the SVG uses currentColor + #009edb fallback,
+   and we want it pure white in the navy hero context). */
+.hero__btn-icon {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  vertical-align: -2px;
+  filter: brightness(0) invert(1);
+}
+.hero__btn-icon--char {
+  width: auto;
+  height: auto;
+  filter: none;
+  font-size: 14px;
+  line-height: 1;
+}
 
 /* Masthead — kicker + oversized condensed title + subline. */
 .hero__masthead { max-width: 920px; margin-bottom: 40px; }
@@ -474,11 +522,11 @@
   color: var(--brand-primary--pale);
 }
 .hero__rail .kpi .label {
-  margin-top: 8px;
-  font-size: 13px;
+  margin-top: 10px;
+  font-size: 16px;
   font-weight: 500;
   color: #fff;
-  line-height: 1.3;
+  line-height: 1.35;
   letter-spacing: 0;
   text-transform: none;
   grid-column: auto;
@@ -712,9 +760,8 @@ a:hover { text-decoration: underline; }
   box-shadow: none;
   display: flex;
   flex-direction: column;
-  /* Darker, slightly heavier page-to-page separator than the lighter
-     --border-rule used inside each page (page-head underline etc). */
-  border-top: 2px solid #A9B6C2;
+  /* No page separator on screen — alternating warm-paper / white
+     section backgrounds provide the visual page-to-page rhythm. */
 }
 /* Alternating warm-paper / white rhythm on screen — Page 2, 4, 6 sit
    on warm bg, Page 1, 3, 5, 7 on white. Inverted in `.pages.a4-mode`
@@ -956,8 +1003,8 @@ a:hover { text-decoration: underline; }
   margin-bottom: 12px;
 }
 .overview-block div {
-  font-size: 1em;          /* body text must be at least 1em on screen */
-  line-height: 1.55;
+  font-size: 17px;
+  line-height: 1.6;
   color: var(--text);
 }
 /* A4 export scales everything down to fit the 1123 × 794 sheet. */
@@ -1227,7 +1274,7 @@ a:hover { text-decoration: underline; }
 }
 .highlights-lead {}
 .highlights-body {
-  font-size: 1em;
+  font-size: 17px;
   line-height: 1.7;
   color: var(--text);
 }
@@ -1256,14 +1303,14 @@ a:hover { text-decoration: underline; }
 .framework--v2 .framework-item h4 {
   font-family: var(--font-cond);
   font-weight: 700;
-  font-size: 22px;
+  font-size: 26px;
   text-transform: none;
   letter-spacing: -0.005em;
   color: var(--text-title);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 .framework--v2 .framework-item p {
-  font-size: 13.5px;
+  font-size: 16px;
   line-height: 1.55;
   color: #374151;
 }
@@ -1449,20 +1496,42 @@ a:hover { text-decoration: underline; }
   border-bottom: 1px solid var(--border-soft);
   background: #fafbfc;
 }
-.table-toolbar input.search {
-  padding: 7px 12px;
-  font: inherit;
-  font-size: 13px;
-  border: 1px solid var(--border);
-  border-radius: 0;
-  background: #fff;
+/* Search input wrapped in a <label class="table-search"> so the
+   OCHA Search icon sits flush-left inside the input frame. */
+.table-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex: 1;
   max-width: 360px;
+  background: #fff;
+  border: 1px solid var(--border);
+  padding: 7px 12px;
+}
+.table-search__icon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  /* SVG uses currentColor — but for an <img> tag, currentColor is
+     not honoured. Fade to muted via opacity instead. */
+  opacity: .55;
+}
+.table-search input.search {
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 16px;
+  color: var(--ocha-ink);
+  flex: 1;
+  min-width: 0;
+  padding: 0;
 }
 .table-meta {
   font-family: var(--font-cond);
   font-weight: 500;
-  font-size: 11.5px;
+  font-size: 12px;
   letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--text-muted);
@@ -1472,7 +1541,7 @@ a:hover { text-decoration: underline; }
 table.data {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 16px;
 }
 table.data th {
   text-align: left;
@@ -1497,10 +1566,12 @@ table.data th:hover { color: var(--brand-primary--text); }
 table.data th.sort-asc::after  { content: ' ▴'; color: var(--brand-primary); }
 table.data th.sort-desc::after { content: ' ▾'; color: var(--brand-primary); }
 table.data td {
-  padding: 11px 14px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--border-soft);
   vertical-align: top;
   color: #1f2937;
+  font-size: 16px;
+  line-height: 1.45;
 }
 table.data tbody tr:nth-child(even) td { background: var(--bg-soft); }
 table.data tbody tr:hover td { background: var(--brand-primary--ice); }
@@ -1552,7 +1623,7 @@ table.data td.col-num {
 .resources__title {
   font-family: var(--font-cond);
   font-weight: 700;
-  font-size: 18px;
+  font-size: 22px;
   letter-spacing: -0.005em;
   color: var(--text-title);
 }

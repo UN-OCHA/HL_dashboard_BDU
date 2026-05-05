@@ -9,33 +9,33 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=1778007632" />
+  <link rel="stylesheet" href="styles.css?v=1778008247" />
 
   <!-- Export libraries (PNG + PDF). Self-hosted in vendor/ so the PDF export
        works even when offline and isn't blocked on a third-party CDN. -->
-  <script src="vendor/html2canvas.min.js?v=1778007632" defer></script>
-  <script src="vendor/jspdf.umd.min.js?v=1778007632" defer></script>
+  <script src="vendor/html2canvas.min.js?v=1778008247" defer></script>
+  <script src="vendor/jspdf.umd.min.js?v=1778008247" defer></script>
 
   <!-- Charts (small purpose-built SVG renderers) -->
-  <script src="app/charts/chart-hbar.js?v=1778007632" defer></script>
-  <script src="app/charts/chart-donut.js?v=1778007632" defer></script>
-  <script src="app/charts/chart-line.js?v=1778007632" defer></script>
-  <script src="app/charts/chart-stacked-col.js?v=1778007632" defer></script>
+  <script src="app/charts/chart-hbar.js?v=1778008247" defer></script>
+  <script src="app/charts/chart-donut.js?v=1778008247" defer></script>
+  <script src="app/charts/chart-line.js?v=1778008247" defer></script>
+  <script src="app/charts/chart-stacked-col.js?v=1778008247" defer></script>
 
   <!-- App modules -->
-  <script src="app/config.js?v=1778007632" defer></script>
-  <script src="app/csv-parser.js?v=1778007632" defer></script>
-  <script src="app/sheets-loader.js?v=1778007632" defer></script>
-  <script src="app/render/header.js?v=1778007632" defer></script>
-  <script src="app/render/kpis.js?v=1778007632" defer></script>
-  <script src="app/render/map.js?v=1778007632" defer></script>
-  <script src="app/render/highlights.js?v=1778007632" defer></script>
-  <script src="app/render/charts.js?v=1778007632" defer></script>
-  <script src="app/render/tables.js?v=1778007632" defer></script>
-  <script src="app/render/resources.js?v=1778007632" defer></script>
-  <script src="app/render/footer.js?v=1778007632" defer></script>
-  <script src="app/export.js?v=1778007632" defer></script>
-  <script src="app/main.js?v=1778007632" defer></script>
+  <script src="app/config.js?v=1778008247" defer></script>
+  <script src="app/csv-parser.js?v=1778008247" defer></script>
+  <script src="app/sheets-loader.js?v=1778008247" defer></script>
+  <script src="app/render/header.js?v=1778008247" defer></script>
+  <script src="app/render/kpis.js?v=1778008247" defer></script>
+  <script src="app/render/map.js?v=1778008247" defer></script>
+  <script src="app/render/highlights.js?v=1778008247" defer></script>
+  <script src="app/render/charts.js?v=1778008247" defer></script>
+  <script src="app/render/tables.js?v=1778008247" defer></script>
+  <script src="app/render/resources.js?v=1778008247" defer></script>
+  <script src="app/render/footer.js?v=1778008247" defer></script>
+  <script src="app/export.js?v=1778008247" defer></script>
+  <script src="app/main.js?v=1778008247" defer></script>
 </head>
 <body>
 
@@ -56,8 +56,14 @@
               <img src="assets/iasc-logo.svg" alt="Inter-Agency Standing Committee" class="hero__logo">
             </a>
             <div class="hero__actions">
-              <button class="hero__btn" id="btn-refresh" title="Reload data from Google Sheet">⟳ Refresh</button>
-              <button class="hero__btn hero__btn--primary" id="btn-pdf" title="Download the whole report as a multi-page A4 PDF">↓ Download PDF</button>
+              <button class="hero__btn" id="btn-refresh" title="Reload data from Google Sheet">
+                <span class="hero__btn-icon hero__btn-icon--char" aria-hidden="true">⟳</span>
+                <span>Refresh</span>
+              </button>
+              <button class="hero__btn hero__btn--primary" id="btn-pdf" title="Download the whole report as a multi-page A4 PDF">
+                <img src="assets/icons/download.svg" alt="" class="hero__btn-icon">
+                <span>Download PDF</span>
+              </button>
             </div>
           </div>
 
@@ -111,6 +117,7 @@
     <!-- Page 2 — Monthly highlight (PPT slide 2) -->
     <section class="page" data-page="highlights" data-page-num="2">
       <div class="section-head">
+        <span class="section-head__num">02</span>
         <div class="section-head__body">
           <div class="section-head__kicker">Monthly highlight</div>
           <h2 class="section-head__title">The HC leadership profile</h2>
@@ -127,19 +134,19 @@
           <div class="link-list">
             <a class="link-row" href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener">
               <span>HC Leadership Profile</span>
-              <span class="link-row__trail" aria-hidden="true">↗</span>
+              <img class="link-row__trail" aria-hidden="true" src="assets/icons/link.svg" alt="">
             </a>
             <a class="link-row" href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener">
               <span>HC Terms of Reference</span>
-              <span class="link-row__trail" aria-hidden="true">↗</span>
+              <img class="link-row__trail" aria-hidden="true" src="assets/icons/link.svg" alt="">
             </a>
             <a class="link-row" href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener">
               <span>RC Leadership Profile</span>
-              <span class="link-row__trail" aria-hidden="true">↗</span>
+              <img class="link-row__trail" aria-hidden="true" src="assets/icons/link.svg" alt="">
             </a>
             <a class="link-row" href="mailto:hls@un.org">
               <span>Contact hls@un.org</span>
-              <span class="link-row__trail" aria-hidden="true">↗</span>
+              <img class="link-row__trail" aria-hidden="true" src="assets/icons/link.svg" alt="">
             </a>
           </div>
         </div>
@@ -171,6 +178,7 @@
     <!-- Page 3 — Leadership characteristics (4 charts) -->
     <section class="page" data-page="characteristics" data-page-num="3">
       <div class="section-head">
+        <span class="section-head__num">03</span>
         <div class="section-head__body">
           <div class="section-head__kicker">Data visualisation</div>
           <h2 class="section-head__title">Leadership characteristics</h2>
@@ -217,10 +225,15 @@
       <!-- Observation callout: replaces the right-side narrative sidebar
            with a full-width call-out beneath the chart grid (more
            editorial, less spreadsheet-y). The #note-characteristics ID
-           is unchanged so render/highlights.js still populates it. -->
+           is unchanged so render/highlights.js still populates it. The
+           outer .observation participates in the page content shell so
+           its edges align with .chart-grid above; the warm-bg + border
+           sit on .observation__inner with its own balanced padding. */
       <div class="observation">
-        <div class="observation__kicker">Observations</div>
-        <div class="observation__body" id="note-characteristics">—</div>
+        <div class="observation__inner">
+          <div class="observation__kicker">Observations</div>
+          <div class="observation__body" id="note-characteristics">—</div>
+        </div>
       </div>
 
       <div class="page-foot"><span class="brand-foot">OCHA · HLS</span><span class="page-num">3</span></div>
@@ -230,6 +243,7 @@
     <!-- Page 4 — Leadership trends (2 stacked-column charts) -->
     <section class="page" data-page="trends" data-page-num="4">
       <div class="section-head">
+        <span class="section-head__num">04</span>
         <div class="section-head__body">
           <div class="section-head__kicker">Long-term trends</div>
           <h2 class="section-head__title">Long-term trends · 1992 → present</h2>
@@ -257,8 +271,10 @@
       </div>
 
       <div class="observation">
-        <div class="observation__kicker">Observations</div>
-        <div class="observation__body" id="note-trends">—</div>
+        <div class="observation__inner">
+          <div class="observation__kicker">Observations</div>
+          <div class="observation__body" id="note-trends">—</div>
+        </div>
       </div>
 
       <div class="page-foot"><span class="brand-foot">OCHA · HLS</span><span class="page-num">4</span></div>
@@ -268,6 +284,7 @@
     <!-- Page 5 — Leadership list -->
     <section class="page" data-page="leaders" data-page-num="5">
       <div class="section-head">
+        <span class="section-head__num">05</span>
         <div class="section-head__body">
           <div class="section-head__kicker">Directory</div>
           <h2 class="section-head__title">List of leaders</h2>
@@ -277,7 +294,10 @@
 
       <div class="table-wrap">
         <div class="table-toolbar">
-          <input type="search" class="search" id="leaders-search" placeholder="Search country, name, position…" />
+          <label class="table-search">
+            <img src="assets/icons/search.svg" alt="" class="table-search__icon">
+            <input type="search" class="search" id="leaders-search" placeholder="Search country, name, position…" />
+          </label>
           <span class="table-meta" id="leaders-count" aria-hidden="true"></span>
         </div>
         <table class="data" id="leaders-table">
@@ -301,6 +321,7 @@
     <!-- Page 6 — Contact directory (may paginate into page 7 in print) -->
     <section class="page" data-page="contacts" data-page-num="6">
       <div class="section-head">
+        <span class="section-head__num">06</span>
         <div class="section-head__body">
           <div class="section-head__kicker">Contacts</div>
           <h2 class="section-head__title">Contact directory</h2>
@@ -310,7 +331,10 @@
 
       <div class="table-wrap">
         <div class="table-toolbar">
-          <input type="search" class="search" id="contacts-search" placeholder="Search country, name…" />
+          <label class="table-search">
+            <img src="assets/icons/search.svg" alt="" class="table-search__icon">
+            <input type="search" class="search" id="contacts-search" placeholder="Search country, name…" />
+          </label>
           <span class="table-meta" id="contacts-count" aria-hidden="true"></span>
         </div>
         <table class="data" id="contacts-table">
@@ -336,6 +360,7 @@
     <!-- Page 7 — Resources -->
     <section class="page" data-page="resources" data-page-num="7">
       <div class="section-head">
+        <span class="section-head__num">07</span>
         <div class="section-head__body">
           <div class="section-head__kicker">References</div>
           <h2 class="section-head__title">Resources</h2>
