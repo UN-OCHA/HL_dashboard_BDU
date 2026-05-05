@@ -494,10 +494,14 @@
   grid-template-rows: minmax(0, 1.5fr) minmax(0, 1fr);
   gap: 28px 24px;
   margin-top: 28px;
-  /* Re-pad horizontally because .page--hero has padding: 0 (so the
-     hero band can break out to the viewport edge). Match the same
-     clamp() used by other .page sections so prose lines up. */
-  padding: 0 clamp(20px, 4vw, 72px) clamp(40px, 4vw, 60px);
+  /* On desktop, .page--hero keeps its horizontal padding from .page
+     (only padding-top is reset to 0 so the hero sits flush at top).
+     That means non-hero content here inherits the same horizontal
+     inset as every other .page — DO NOT add horizontal padding here
+     or Page 1's content will sit further in than every other page.
+     Mobile / tablet re-add this padding because .page--hero is
+     `padding: 0` there to let the hero escape on small screens. */
+  padding: 0;
   flex: 1;
   min-height: 0;
 }
@@ -696,11 +700,14 @@ a:hover { text-decoration: underline; }
   max-width: none;
   margin: 0;
   min-height: auto;
-  /* v2: each .page now provides BOTH its own vertical rhythm AND
-     its own horizontal padding (.pages no longer pads). This lets
-     alternating warm-paper backgrounds fill the viewport edge-to-
-     edge while inner content stays comfortably inset. */
-  padding: clamp(48px, 5vw, 72px) clamp(20px, 4vw, 72px);
+  /* v2: .page provides only the vertical rhythm. Horizontal padding
+     lives INSIDE each content shell (see `.page > .section-head`
+     etc. below) so hero shell + page content shell share the exact
+     same internal-padding pattern — content edges line up across
+     every page on every viewport. The alternating warm-paper bg
+     can still fill the viewport edge-to-edge because .page itself
+     has no horizontal padding. */
+  padding: clamp(48px, 5vw, 72px) 0;
   background: transparent;
   box-shadow: none;
   display: flex;
@@ -719,8 +726,9 @@ a:hover { text-decoration: underline; }
 /* v2 content shell — centres each .page's CONTENT at a comfortable
    reading max while the .page BACKGROUND (warm-paper, navy hero,
    etc.) keeps spanning the full viewport. Same pattern as the
-   Claude Design mockup's `.heroShell`. The .page horizontal padding
-   above kicks in on smaller viewports as the safety gutter. */
+   Claude Design mockup's `.heroShell`: max-width 1500 px + internal
+   horizontal padding so content edges sit at the SAME x-coordinate
+   on every page. .page itself has no horizontal padding. */
 .page > .section-head,
 .page > .chart-grid,
 .page > .observation,
@@ -732,6 +740,8 @@ a:hover { text-decoration: underline; }
   width: 100%;
   margin-left: auto;
   margin-right: auto;
+  padding-left: clamp(20px, 4vw, 72px);
+  padding-right: clamp(20px, 4vw, 72px);
 }
 .page:first-child { border-top: 0; padding-top: clamp(8px, 1vw, 16px); }
 .page:last-child  { padding-bottom: clamp(24px, 3vw, 40px); }
@@ -1595,12 +1605,15 @@ table.data td.col-num {
 
 /* Tablet ---------------------------------------------------- */
 @media screen and (max-width: 1163px) {
-  .pages { padding: 12px; gap: 14px; }
+  .pages { padding: 0; gap: 0; }
   .page {
     width: 100%;
     max-width: 100%;
     min-height: 0;
-    padding: 20px;
+    /* Vertical only — horizontal inset comes from the content shell
+       so warm-bg sections fill the viewport edge-to-edge and content
+       on every page aligns at the same x-coord. */
+    padding: 28px 0;
   }
   /* Release the fixed A4-landscape lock on the overview page so content
      can grow vertically for readability. */
@@ -1663,13 +1676,12 @@ table.data td.col-num {
     -webkit-overflow-scrolling: touch;
   }
 
-  /* v2 Hero on tablet — escape .page's 20px horizontal padding so the
-     navy band reads as a full-width band, then re-pad inside .hero__shell. */
-  .page--hero { padding: 0 !important; }
+  /* v2 Hero on tablet — .page already has padding: 28px 0 (vertical
+     only) so the hero just needs its top padding suppressed and
+     can keep its 100 vw breakout. Content shell handles horizontal. */
+  .page--hero { padding-top: 0; }
   .hero { padding: 28px 0 36px; }
-  .hero__shell { padding: 0 32px; }
   .overview-layout--v2 {
-    padding: 20px;
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto;
     gap: 18px;
@@ -1678,8 +1690,6 @@ table.data td.col-num {
   .overview-layout--v2 .map-wrap,
   .overview-layout--v2 .overview-block--overview,
   .overview-layout--v2 .overview-block--lotm { grid-column: 1 / -1; grid-row: auto; }
-  .page--hero .page-foot,
-  .page--hero .page-png-btn { margin: 0 20px; }
 }
 
 /* Mobile ---------------------------------------------------- */
@@ -1690,10 +1700,10 @@ table.data td.col-num {
   .topbar .brand .sub { font-size: 11px; }
   .topbar-actions { gap: 6px; flex: 1 1 auto; justify-content: flex-end; }
   .btn { padding: 8px 10px; font-size: 11.5px; }
-  .pages { padding: 10px; gap: 12px; }
+  .pages { padding: 0; gap: 0; }
   .page {
-    padding: 16px;
-    border-radius: 4px;
+    padding: 24px 0;     /* vertical only — shell provides horizontal inset */
+    border-radius: 0;
   }
 
   /* Typography trims for a phone-friendly read. */
@@ -1782,9 +1792,10 @@ table.data td.col-num {
   .page-png-btn { display: none; }
 
   /* v2 Hero on mobile — full-width navy band with stacked utility row,
-     2-column KPI grid, smaller title. The hero escapes .page's 16 px
-     padding so the navy band reaches the .pages container edge. */
-  .page--hero { padding: 0 !important; }
+     2-column KPI grid, smaller title. The hero escapes any container
+     padding via its 100 vw breakout; .page is padding 24px 0 (vertical
+     only) so we just need to suppress the top padding for .page--hero. */
+  .page--hero { padding-top: 0; }
   .hero { padding: 24px 0 28px; }
   .hero__shell { padding: 0 18px; }
   .hero__utility { padding-bottom: 24px; flex-wrap: wrap; gap: 12px; }
@@ -1812,10 +1823,10 @@ table.data td.col-num {
   .hero__rail .kpi .label { font-size: 12px; }
   .hero__rail .kpi .kpi-icon { width: 28px; height: 28px; margin-bottom: 4px; }
 
-  /* Page-1 v2 layout — re-pad the post-hero content since .page--hero
-     has padding 0 to let the hero break out. */
+  /* Page-1 v2 layout collapse — single column on phone. Horizontal
+     padding comes from the content shell rule (clamp 20-72), so we
+     don't need to add it here. */
   .overview-layout--v2 {
-    padding: 16px;
     grid-template-columns: 1fr !important;
     grid-template-rows: auto !important;
     gap: 16px;
@@ -1824,7 +1835,6 @@ table.data td.col-num {
   .overview-layout--v2 .overview-block--overview,
   .overview-layout--v2 .overview-block--lotm { grid-column: 1 / -1 !important; grid-row: auto !important; }
   .overview-layout--v2 .map-wrap { min-height: 280px; }
-  .page--hero .page-foot { left: 16px; right: 16px; }
 }
 
 /* Print — the layout itself is driven by `.pages.a4-mode` (added by
