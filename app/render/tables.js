@@ -8,32 +8,36 @@
 var RenderTables = (function () {
   "use strict";
 
+  // `cls`: optional CSS class added to TD for the v2 cell-type styling
+  // (e.g. country in navy + 500 weight, position in Roboto Condensed,
+  // email in blue). Class names match the `td-*` rules in styles.css.
   var LEADERS_COLS = [
-    { key: "country",      label: "Country" },
+    { key: "country",      label: "Country",      cls: "td-country" },
     { key: "duty_station", label: "Duty station" },
     { key: "name",         label: "Name" },
-    { key: "position",     label: "Position" }
+    { key: "position",     label: "Position",     cls: "td-position" }
   ];
   var CONTACTS_COLS = [
-    { key: "country",  label: "Country" },
+    { key: "country",  label: "Country",  cls: "td-country" },
     { key: "name",     label: "Name" },
-    { key: "position", label: "Position" },
-    { key: "email",    label: "Email",    kind: "email" },
+    { key: "position", label: "Position", cls: "td-position" },
+    { key: "email",    label: "Email",    kind: "email", cls: "td-email" },
     { key: "phone",    label: "Phone" },
     { key: "pa_name",  label: "Special assistant", linked: "pa_phone" },
     { key: "ea_name",  label: "Executive assistant", linked: "ea_phone" }
   ];
 
   function render(state) {
-    bindTable("leaders-table", "leaders-search", state.leaders || [], LEADERS_COLS);
-    bindTable("contacts-table", "contacts-search", state.contacts || [], CONTACTS_COLS);
+    bindTable("leaders-table", "leaders-search", "leaders-count", state.leaders || [], LEADERS_COLS);
+    bindTable("contacts-table", "contacts-search", "contacts-count", state.contacts || [], CONTACTS_COLS);
   }
 
-  function bindTable(tableId, searchId, data, cols) {
+  function bindTable(tableId, searchId, countId, data, cols) {
     var table = document.getElementById(tableId);
     if (!table) return;
     var tbody = table.querySelector("tbody");
     var search = document.getElementById(searchId);
+    var countEl = countId ? document.getElementById(countId) : null;
 
     var state = { sortKey: cols[0].key, sortDir: "asc", query: "" };
 
@@ -67,6 +71,7 @@ var RenderTables = (function () {
         }
         cols.forEach(function (c) {
           var td = document.createElement("td");
+          if (c.cls) td.classList.add(c.cls);
           var v = (row[c.key] == null ? "" : String(row[c.key])).trim();
           if (c.kind === "email" && v) {
             var a = document.createElement("a");
@@ -107,6 +112,13 @@ var RenderTables = (function () {
           th.classList.add(state.sortDir === "asc" ? "sort-asc" : "sort-desc");
         }
       });
+
+      // Count badge in the toolbar — "X of Y" or just "Y rows" if unfiltered.
+      if (countEl) {
+        countEl.textContent = q
+          ? filtered.length + " of " + data.length
+          : data.length + " " + (data.length === 1 ? "row" : "rows");
+      }
     }
 
     // Wire header clicks for sort

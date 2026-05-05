@@ -9,33 +9,33 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=1778006531" />
+  <link rel="stylesheet" href="styles.css?v=1778006764" />
 
   <!-- Export libraries (PNG + PDF). Self-hosted in vendor/ so the PDF export
        works even when offline and isn't blocked on a third-party CDN. -->
-  <script src="vendor/html2canvas.min.js?v=1778006531" defer></script>
-  <script src="vendor/jspdf.umd.min.js?v=1778006531" defer></script>
+  <script src="vendor/html2canvas.min.js?v=1778006764" defer></script>
+  <script src="vendor/jspdf.umd.min.js?v=1778006764" defer></script>
 
   <!-- Charts (small purpose-built SVG renderers) -->
-  <script src="app/charts/chart-hbar.js?v=1778006531" defer></script>
-  <script src="app/charts/chart-donut.js?v=1778006531" defer></script>
-  <script src="app/charts/chart-line.js?v=1778006531" defer></script>
-  <script src="app/charts/chart-stacked-col.js?v=1778006531" defer></script>
+  <script src="app/charts/chart-hbar.js?v=1778006764" defer></script>
+  <script src="app/charts/chart-donut.js?v=1778006764" defer></script>
+  <script src="app/charts/chart-line.js?v=1778006764" defer></script>
+  <script src="app/charts/chart-stacked-col.js?v=1778006764" defer></script>
 
   <!-- App modules -->
-  <script src="app/config.js?v=1778006531" defer></script>
-  <script src="app/csv-parser.js?v=1778006531" defer></script>
-  <script src="app/sheets-loader.js?v=1778006531" defer></script>
-  <script src="app/render/header.js?v=1778006531" defer></script>
-  <script src="app/render/kpis.js?v=1778006531" defer></script>
-  <script src="app/render/map.js?v=1778006531" defer></script>
-  <script src="app/render/highlights.js?v=1778006531" defer></script>
-  <script src="app/render/charts.js?v=1778006531" defer></script>
-  <script src="app/render/tables.js?v=1778006531" defer></script>
-  <script src="app/render/resources.js?v=1778006531" defer></script>
-  <script src="app/render/footer.js?v=1778006531" defer></script>
-  <script src="app/export.js?v=1778006531" defer></script>
-  <script src="app/main.js?v=1778006531" defer></script>
+  <script src="app/config.js?v=1778006764" defer></script>
+  <script src="app/csv-parser.js?v=1778006764" defer></script>
+  <script src="app/sheets-loader.js?v=1778006764" defer></script>
+  <script src="app/render/header.js?v=1778006764" defer></script>
+  <script src="app/render/kpis.js?v=1778006764" defer></script>
+  <script src="app/render/map.js?v=1778006764" defer></script>
+  <script src="app/render/highlights.js?v=1778006764" defer></script>
+  <script src="app/render/charts.js?v=1778006764" defer></script>
+  <script src="app/render/tables.js?v=1778006764" defer></script>
+  <script src="app/render/resources.js?v=1778006764" defer></script>
+  <script src="app/render/footer.js?v=1778006764" defer></script>
+  <script src="app/export.js?v=1778006764" defer></script>
+  <script src="app/main.js?v=1778006764" defer></script>
 </head>
 <body>
 
@@ -108,44 +108,61 @@
       <button class="btn page-png-btn" data-export-page="1">PNG</button>
     </section>
 
-    <!-- Page 2 — What's New: Monthly Leadership Highlights (PPT slide 2) -->
+    <!-- Page 2 — Monthly highlight (PPT slide 2) -->
     <section class="page" data-page="highlights" data-page-num="2">
-      <div class="page-head">
-        <div class="title">What's New — Monthly Leadership Highlights</div>
-        <div class="meta">From the Humanitarian Leadership Section</div>
-      </div>
-
-      <div class="highlight-card" id="highlight-card">
-        <h3>Humanitarian Coordinator Leadership Profile</h3>
-        <div id="highlight-body">—</div>
-      </div>
-
-      <div class="framework">
-        <div class="framework-item">
-          <h4>Values</h4>
-          <p>Emphasizes core humanitarian values (integrity, humility, inclusion, and humanity) that guide decision-making and behavior. These values ensure that HCs act with a strong moral compass, respect diversity, listen and learn from others, and prioritize the dignity and well-being of affected populations. They form the ethical foundation for effective leadership in complex and high-stakes humanitarian contexts.</p>
-        </div>
-        <div class="framework-item">
-          <h4>Competencies</h4>
-          <p>Outlines essential competencies required for leading operations, including strategic vision, operational and contextual fluency, political acumen, humanitarian diplomacy, coordination of teamwork, innovation, and driving systems change. These competencies equip HCs to guide the humanitarian community toward collective goals, influence high-level stakeholders, foster inclusive partnerships, and adapt systems and strategies.</p>
-        </div>
-        <div class="framework-item">
-          <h4>Attributes</h4>
-          <p>Effective HCs demonstrate key personal attributes, including adaptability, courage, emotional intelligence, resilience, and social intelligence. These qualities enable them to navigate uncertainty, respond empathetically, remain composed under pressure, and foster trust and collaboration across diverse teams. Attributes complement technical skills by shaping how leaders engage with people, make decisions, and uphold humanitarian principles.</p>
-        </div>
-        <div class="framework-item">
-          <h4>Commitments</h4>
-          <p>Humanitarian leadership is grounded in commitments to localisation, collaborative leadership, accountability, and inclusivity. HCs are expected to shift power and resources to local responders, engage and empower affected populations, uphold transparency and collective responsibility, and ensure responses address the diverse needs of women, girls, and marginalised groups.</p>
+      <div class="section-head">
+        <div class="section-head__body">
+          <div class="section-head__kicker">Monthly highlight</div>
+          <h2 class="section-head__title">The HC leadership profile</h2>
+          <div class="section-head__dek">A four-quadrant framework for the role.</div>
         </div>
       </div>
 
-      <p class="highlight-links">
-        Access the
-        <a href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener">HC Leadership Profile</a>,
-        <a href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener">HC Terms of Reference</a>,
-        <a href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener">RC Leadership Profile</a>.
-        Contact <a href="mailto:hls@un.org">hls@un.org</a> for more information.
-      </p>
+      <!-- 12-col grid: lead prose (5 cols) + framework 2x2 (7 cols) -->
+      <div class="highlights-grid">
+        <div class="highlights-lead">
+          <div class="kicker-rule">This month</div>
+          <div id="highlight-body" class="highlights-body">—</div>
+
+          <div class="link-list">
+            <a class="link-row" href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener">
+              <span>HC Leadership Profile</span>
+              <span class="link-row__trail" aria-hidden="true">↗</span>
+            </a>
+            <a class="link-row" href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener">
+              <span>HC Terms of Reference</span>
+              <span class="link-row__trail" aria-hidden="true">↗</span>
+            </a>
+            <a class="link-row" href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener">
+              <span>RC Leadership Profile</span>
+              <span class="link-row__trail" aria-hidden="true">↗</span>
+            </a>
+            <a class="link-row" href="mailto:hls@un.org">
+              <span>Contact hls@un.org</span>
+              <span class="link-row__trail" aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="framework framework--v2">
+          <div class="framework-item">
+            <h4>Values</h4>
+            <p>Emphasises core humanitarian values (integrity, humility, inclusion, and humanity) that guide decision-making and behaviour. These values ensure that HCs act with a strong moral compass, respect diversity, listen and learn from others, and prioritise the dignity and well-being of affected populations. They form the ethical foundation for effective leadership in complex and high-stakes humanitarian contexts.</p>
+          </div>
+          <div class="framework-item">
+            <h4>Competencies</h4>
+            <p>Outlines essential competencies required for leading operations, including strategic vision, operational and contextual fluency, political acumen, humanitarian diplomacy, coordination of teamwork, innovation, and driving systems change. These competencies equip HCs to guide the humanitarian community toward collective goals, influence high-level stakeholders, foster inclusive partnerships, and adapt systems and strategies.</p>
+          </div>
+          <div class="framework-item">
+            <h4>Attributes</h4>
+            <p>Effective HCs demonstrate key personal attributes, including adaptability, courage, emotional intelligence, resilience, and social intelligence. These qualities enable them to navigate uncertainty, respond empathetically, remain composed under pressure, and foster trust and collaboration across diverse teams. Attributes complement technical skills by shaping how leaders engage with people, make decisions, and uphold humanitarian principles.</p>
+          </div>
+          <div class="framework-item">
+            <h4>Commitments</h4>
+            <p>Humanitarian leadership is grounded in commitments to localisation, collaborative leadership, accountability, and inclusivity. HCs are expected to shift power and resources to local responders, engage and empower affected populations, uphold transparency and collective responsibility, and ensure responses address the diverse needs of women, girls, and marginalised groups.</p>
+          </div>
+        </div>
+      </div>
 
       <div class="page-foot"><span class="brand-foot">OCHA · HLS</span><span class="page-num">2</span></div>
       <button class="btn page-png-btn" data-export-page="2">PNG</button>
@@ -250,27 +267,32 @@
 
     <!-- Page 5 — Leadership list -->
     <section class="page" data-page="leaders" data-page-num="5">
-      <div class="page-head">
-        <div class="title">List of Humanitarian Leadership</div>
-        <div class="meta">Current roster</div>
+      <div class="section-head">
+        <div class="section-head__body">
+          <div class="section-head__kicker">Directory</div>
+          <h2 class="section-head__title">List of leaders</h2>
+          <div class="section-head__dek">Sortable, searchable directory of the current cohort.</div>
+        </div>
       </div>
 
-      <div class="table-toolbar">
-        <div></div>
-        <input type="search" class="search" id="leaders-search" placeholder="Search country, name, position…" />
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <input type="search" class="search" id="leaders-search" placeholder="Search country, name, position…" />
+          <span class="table-meta" id="leaders-count" aria-hidden="true"></span>
+        </div>
+        <table class="data" id="leaders-table">
+          <thead>
+            <tr>
+              <th class="col-num">#</th>
+              <th data-sort="country">Country</th>
+              <th data-sort="duty_station">Duty station</th>
+              <th data-sort="name">Name</th>
+              <th data-sort="position">Position</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
-      <table class="data" id="leaders-table">
-        <thead>
-          <tr>
-            <th class="col-num">#</th>
-            <th data-sort="country">Country</th>
-            <th data-sort="duty_station">Duty station</th>
-            <th data-sort="name">Name</th>
-            <th data-sort="position">Position</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
 
       <div class="page-foot"><span class="brand-foot">OCHA · HLS</span><span class="page-num">5</span></div>
       <button class="btn page-png-btn" data-export-page="5">PNG</button>
@@ -278,29 +300,34 @@
 
     <!-- Page 6 — Contact directory (may paginate into page 7 in print) -->
     <section class="page" data-page="contacts" data-page-num="6">
-      <div class="page-head">
-        <div class="title">Humanitarian Leadership Contact List</div>
-        <div class="meta">Restricted — for internal coordination</div>
+      <div class="section-head">
+        <div class="section-head__body">
+          <div class="section-head__kicker">Contacts</div>
+          <h2 class="section-head__title">Contact directory</h2>
+          <div class="section-head__dek">Names, positions, and direct lines for the current cohort.</div>
+        </div>
       </div>
 
-      <div class="table-toolbar">
-        <div></div>
-        <input type="search" class="search" id="contacts-search" placeholder="Search country, name…" />
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <input type="search" class="search" id="contacts-search" placeholder="Search country, name…" />
+          <span class="table-meta" id="contacts-count" aria-hidden="true"></span>
+        </div>
+        <table class="data" id="contacts-table">
+          <thead>
+            <tr>
+              <th data-sort="country">Country</th>
+              <th data-sort="name">Name</th>
+              <th data-sort="position">Position</th>
+              <th data-sort="email">Email</th>
+              <th data-sort="phone">Phone</th>
+              <th data-sort="pa_name">Special assistant</th>
+              <th data-sort="ea_name">Executive assistant</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
-      <table class="data" id="contacts-table">
-        <thead>
-          <tr>
-            <th data-sort="country">Country</th>
-            <th data-sort="name">Name</th>
-            <th data-sort="position">Position</th>
-            <th data-sort="email">Email</th>
-            <th data-sort="phone">Phone</th>
-            <th data-sort="pa_name">Special assistant</th>
-            <th data-sort="ea_name">Executive assistant</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
 
       <div class="page-foot"><span class="brand-foot">OCHA · HLS</span><span class="page-num">6</span></div>
       <button class="btn page-png-btn" data-export-page="6">PNG</button>
@@ -308,9 +335,12 @@
 
     <!-- Page 7 — Resources -->
     <section class="page" data-page="resources" data-page-num="7">
-      <div class="page-head">
-        <div class="title">Resources</div>
-        <div class="meta">Guidance, voices, and talent initiatives</div>
+      <div class="section-head">
+        <div class="section-head__body">
+          <div class="section-head__kicker">References</div>
+          <h2 class="section-head__title">Resources</h2>
+          <div class="section-head__dek">Standing references for HCs, the IASC, and the wider humanitarian community.</div>
+        </div>
       </div>
 
       <div class="resources" id="resources">

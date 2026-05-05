@@ -508,6 +508,21 @@
   padding: 0;
   border-radius: 0;
 }
+/* Override the v1 .overview-block h3 styling for v2 — use the
+   kicker-rule treatment (Roboto Condensed, .18em letterspaced,
+   navy text, warm-rule underline). Specificity needs to match
+   `.overview-block h3` (0,1,1). */
+.overview-layout--v2 .overview-block h3 {
+  font-family: var(--font-cond);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text-title);
+  border-bottom: 1px solid var(--ocha-warm-rule);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
 
 /* When .page--hero is the FIRST page, drop its top padding so the hero
    sits flush against the top of the screen / A4 sheet. */
@@ -1110,6 +1125,61 @@ a:hover { text-decoration: underline; }
 }
 .framework-item p { font-size: 1em; color: var(--text); line-height: 1.6; }
 
+/* ── v2 Page 2 — highlights-grid + framework--v2 + link-list ──
+   Two-column layout: lead prose + link list on the left,
+   2 × 2 framework on the right with hairline rules between
+   cells (no big colored number tiles). */
+.highlights-grid {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 56px;
+  margin-top: 24px;
+  flex: 1;
+  align-items: start;
+}
+.highlights-lead {}
+.highlights-body {
+  font-size: 1em;
+  line-height: 1.7;
+  color: var(--text);
+}
+.highlights-body p { margin: 0 0 12px; }
+.highlights-body p:last-child { margin: 0; }
+.highlights-body strong { color: var(--text-strong); }
+.link-list { margin-top: 28px; border-top: 1px solid var(--ocha-warm-rule); }
+
+.framework--v2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;                                /* hairline gap shows through */
+  background: var(--ocha-warm-rule);       /* the hairline colour */
+  border: 1px solid var(--ocha-warm-rule);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.framework--v2 .framework-item {
+  grid-column: auto;                       /* override the v1 span 6 rule */
+  background: #fff;
+  border-top: 0;                           /* override the v1 3 px navy rule */
+  padding: 26px 28px;
+  font-size: 1em;
+  line-height: 1.55;
+}
+.framework--v2 .framework-item h4 {
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 22px;
+  text-transform: none;
+  letter-spacing: -0.005em;
+  color: var(--text-title);
+  margin-bottom: 8px;
+}
+.framework--v2 .framework-item p {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #374151;
+}
+
 .highlight-links {
   font-size: 1em;
   color: var(--text-muted);
@@ -1268,47 +1338,81 @@ a:hover { text-decoration: underline; }
 }
 
 /* Tables ---------------------------------------------------- */
+/* ── Tables (Pages 5 + 6) — v2 redesign ───────────────────────
+   Navy-underline TH instead of solid-blue background; condensed
+   search toolbar with a count badge on the right. The table sits
+   inside a .table-wrap card that contains its own scroll on
+   narrow screens (mobile fix from commit 9a1db13). */
+.table-wrap {
+  margin-top: 22px;
+  border: 1px solid var(--border-soft);
+  background: #fff;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
 .table-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  gap: 14px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-soft);
+  background: #fafbfc;
 }
 .table-toolbar input.search {
-  padding: 6px 10px;
+  padding: 7px 12px;
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
   border: 1px solid var(--border);
-  border-radius: 4px;
-  width: 220px;
+  border-radius: 0;
+  background: #fff;
+  flex: 1;
+  max-width: 360px;
 }
+.table-meta {
+  font-family: var(--font-cond);
+  font-weight: 500;
+  font-size: 11.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
 table.data {
   width: 100%;
   border-collapse: collapse;
-  font-size: 1em;
+  font-size: 13px;
 }
 table.data th {
   text-align: left;
-  padding: 7px 8px;
+  padding: 12px 14px;
+  font-family: var(--font-cond);
   font-weight: 700;
-  color: var(--text-inv);
-  background: var(--brand-primary);
-  font-size: 10px;
+  font-size: 11.5px;
+  color: var(--text-title);
+  background: transparent;
+  letter-spacing: .14em;
   text-transform: uppercase;
-  letter-spacing: .04em;
-  position: sticky;
-  top: 0;
+  border-bottom: 2px solid var(--text-title);
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
-table.data th:hover { background: var(--brand-primary--text); }
-table.data th.sort-asc::after  { content: ' ▴'; }
-table.data th.sort-desc::after { content: ' ▾'; }
+table.data thead { background: #fff; }
+table.data th:hover { color: var(--brand-primary--text); }
+table.data th.sort-asc::after  { content: ' ▴'; color: var(--brand-primary); }
+table.data th.sort-desc::after { content: ' ▾'; color: var(--brand-primary); }
 table.data td {
-  padding: 6px 8px;
+  padding: 11px 14px;
   border-bottom: 1px solid var(--border-soft);
   vertical-align: top;
+  color: #1f2937;
 }
 table.data tbody tr:nth-child(even) td { background: var(--bg-soft); }
 table.data tbody tr:hover td { background: var(--brand-primary--ice); }
@@ -1316,39 +1420,54 @@ table.data td a { color: var(--brand-primary--text); }
 table.data td.num { text-align: right; font-variant-numeric: tabular-nums; }
 .td-missing { color: var(--brand-grey--border); font-style: italic; }
 .td-sub     { color: var(--text-muted); font-size: 10.5px; }
-/* PPT-style numeric row index column on the Leaders table. */
+
+/* Cell-type modifiers (added by render/tables.js — see below). */
+table.data td.td-country {
+  font-weight: 500;
+  color: var(--text-title);
+}
+table.data td.td-position {
+  font-family: var(--font-cond);
+  font-weight: 500;
+}
+table.data td.td-email a { color: var(--brand-primary--dark); }
+
+/* Numeric row index column on the Leaders table. */
 table.data th.col-num,
 table.data td.col-num {
-  width: 32px;
-  text-align: center;
+  width: 40px;
+  text-align: left;
+  font-family: var(--font-cond);
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--text-muted);
+  color: var(--brand-primary--dark);
 }
 
-/* Page 8 — Resources --------------------------------------- */
+/* Page 7 — Resources (v2) ----------------------------------
+   Three columns, each with an icon-less title + 2 px navy
+   bottom rule, then .link-row items. Markup emitted by
+   render/resources.js. */
 .resources {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);       /* 12-col grid, each section spans 4 */
-  gap: 28px 24px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px 36px;
+  margin-top: 22px;
+  flex: 1;
+  align-items: start;
 }
-.resources > *    { grid-column: span 4; }
-.resources h3 {
-  font-size: 13px;
+.resources__col {}
+.resources__head {
+  padding-bottom: 12px;
+  margin-bottom: 6px;
+  border-bottom: 2px solid var(--text-title);
+}
+.resources__title {
+  font-family: var(--font-cond);
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .05em;
-  color: var(--brand-primary--text);
-  border-bottom: 2px solid var(--brand-primary);
-  padding-bottom: 6px;
-  margin-bottom: 14px;
+  font-size: 18px;
+  letter-spacing: -0.005em;
+  color: var(--text-title);
 }
-.resources li {
-  font-size: 1em;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border-soft);
-  line-height: 1.5;
-}
-/* A4 mode: keep the old compact size so the resources page fits one sheet. */
 
 /* Page footer -----------------------------------------------
    Only visible in A4 mode + print — page numbers don't make sense in

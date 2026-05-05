@@ -16,21 +16,35 @@ var RenderResources = (function () {
 
     Object.keys(HLConfig.RESOURCES).forEach(function (section) {
       var col = document.createElement("div");
+      col.className = "resources__col";
+
+      // Heading: title with a 2px navy bottom rule (per v2 design).
+      var head = document.createElement("div");
+      head.className = "resources__head";
       var h = document.createElement("h3");
+      h.className = "resources__title";
       h.textContent = section;
-      col.appendChild(h);
-      var ul = document.createElement("ul");
+      head.appendChild(h);
+      col.appendChild(head);
+
+      // Items rendered as the shared .link-row primitive.
       HLConfig.RESOURCES[section].forEach(function (item) {
-        var li = document.createElement("li");
         var a = document.createElement("a");
+        a.className = "link-row";
         a.href = item.url;
         a.target = "_blank";
         a.rel = "noopener";
-        a.textContent = item.label;
-        li.appendChild(a);
-        ul.appendChild(li);
+        var label = document.createElement("span");
+        label.textContent = item.label;
+        a.appendChild(label);
+        var trail = document.createElement("span");
+        trail.className = "link-row__trail";
+        trail.setAttribute("aria-hidden", "true");
+        trail.textContent = "↗";
+        a.appendChild(trail);
+        col.appendChild(a);
       });
-      col.appendChild(ul);
+
       root.appendChild(col);
     });
   }
