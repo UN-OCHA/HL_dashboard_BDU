@@ -91,8 +91,13 @@
      section rhythm, and the inkier body colour. Every value is a
      warm-neutral or a re-alias of an existing OCHA blue — no new
      brand colours. */
-  --ocha-warm-bg:   #F7F6F3;          /* warm-paper alternating section bg */
-  --ocha-warm-rule: #E8E5DE;          /* soft warm separator inside warm-bg */
+  /* Alternating section background — applied to even-indexed .page
+     sections (Pages 2 / 4 / 6) so the dashboard reads as a clear
+     editorial rhythm of white / grey / white / grey. Cool grey so it
+     pairs with UN Blue rather than competing with it. Old name was
+     --ocha-warm-bg / --ocha-warm-rule (warm paper); v2 is grey. */
+  --section-alt-bg:   #F1F3F6;
+  --section-alt-rule: #DEE3E9;
   --ocha-ink:       #1A1F2C;          /* slightly inkier body for editorial */
   --hero-from:      var(--brand-primary--navy);  /* navy 1, hero gradient top */
   --hero-to:        #003C7D;          /* gradient bottom (warmer than navy) */
@@ -259,7 +264,7 @@
   /* No background or border here — those are on .observation__inner. */
 }
 .observation__inner {
-  background: var(--ocha-warm-bg);
+  background: var(--section-alt-bg);
   border-left: 3px solid var(--brand-primary);
   padding: 18px 24px;
 }
@@ -292,7 +297,7 @@
   color: var(--text-title);
   padding-bottom: 8px;
   margin-bottom: 12px;
-  border-bottom: 1px solid var(--ocha-warm-rule);
+  border-bottom: 1px solid var(--section-alt-rule);
 }
 
 /* ── link-row — full-width interactive row, used in the Highlights
@@ -303,7 +308,7 @@
   align-items: center;
   gap: 10px;
   padding: 14px 0;
-  border-bottom: 1px solid var(--ocha-warm-rule);
+  border-bottom: 1px solid var(--section-alt-rule);
   font-size: 16px;
   font-weight: 500;
   color: var(--text-title);
@@ -606,7 +611,7 @@ img.link-row__trail:hover { opacity: 1; }
   letter-spacing: .18em;
   text-transform: uppercase;
   color: var(--text-title);
-  border-bottom: 1px solid var(--ocha-warm-rule);
+  border-bottom: 1px solid var(--section-alt-rule);
   padding-bottom: 8px;
   margin-bottom: 12px;
 }
@@ -796,7 +801,7 @@ a:hover { text-decoration: underline; }
    on warm bg, Page 1, 3, 5, 7 on white. Inverted in `.pages.a4-mode`
    so PDF sheets stay clean white. */
 .pages > .page:nth-child(even) {
-  background: var(--ocha-warm-bg);
+  background: var(--section-alt-bg);
 }
 
 /* v2 content shell — centres each .page's CONTENT at a comfortable
@@ -1310,14 +1315,14 @@ a:hover { text-decoration: underline; }
 .highlights-body p { margin: 0 0 12px; }
 .highlights-body p:last-child { margin: 0; }
 .highlights-body strong { color: var(--text-strong); }
-.link-list { margin-top: 28px; border-top: 1px solid var(--ocha-warm-rule); }
+.link-list { margin-top: 28px; border-top: 1px solid var(--section-alt-rule); }
 
 .framework--v2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1px;                                /* hairline gap shows through */
-  background: var(--ocha-warm-rule);       /* the hairline colour */
-  border: 1px solid var(--ocha-warm-rule);
+  background: var(--section-alt-rule);       /* the hairline colour */
+  border: 1px solid var(--section-alt-rule);
   margin-top: 0;
   margin-bottom: 0;
 }
