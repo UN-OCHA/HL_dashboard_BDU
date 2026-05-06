@@ -67,7 +67,13 @@
   --bg-paper:   #FFFFFF;           /* inside of .page                */
   --bg-soft:    #F6F9FC;           /* subtle surface for accent cards */
   --border:     #E6EAEF;
-  --border-soft:#EEF2F6;
+  /* Bumped from #EEF2F6 → #D5DCE3 in v2 so chart-card outlines and
+     table row separators read clearly against the white surface
+     without feeling heavy. Used by .chart-card, .chart-card__head
+     underline, .table-wrap, .table-toolbar bottom rule, table.data
+     td bottom rules, .page-foot top rule, and chart-axis tick lines
+     (which stay subtle thanks to their .5 stroke-width). */
+  --border-soft:#D5DCE3;
   --border-rule:#E1E8EF;           /* slightly warmer for section rules */
 
   /* A4 LANDSCAPE at 96 DPI (297mm × 210mm) */
