@@ -338,6 +338,11 @@ img.link-row__trail:hover { opacity: 1; }
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
+  /* Breathing room between the navy band and the section 01 head
+     that follows. Set as margin-bottom (rather than rolling it into
+     the gradient padding) so the gradient ends crisply at the bottom
+     edge of the hero — the gap below is white/warm-bg, not navy. */
+  margin-bottom: clamp(40px, 4vw, 72px);
   padding: 40px 0 56px;
   background: linear-gradient(180deg, var(--hero-from) 0%, var(--hero-to) 100%);
   color: #fff;
