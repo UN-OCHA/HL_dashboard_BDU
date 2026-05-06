@@ -9,46 +9,44 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=1778067639" />
+  <link rel="stylesheet" href="styles.css?v=1778079097" />
 
   <!-- Export libraries (PNG + PDF). Self-hosted in vendor/ so the PDF export
        works even when offline and isn't blocked on a third-party CDN. -->
-  <script src="vendor/html2canvas.min.js?v=1778067639" defer></script>
-  <script src="vendor/jspdf.umd.min.js?v=1778067639" defer></script>
+  <script src="vendor/html2canvas.min.js?v=1778079097" defer></script>
+  <script src="vendor/jspdf.umd.min.js?v=1778079097" defer></script>
 
   <!-- Charts (small purpose-built SVG renderers) -->
-  <script src="app/charts/chart-hbar.js?v=1778067639" defer></script>
-  <script src="app/charts/chart-donut.js?v=1778067639" defer></script>
-  <script src="app/charts/chart-line.js?v=1778067639" defer></script>
-  <script src="app/charts/chart-stacked-col.js?v=1778067639" defer></script>
+  <script src="app/charts/chart-hbar.js?v=1778079097" defer></script>
+  <script src="app/charts/chart-donut.js?v=1778079097" defer></script>
+  <script src="app/charts/chart-line.js?v=1778079097" defer></script>
+  <script src="app/charts/chart-stacked-col.js?v=1778079097" defer></script>
 
   <!-- App modules -->
-  <script src="app/config.js?v=1778067639" defer></script>
-  <script src="app/csv-parser.js?v=1778067639" defer></script>
-  <script src="app/sheets-loader.js?v=1778067639" defer></script>
-  <script src="app/render/header.js?v=1778067639" defer></script>
-  <script src="app/render/kpis.js?v=1778067639" defer></script>
-  <script src="app/render/map.js?v=1778067639" defer></script>
-  <script src="app/render/highlights.js?v=1778067639" defer></script>
-  <script src="app/render/charts.js?v=1778067639" defer></script>
-  <script src="app/render/tables.js?v=1778067639" defer></script>
-  <script src="app/render/resources.js?v=1778067639" defer></script>
-  <script src="app/render/footer.js?v=1778067639" defer></script>
-  <script src="app/export.js?v=1778067639" defer></script>
-  <script src="app/main.js?v=1778067639" defer></script>
+  <script src="app/config.js?v=1778079097" defer></script>
+  <script src="app/csv-parser.js?v=1778079097" defer></script>
+  <script src="app/sheets-loader.js?v=1778079097" defer></script>
+  <script src="app/render/header.js?v=1778079097" defer></script>
+  <script src="app/render/kpis.js?v=1778079097" defer></script>
+  <script src="app/render/map.js?v=1778079097" defer></script>
+  <script src="app/render/highlights.js?v=1778079097" defer></script>
+  <script src="app/render/charts.js?v=1778079097" defer></script>
+  <script src="app/render/tables.js?v=1778079097" defer></script>
+  <script src="app/render/resources.js?v=1778079097" defer></script>
+  <script src="app/render/footer.js?v=1778079097" defer></script>
+  <script src="app/export.js?v=1778079097" defer></script>
+  <script src="app/main.js?v=1778079097" defer></script>
 </head>
 <body>
 
   <main class="pages" id="pages">
 
-    <!-- ─── Page 1 — Hero + Map + Overview prose ───────────────────────────
-         The hero band lives INSIDE Page 1 so it ships as part of the first
-         A4 sheet when exporting (no duplicate markup, no print-mode hack).
-         On screen the .page is fluid and scrolls; in `.pages.a4-mode` the
-         existing wrapper scales the whole thing to A4 landscape. -->
-    <section class="page page--hero" data-page="overview" data-page-num="1">
+    <!-- ─── Cover — full-bleed navy hero only, no section number.
+         A standalone A4 sheet at the top of the report. Magazine cover
+         feel. Section 01 begins on the next page. -->
+    <section class="page page--hero" data-page="cover">
 
-      <!-- v2 navy gradient hero — replaces the v1 .topbar + .overview-head -->
+      <!-- v2 navy gradient hero -->
       <div class="hero">
         <div class="hero__shell">
           <div class="hero__utility">
@@ -81,9 +79,11 @@
         </div>
       </div>
 
-      <!-- Section 01 head — sits between the hero band and the map + prose
-           grid so the numbered editorial rhythm starts at 01 (matches the
-           design mockup; PDF page numbers also start counting here). -->
+      <button class="btn page-png-btn" data-export-page="cover">PNG</button>
+    </section>
+
+    <!-- Page 1 — Section 01 — Overview (map + prose) -->
+    <section class="page" data-page="overview" data-page-num="1">
       <div class="section-head">
         <span class="section-head__num">01</span>
         <div class="section-head__body">
@@ -93,7 +93,6 @@
         </div>
       </div>
 
-      <!-- Below the hero: map + prose blocks -->
       <div class="overview-layout overview-layout--v2">
         <div class="map-wrap">
           <div class="map-container" id="map-container">

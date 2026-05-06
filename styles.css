@@ -618,9 +618,12 @@ img.link-row__trail:hover { opacity: 1; }
   margin-bottom: 12px;
 }
 
-/* When .page--hero is the FIRST page, drop its top padding so the hero
-   sits flush against the top of the screen / A4 sheet. */
-.page--hero { padding-top: 0 !important; }
+/* The cover (.page--hero) holds ONLY the hero band — no other
+   content. Drop all .page padding so the navy gradient fills the
+   sheet edge-to-edge and there's no stray white/grey gap below
+   the hero. The hero's `margin-bottom` still gives breathing
+   room before the next section on screen. */
+.page--hero { padding: 0 !important; }
 
 /* ── Mega-footer (web only) ─────────────────────────────────
    Full-width navy band that closes the dashboard on screen.
@@ -799,20 +802,21 @@ a:hover { text-decoration: underline; }
   /* No page separator on screen — alternating warm-paper / white
      section backgrounds provide the visual page-to-page rhythm. */
 }
-/* Alternating white / grey rhythm on screen. Pages 1, 3, 5, 7 sit
-   on white; Pages 2, 4, 6 sit on grey. Both sides of the rhythm
-   are stated explicitly (rather than relying on the .page default
-   `background: transparent` for odd pages) so the cascade can't
-   surprise us. `:nth-of-type` is used in addition to `:nth-child`
-   so the rule still matches if a non-<section> element ever lands
-   inside .pages. `.pages.a4-mode .page { background: var(--bg-paper) }`
-   below restores white in PDF / PNG export. */
-.pages > .page:nth-child(odd),
-.pages > section.page:nth-of-type(odd) {
-  background: var(--bg-paper);
-}
+/* Alternating white / grey rhythm on screen.
+   .pages now has 8 children: Cover (.page--hero) at index 1,
+   then Sections 01–07 at indices 2–8. Cover is always navy
+   (hero gradient covers any background), so for the rhythm
+   we want even-indexed sections to be white and odd-indexed
+   sections grey. With cover at index 1 (odd, doesn't matter)
+   the pattern walks: 2 white, 3 grey, 4 white, 5 grey, 6
+   white, 7 grey, 8 white. `.pages.a4-mode .page` below
+   forces white in PDF / PNG export regardless. */
 .pages > .page:nth-child(even),
 .pages > section.page:nth-of-type(even) {
+  background: var(--bg-paper);
+}
+.pages > .page:nth-child(odd),
+.pages > section.page:nth-of-type(odd) {
   background: var(--section-alt-bg);
 }
 
