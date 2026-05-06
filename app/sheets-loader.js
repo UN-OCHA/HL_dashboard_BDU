@@ -138,6 +138,30 @@ var SheetsLoader = (function () {
       })
       .filter(function (r) { return !isNaN(r.year); });
   }
+  // Reference links (tab 11) — feeds Page 2's highlight link list AND
+  // Page 7's Resources columns. Output is grouped by section in
+  // sheet-row order so both pages preserve Valijon's intended order.
+  //   { sections: [{ key, label, items: [{ label, url }] }] }
+  // — section.key is the lowercase slug of the section column,
+  // section.label is the original case (e.g. "Talent initiatives").
+  function parseLinks(csv) {
+    var rows = CSVParser.parseRows(csv);
+    var index = {};   // key → section object
+    var ordered = []; // preserves insertion order
+    rows.forEach(function (r) {
+      var section = String(r.section || "").trim();
+      var label = String(r.label || "").trim();
+      var url = String(r.url || "").trim();
+      if (!section || !label) return;
+      var key = section.toLowerCase();
+      if (!index[key]) {
+        index[key] = { key: key, label: section, items: [] };
+        ordered.push(index[key]);
+      }
+      index[key].items.push({ label: label, url: url });
+    });
+    return { sections: ordered };
+  }
 
   var PARSERS = {
     meta:             parseMeta,
@@ -149,7 +173,8 @@ var SheetsLoader = (function () {
     country_by_grade: parseCountryByGrade,
     gender_by_grade:  parseGenderByGrade,
     gender_trends:    parseGenderTrends,
-    region_trends:    parseRegionTrends
+    region_trends:    parseRegionTrends,
+    links:            parseLinks
   };
 
   function loadAll() {
@@ -168,7 +193,9 @@ var SheetsLoader = (function () {
         })
         .catch(function (err) {
           warnings.push("Failed to load tab \"" + tab + "\": " + err.message);
-          result[tab] = (tab === "meta") ? {} : [];
+          if (tab === "meta")  result[tab] = {};
+          else if (tab === "links") result[tab] = { sections: [] };
+          else                  result[tab] = [];
         });
     });
 

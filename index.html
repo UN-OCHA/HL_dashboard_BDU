@@ -9,33 +9,33 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=1778008619" />
+  <link rel="stylesheet" href="styles.css?v=1778061042" />
 
   <!-- Export libraries (PNG + PDF). Self-hosted in vendor/ so the PDF export
        works even when offline and isn't blocked on a third-party CDN. -->
-  <script src="vendor/html2canvas.min.js?v=1778008619" defer></script>
-  <script src="vendor/jspdf.umd.min.js?v=1778008619" defer></script>
+  <script src="vendor/html2canvas.min.js?v=1778061042" defer></script>
+  <script src="vendor/jspdf.umd.min.js?v=1778061042" defer></script>
 
   <!-- Charts (small purpose-built SVG renderers) -->
-  <script src="app/charts/chart-hbar.js?v=1778008619" defer></script>
-  <script src="app/charts/chart-donut.js?v=1778008619" defer></script>
-  <script src="app/charts/chart-line.js?v=1778008619" defer></script>
-  <script src="app/charts/chart-stacked-col.js?v=1778008619" defer></script>
+  <script src="app/charts/chart-hbar.js?v=1778061042" defer></script>
+  <script src="app/charts/chart-donut.js?v=1778061042" defer></script>
+  <script src="app/charts/chart-line.js?v=1778061042" defer></script>
+  <script src="app/charts/chart-stacked-col.js?v=1778061042" defer></script>
 
   <!-- App modules -->
-  <script src="app/config.js?v=1778008619" defer></script>
-  <script src="app/csv-parser.js?v=1778008619" defer></script>
-  <script src="app/sheets-loader.js?v=1778008619" defer></script>
-  <script src="app/render/header.js?v=1778008619" defer></script>
-  <script src="app/render/kpis.js?v=1778008619" defer></script>
-  <script src="app/render/map.js?v=1778008619" defer></script>
-  <script src="app/render/highlights.js?v=1778008619" defer></script>
-  <script src="app/render/charts.js?v=1778008619" defer></script>
-  <script src="app/render/tables.js?v=1778008619" defer></script>
-  <script src="app/render/resources.js?v=1778008619" defer></script>
-  <script src="app/render/footer.js?v=1778008619" defer></script>
-  <script src="app/export.js?v=1778008619" defer></script>
-  <script src="app/main.js?v=1778008619" defer></script>
+  <script src="app/config.js?v=1778061042" defer></script>
+  <script src="app/csv-parser.js?v=1778061042" defer></script>
+  <script src="app/sheets-loader.js?v=1778061042" defer></script>
+  <script src="app/render/header.js?v=1778061042" defer></script>
+  <script src="app/render/kpis.js?v=1778061042" defer></script>
+  <script src="app/render/map.js?v=1778061042" defer></script>
+  <script src="app/render/highlights.js?v=1778061042" defer></script>
+  <script src="app/render/charts.js?v=1778061042" defer></script>
+  <script src="app/render/tables.js?v=1778061042" defer></script>
+  <script src="app/render/resources.js?v=1778061042" defer></script>
+  <script src="app/render/footer.js?v=1778061042" defer></script>
+  <script src="app/export.js?v=1778061042" defer></script>
+  <script src="app/main.js?v=1778061042" defer></script>
 </head>
 <body>
 
@@ -56,10 +56,6 @@
               <img src="assets/iasc-logo.svg" alt="Inter-Agency Standing Committee" class="hero__logo">
             </a>
             <div class="hero__actions">
-              <button class="hero__btn" id="btn-refresh" title="Reload data from Google Sheet">
-                <span class="hero__btn-icon hero__btn-icon--char" aria-hidden="true">⟳</span>
-                <span>Refresh</span>
-              </button>
               <button class="hero__btn hero__btn--primary" id="btn-pdf" title="Download the whole report as a multi-page A4 PDF">
                 <img src="assets/icons/download.svg" alt="" class="hero__btn-icon">
                 <span>Download PDF</span>
@@ -131,24 +127,9 @@
           <div class="kicker-rule">This month</div>
           <div id="highlight-body" class="highlights-body">—</div>
 
-          <div class="link-list">
-            <a class="link-row" href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener">
-              <span>HC Leadership Profile</span>
-              <img class="link-row__trail" aria-hidden="true" src="assets/icons/link.svg" alt="">
-            </a>
-            <a class="link-row" href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener">
-              <span>HC Terms of Reference</span>
-              <img class="link-row__trail" aria-hidden="true" src="assets/icons/link.svg" alt="">
-            </a>
-            <a class="link-row" href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener">
-              <span>RC Leadership Profile</span>
-              <img class="link-row__trail" aria-hidden="true" src="assets/icons/link.svg" alt="">
-            </a>
-            <a class="link-row" href="mailto:hls@un.org">
-              <span>Contact hls@un.org</span>
-              <img class="link-row__trail" aria-hidden="true" src="assets/icons/link.svg" alt="">
-            </a>
-          </div>
+          <!-- Sheet-driven link list — populated by render/highlights.js
+               from the "11. Reference links" tab, section "Highlight". -->
+          <div class="link-list" id="highlight-links"></div>
         </div>
 
         <div class="framework framework--v2">

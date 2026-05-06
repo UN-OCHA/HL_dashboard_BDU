@@ -32,6 +32,49 @@ var RenderHighlights = (function () {
       m.note_characteristics || "Add a short narrative about the current leadership composition in the Google Sheet meta tab.");
     setHtml("note-trends",
       m.note_trends || "Add a short narrative about long-term trends in the Google Sheet meta tab.");
+
+    // Page 2 — highlight link list. Reads section "Highlight" rows from
+    // the sheet's "11. Reference links" tab (state.links.sections).
+    renderHighlightLinks(state.links);
+  }
+
+  function renderHighlightLinks(linksData) {
+    var root = document.getElementById("highlight-links");
+    if (!root) return;
+    while (root.firstChild) root.removeChild(root.firstChild);
+
+    var section = ((linksData && linksData.sections) || [])
+      .filter(function (s) { return s.key === "highlight"; })[0];
+    var items = section ? section.items : [];
+
+    if (!items.length) {
+      // Empty-state hint so editors know where to add links.
+      var empty = document.createElement("div");
+      empty.className = "td-missing";
+      empty.textContent = "Add Highlight rows to the “11. Reference links” tab to populate this list.";
+      root.appendChild(empty);
+      return;
+    }
+
+    items.forEach(function (item) {
+      var a = document.createElement("a");
+      a.className = "link-row";
+      a.href = item.url || "#";
+      if (/^https?:/i.test(item.url)) {
+        a.target = "_blank";
+        a.rel = "noopener";
+      }
+      var label = document.createElement("span");
+      label.textContent = item.label;
+      a.appendChild(label);
+      var trail = document.createElement("img");
+      trail.className = "link-row__trail";
+      trail.setAttribute("aria-hidden", "true");
+      trail.src = "assets/icons/link.svg";
+      trail.alt = "";
+      a.appendChild(trail);
+      root.appendChild(a);
+    });
   }
 
   function setHtml(id, raw) {

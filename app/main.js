@@ -39,7 +39,7 @@
     RenderHighlights.render(state);
     RenderCharts.render(state);
     RenderTables.render(state);
-    RenderResources.render();
+    RenderResources.render(state);
     RenderFooter.render(state);
   }
 
@@ -60,18 +60,9 @@
   }
 
   function wireUi() {
-    var refresh = document.getElementById("btn-refresh");
-    if (refresh) {
-      refresh.addEventListener("click", function () {
-        SheetsLoader.clearCache();
-        refresh.disabled = true;
-        refresh.textContent = "⟳ Refreshing…";
-        load().finally(function () {
-          refresh.disabled = false;
-          refresh.textContent = "⟳ Refresh data";
-        });
-      });
-    }
+    // Refresh button removed in v2 — sheet edits propagate within
+    // ~2 min via the gviz cache + 60 s client cache, and a hard
+    // page reload always pulls fresh data.
     var pdf = document.getElementById("btn-pdf");
     if (pdf) {
       pdf.addEventListener("click", function () {

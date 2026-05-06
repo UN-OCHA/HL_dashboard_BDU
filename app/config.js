@@ -41,7 +41,16 @@ var HLConfig = (function () {
     gender_trends:    "7. Gender trend, 1992 → present",
     region_trends:    "8. Region trend, 1992 → present",
     leaders:          "9. Leaders (roster)",
-    contacts:         "10. Contact directory"
+    contacts:         "10. Contact directory",
+    // Single editable tab that drives BOTH the Page-2 highlight link
+    // list AND the Page-7 Resources columns. Columns:
+    //   section  — group key. "Highlight" → Page 2 link list;
+    //              anything else (e.g. "Guidance", "Voices",
+    //              "Talent initiatives") → a Resources column on
+    //              Page 7. Order in the sheet drives display order.
+    //   label    — visible link text.
+    //   url      — http(s):// or mailto: URL.
+    links:            "11. Reference links"
   };
   var TAB_NAMES = Object.keys(TAB_TITLES);
 
@@ -89,7 +98,8 @@ var HLConfig = (function () {
     country_by_grade: "data/initial/country_by_grade.csv",
     gender_by_grade:  "data/initial/gender_by_grade.csv",
     gender_trends:    "data/initial/gender_trends.csv",
-    region_trends:    "data/initial/region_trends.csv"
+    region_trends:    "data/initial/region_trends.csv",
+    links:            "data/initial/links.csv"
   };
 
   function csvUrlFor(tabName) {
