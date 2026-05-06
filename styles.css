@@ -1408,10 +1408,11 @@ a:hover { text-decoration: underline; }
   gap: 32px;
   min-height: 0;
 }
-/* v2: when .chart-grid is a direct child of .page (no longer wrapped
-   inside .page-body), let it take the available vertical space so the
-   chart cards stretch nicely between section-head and observation. */
-.page > .chart-grid { flex: 1; }
+/* On screen the chart grid sits at its natural content height so the
+   alternating page bg (white / grey) shows clearly around the cards.
+   In `.a4-mode` we re-enable flex:1 so the grid fills the A4 sheet
+   exactly between the section-head and the observation callout. */
+.pages.a4-mode .page > .chart-grid { flex: 1; }
 /* v2: observation callout sits right under the chart grid. Auto height. */
 .page > .observation { flex: 0 0 auto; }
 /* Slide 3: 4 charts in a 2 × 2 grid, matching the PPT layout. */
@@ -1431,12 +1432,11 @@ a:hover { text-decoration: underline; }
   padding: 22px 24px;
   border-radius: 6px;
   min-height: 0;
-  /* Transparent so the alternating page background (white on Pages
-     1/3/5/7, grey on 2/4/6) shows through. The border alone defines
-     the card on either surface. White-on-grey wasn't actually
-     readable as alternation because the white card filled almost
-     the whole page on Pages 4 + 6. */
-  background: transparent;
+  /* White card on alternating bg: pops against grey on Page 4,
+     reads as a subtle bordered region on the white pages (3/5/7).
+     The grey shows around the card via the chart-grid `gap` and
+     the page-level vertical padding above and below. */
+  background: #fff;
 }
 .chart-card h3 {
   font-size: 1em;
@@ -1532,16 +1532,18 @@ a:hover { text-decoration: underline; }
 .table-wrap {
   margin-top: 22px;
   border: 1px solid var(--border-soft);
-  /* Transparent so the alternating page background shows through —
-     white-on-grey on Page 6 (Contacts) was hiding nearly all of the
-     section's grey because the table-wrap is `flex: 1` and fills the
-     remaining vertical space. Keeping just the border frame. */
-  background: transparent;
-  flex: 1;
+  /* White card on the alternating page bg — same pattern as
+     .chart-card: white pops against the grey on Page 6, reads
+     as a subtle bordered region on white Page 5. */
+  background: #fff;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  /* No flex-grow on screen — let the table size to its content so
+     the grey page bg shows clearly above and below. In `.a4-mode`
+     we re-enable flex:1 so the table fills the A4 sheet exactly. */
 }
+.pages.a4-mode .table-wrap { flex: 1; }
 .table-toolbar {
   display: flex;
   justify-content: space-between;
