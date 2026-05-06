@@ -1419,7 +1419,12 @@ a:hover { text-decoration: underline; }
   padding: 22px 24px;
   border-radius: 6px;
   min-height: 0;
-  background: #fff;
+  /* Transparent so the alternating page background (white on Pages
+     1/3/5/7, grey on 2/4/6) shows through. The border alone defines
+     the card on either surface. White-on-grey wasn't actually
+     readable as alternation because the white card filled almost
+     the whole page on Pages 4 + 6. */
+  background: transparent;
 }
 .chart-card h3 {
   font-size: 1em;
@@ -1515,7 +1520,11 @@ a:hover { text-decoration: underline; }
 .table-wrap {
   margin-top: 22px;
   border: 1px solid var(--border-soft);
-  background: #fff;
+  /* Transparent so the alternating page background shows through —
+     white-on-grey on Page 6 (Contacts) was hiding nearly all of the
+     section's grey because the table-wrap is `flex: 1` and fills the
+     remaining vertical space. Keeping just the border frame. */
+  background: transparent;
   flex: 1;
   display: flex;
   flex-direction: column;
