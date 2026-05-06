@@ -94,10 +94,12 @@
   /* Alternating section background — applied to even-indexed .page
      sections (Pages 2 / 4 / 6) so the dashboard reads as a clear
      editorial rhythm of white / grey / white / grey. Cool grey so it
-     pairs with UN Blue rather than competing with it. Old name was
-     --ocha-warm-bg / --ocha-warm-rule (warm paper); v2 is grey. */
-  --section-alt-bg:   #F1F3F6;
-  --section-alt-rule: #DEE3E9;
+     pairs with UN Blue rather than competing with it. Bumped from
+     #F1F3F6 → #E9EDF1 so the alternation reads clearly even from
+     across the room. Old name was --ocha-warm-bg / --ocha-warm-rule
+     (warm paper); v2 is grey. */
+  --section-alt-bg:   #E9EDF1;
+  --section-alt-rule: #D7DCE2;
   --ocha-ink:       #1A1F2C;          /* slightly inkier body for editorial */
   --hero-from:      var(--brand-primary--navy);  /* navy 1, hero gradient top */
   --hero-to:        #003C7D;          /* gradient bottom (warmer than navy) */
@@ -797,10 +799,20 @@ a:hover { text-decoration: underline; }
   /* No page separator on screen — alternating warm-paper / white
      section backgrounds provide the visual page-to-page rhythm. */
 }
-/* Alternating warm-paper / white rhythm on screen — Page 2, 4, 6 sit
-   on warm bg, Page 1, 3, 5, 7 on white. Inverted in `.pages.a4-mode`
-   so PDF sheets stay clean white. */
-.pages > .page:nth-child(even) {
+/* Alternating white / grey rhythm on screen. Pages 1, 3, 5, 7 sit
+   on white; Pages 2, 4, 6 sit on grey. Both sides of the rhythm
+   are stated explicitly (rather than relying on the .page default
+   `background: transparent` for odd pages) so the cascade can't
+   surprise us. `:nth-of-type` is used in addition to `:nth-child`
+   so the rule still matches if a non-<section> element ever lands
+   inside .pages. `.pages.a4-mode .page { background: var(--bg-paper) }`
+   below restores white in PDF / PNG export. */
+.pages > .page:nth-child(odd),
+.pages > section.page:nth-of-type(odd) {
+  background: var(--bg-paper);
+}
+.pages > .page:nth-child(even),
+.pages > section.page:nth-of-type(even) {
   background: var(--section-alt-bg);
 }
 
