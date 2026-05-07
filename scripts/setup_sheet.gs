@@ -30,7 +30,8 @@ var BRAND = {
   purple:     "#A05FB4",
   gold:       "#FFC800",
   grey:       "#4D4D4D",
-  lightGrey:  "#F2F2F2"
+  lightGrey:  "#F2F2F2",
+  lightBlue:  "#64BDEA"
 };
 
 // Tab catalogue — what each tab is for, what columns it needs, starter
@@ -147,13 +148,18 @@ var TABS = [
     group: "Chart",
     color: BRAND.orange,
     description:
-      "Grouped bar chart on page 3. One row per UN grade (ASG / D2 / D1). " +
-      "Columns: WEOG count, Non-WEOG count.",
+      "Stacked bar chart on page 3. One row per UN grade. Columns: " +
+      "WEOG count, Non-WEOG count. Rows are pre-seeded for the full " +
+      "UN-grade ladder (ASG → P5) so Valijon only has to fill values; " +
+      "delete a row entirely if a grade is not represented.",
     headers: ["grade", "weog", "non_weog"],
     rows: [
       ["ASG", 6, 8],
       ["D2",  3, 8],
-      ["D1",  2, 0]
+      ["D1",  2, 0],
+      ["P5",  0, 0],
+      ["P4",  0, 0],
+      ["P3",  0, 0]
     ]
   },
   {
@@ -163,12 +169,17 @@ var TABS = [
     color: BRAND.orange,
     description:
       "Grouped bar chart on page 3. One row per UN grade. Columns: " +
-      "female, male (absolute counts).",
+      "female, male (absolute counts). Pre-seeded for the full UN-grade " +
+      "ladder (ASG → P5) — fill values; delete a row if a grade isn't " +
+      "represented.",
     headers: ["grade", "female", "male"],
     rows: [
       ["ASG", 4, 10],
       ["D2",  6,  5],
-      ["D1",  2,  0]
+      ["D1",  2,  0],
+      ["P5",  0,  0],
+      ["P4",  0,  0],
+      ["P3",  0,  0]
     ]
   },
 
@@ -264,6 +275,35 @@ var TABS = [
       "pa_name", "pa_phone", "ea_name", "ea_phone"
     ],
     rows: []   // names auto-copied from 'leaders' on first sync; see below
+  },
+  {
+    key: "links",
+    title: "11. Reference links",
+    group: "References",
+    color: BRAND.lightBlue,
+    description:
+      "Drives BOTH the Page 2 highlight link list AND the Page 7 " +
+      "Resources columns. Section column groups rows: rows where " +
+      "section = 'Highlight' show on Page 2 under the monthly " +
+      "highlight prose; everything else (Guidance, Voices, Talent " +
+      "initiatives, …) renders as a column on Page 7. Order in this " +
+      "tab drives display order.",
+    headers: ["section", "label", "url"],
+    rows: [
+      ["Highlight",          "HC Leadership Profile",                       "https://interagencystandingcommittee.org/"],
+      ["Highlight",          "HC Terms of Reference",                       "https://interagencystandingcommittee.org/"],
+      ["Highlight",          "RC Leadership Profile",                       "https://interagencystandingcommittee.org/"],
+      ["Highlight",          "Contact hls@un.org",                          "mailto:hls@un.org"],
+      ["Guidance",           "Humanitarian Reset",                          "https://interagencystandingcommittee.org/"],
+      ["Guidance",           "Inter-Agency Standing Committee (IASC)",      "https://interagencystandingcommittee.org/"],
+      ["Guidance",           "OCHA Humanitarian Leadership Strengthening",  "https://www.unocha.org/"],
+      ["Guidance",           "Leadership in Humanitarian Action Handbook",  "https://interagencystandingcommittee.org/"],
+      ["Guidance",           "Leading an Emergency Response",               "https://interagencystandingcommittee.org/"],
+      ["Voices",             "ERG's Humanifesto",                           "https://interagencystandingcommittee.org/"],
+      ["Voices",             "I Was There: voices of humanitarian leadership", "https://interagencystandingcommittee.org/"],
+      ["Voices",             "Humanitarian Leadership stories",             "https://interagencystandingcommittee.org/"],
+      ["Talent initiatives", "RC/HC Talent Pipeline",                       "https://unsceb.org/"]
+    ]
   }
 ];
 

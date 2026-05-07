@@ -18,7 +18,16 @@
     bar.className = "data-error";
     bar.style.margin = "12px 20px";
     bar.textContent = msg;
-    document.body.insertBefore(bar, document.body.firstChild.nextSibling);
+    // Safe append: insertBefore(bar, null) appends at the end of body
+    // when there's no second child. This never throws.
+    var anchor = document.body.firstChild
+      ? document.body.firstChild.nextSibling
+      : null;
+    if (anchor && anchor.parentNode === document.body) {
+      document.body.insertBefore(bar, anchor);
+    } else {
+      document.body.appendChild(bar);
+    }
   }
 
   // Last-rendered state, kept around so the PNG exporter can ask for a
@@ -32,15 +41,25 @@
     if (state._warnings && state._warnings.length > 0) {
       console.warn("[HL Dashboard] Data warnings:", state._warnings);
     }
-    RenderHeader.render(state);
-    RenderKpis.render(state);
-    // Map is async (fetches the SVG); charts and tables are sync.
-    RenderMap.render(state);
-    RenderHighlights.render(state);
-    RenderCharts.render(state);
-    RenderTables.render(state);
-    RenderResources.render();
-    RenderFooter.render(state);
+    // Each renderer is wrapped so a single section's failure can't
+    // blank every section below it. Errors are logged + surfaced as
+    // a non-blocking warning bar; the rest of the dashboard renders.
+    safeRender("header",     function () { RenderHeader.render(state); });
+    safeRender("kpis",       function () { RenderKpis.render(state); });
+    safeRender("map",        function () { RenderMap.render(state); });
+    safeRender("highlights", function () { RenderHighlights.render(state); });
+    safeRender("charts",     function () { RenderCharts.render(state); });
+    safeRender("tables",     function () { RenderTables.render(state); });
+    safeRender("resources",  function () { RenderResources.render(state); });
+    safeRender("footer",     function () { RenderFooter.render(state); });
+  }
+
+  function safeRender(label, fn) {
+    try { fn(); }
+    catch (err) {
+      console.error("[HL Dashboard] " + label + " render failed:", err);
+      mountErr("Render error in “" + label + "” section: " + err.message);
+    }
   }
 
   // Re-render only the parts whose layout depends on container size —
@@ -60,18 +79,9 @@
   }
 
   function wireUi() {
-    var refresh = document.getElementById("btn-refresh");
-    if (refresh) {
-      refresh.addEventListener("click", function () {
-        SheetsLoader.clearCache();
-        refresh.disabled = true;
-        refresh.textContent = "⟳ Refreshing…";
-        load().finally(function () {
-          refresh.disabled = false;
-          refresh.textContent = "⟳ Refresh data";
-        });
-      });
-    }
+    // Refresh button removed in v2 — sheet edits propagate within
+    // ~2 min via the gviz cache + 60 s client cache, and a hard
+    // page reload always pulls fresh data.
     var pdf = document.getElementById("btn-pdf");
     if (pdf) {
       pdf.addEventListener("click", function () {

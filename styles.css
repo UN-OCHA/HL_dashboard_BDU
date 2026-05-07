@@ -67,7 +67,13 @@
   --bg-paper:   #FFFFFF;           /* inside of .page                */
   --bg-soft:    #F6F9FC;           /* subtle surface for accent cards */
   --border:     #E6EAEF;
-  --border-soft:#EEF2F6;
+  /* Bumped from #EEF2F6 → #D5DCE3 in v2 so chart-card outlines and
+     table row separators read clearly against the white surface
+     without feeling heavy. Used by .chart-card, .chart-card__head
+     underline, .table-wrap, .table-toolbar bottom rule, table.data
+     td bottom rules, .page-foot top rule, and chart-axis tick lines
+     (which stay subtle thanks to their .5 stroke-width). */
+  --border-soft:#D5DCE3;
   --border-rule:#E1E8EF;           /* slightly warmer for section rules */
 
   /* A4 LANDSCAPE at 96 DPI (297mm × 210mm) */
@@ -78,6 +84,25 @@
   /* Elevation */
   --shadow-1: 0 1px 3px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
   --shadow-2: 0 4px 14px rgba(0,0,0,.08), 0 10px 30px rgba(0,0,0,.05);
+
+  /* ── v2 redesign tokens ──────────────────────────────────────
+     Editorial layer added on top of the OCHA design system. These
+     tokens drive the navy hero, the alternating warm-paper / white
+     section rhythm, and the inkier body colour. Every value is a
+     warm-neutral or a re-alias of an existing OCHA blue — no new
+     brand colours. */
+  /* Alternating section background — applied to even-indexed .page
+     sections (Pages 2 / 4 / 6) so the dashboard reads as a clear
+     editorial rhythm of white / grey / white / grey. Cool grey so it
+     pairs with UN Blue rather than competing with it. Bumped from
+     #F1F3F6 → #E9EDF1 so the alternation reads clearly even from
+     across the room. Old name was --ocha-warm-bg / --ocha-warm-rule
+     (warm paper); v2 is grey. */
+  --section-alt-bg:   #E9EDF1;
+  --section-alt-rule: #D7DCE2;
+  --ocha-ink:       #1A1F2C;          /* slightly inkier body for editorial */
+  --hero-from:      var(--brand-primary--navy);  /* navy 1, hero gradient top */
+  --hero-to:        #003C7D;          /* gradient bottom (warmer than navy) */
 }
 
 /* Local Roboto (so PDFs render correctly offline).
@@ -118,6 +143,533 @@
   src: local('Roboto Condensed Bold'), url('assets/fonts/RobotoCondensed-Bold.woff2') format('woff2');
 }
 
+/* =============================================================
+   v2 redesign primitives
+   -------------------------------------------------------------
+   Shared building blocks introduced for the editorial redesign.
+   Each is a pure CSS recipe — no JS changes required — so any
+   render module can adopt them without touching the others.
+
+   Inventory:
+     .section-head          editorial section heading (kicker + title + dek)
+     .chart-card__head      title + figure tag row inside a chart card
+     .chart-card__title
+     .chart-card__tag
+     .observation           full-width callout under a chart group
+     .observation__kicker
+     .kicker-rule           small uppercase eyebrow with bottom warm-rule
+     .link-row              full-width row with trailing external icon
+     .hero / .hero__*       Page 1 navy gradient hero band (Phase 2 mounts it)
+     .mega-footer           navy bottom bar (Phase 5 mounts it)
+
+   These primitives DO NOT replace existing classes (e.g. `.page-head`,
+   `.chart-card`); they're additive. Phase 2+ will migrate templates
+   onto them while leaving v1 fallbacks intact for safety.
+   ============================================================= */
+
+/* ── section-head — used in place of .page-head where the redesign
+   wants a numbered tab + kicker + condensed title + italic dek
+   rhythm. The 2-digit number sits left of the body block on a 2 px
+   UN-Blue rule (matches the design mockup) — its ordinal also
+   appears in the PDF and Google Sheet so producers and editors
+   can talk in the same vocabulary ("update section 03"). */
+.section-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+  margin-bottom: 22px;
+}
+.section-head__num {
+  flex: 0 0 auto;
+  min-width: 36px;
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: .16em;
+  color: var(--brand-primary);
+  padding-top: 10px;
+  border-top: 2px solid var(--brand-primary);
+}
+.section-head__body {
+  flex: 1;
+  min-width: 0;
+}
+.section-head__kicker {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 11.5px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--blue-3);
+  margin-bottom: 6px;
+}
+.section-head__title {
+  margin: 0;
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: clamp(30px, 3.4vw, 44px);
+  line-height: 1.05;
+  letter-spacing: -0.012em;
+  color: var(--text-title);
+}
+.section-head__dek {
+  margin-top: 8px;
+  font-size: 17px;
+  line-height: 1.5;
+  color: #4b5563;
+  font-style: italic;
+  max-width: 820px;
+  text-wrap: pretty;
+}
+.section-head__action {
+  flex: 0 0 auto;
+}
+
+/* ── chart-card BEM extensions — sit on top of the existing .chart-card.
+   The plain .chart-card stays available for any caller that doesn't
+   need the figure-tag head pattern. */
+.chart-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-soft);
+  gap: 12px;
+}
+.chart-card__title {
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.005em;
+  color: var(--text-title);
+  margin: 0;
+}
+.chart-card__tag {
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--blue-3);
+  white-space: nowrap;
+}
+
+/* ── observation — call-out placed below a chart grid.
+   Outer wrapper participates in the page content shell (so its
+   left + right edges align with chart-grid above); the warm-bg
+   styling lives on .observation__inner so the visible block has
+   its own balanced internal padding regardless of the shell
+   horizontal padding. */
+.observation {
+  margin-top: 22px;
+  /* No background or border here — those are on .observation__inner. */
+}
+.observation__inner {
+  background: var(--section-alt-bg);
+  border-left: 3px solid var(--brand-primary);
+  padding: 18px 24px;
+}
+.observation__kicker {
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text-title);
+  margin-bottom: 6px;
+}
+.observation__body {
+  font-size: 17px;
+  line-height: 1.55;
+  color: #1f2937;
+  text-wrap: pretty;
+}
+.observation__body p { margin: 0 0 8px; }
+.observation__body p:last-child { margin: 0; }
+
+/* ── kicker-rule — small uppercase eyebrow above a prose block,
+   with a bottom rule that sits on the section's warm tint. */
+.kicker-rule {
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text-title);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--section-alt-rule);
+}
+
+/* ── link-row — full-width interactive row, used in the Highlights
+   link list and the Resources columns. Trailing space reserved for
+   an external-link or chevron icon. */
+.link-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--section-alt-rule);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-title);
+  text-decoration: none;
+  cursor: pointer;
+}
+.link-row:hover { color: var(--brand-primary--text); }
+.link-row__trail {
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+/* Where .link-row__trail is the OCHA Link icon <img>, render it
+   small + muted. (SVG uses currentColor but <img> fixes the colour
+   to the SVG's intrinsic UN-Blue, which sits well in the link list
+   without further treatment.) */
+img.link-row__trail {
+  width: 12px;
+  height: 12px;
+  opacity: .7;
+}
+img.link-row__trail:hover { opacity: 1; }
+
+/* ── Hero band (Page 1 only) ────────────────────────────────
+   Navy gradient that opens the dashboard. Lives inside Page 1
+   so it ships with A4 sheet 1 in print, but on screen it breaks
+   out to 100 vw via the standard "negative-margin to viewport"
+   trick — gives a true editorial full-bleed regardless of
+   .pages padding. In `.pages.a4-mode` (PDF export) we cancel
+   the break-out below so the hero sits inside the A4 sheet. */
+.hero {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  /* Breathing room between the navy band and the section 01 head
+     that follows. Set as margin-bottom (rather than rolling it into
+     the gradient padding) so the gradient ends crisply at the bottom
+     edge of the hero — the gap below is white/warm-bg, not navy. */
+  margin-bottom: clamp(40px, 4vw, 72px);
+  padding: 40px 0 56px;
+  background: linear-gradient(180deg, var(--hero-from) 0%, var(--hero-to) 100%);
+  color: #fff;
+  overflow: hidden;
+}
+/* In A4 / print mode, hero stays inside its .page-inner box. */
+.pages.a4-mode .hero {
+  width: auto;
+  margin-left: 0;
+  margin-right: 0;
+}
+/* Fine vertical-grid texture in the hero — purely decorative,
+   pulled almost imperceptible. Uses repeating-linear-gradient
+   so no extra DOM nodes are needed. Stripe alpha was dropped
+   from 0.04 → 0.015 per design feedback (was reading too active
+   against the navy gradient). */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(255,255,255,0.015) 0,
+    rgba(255,255,255,0.015) 1px,
+    transparent 1px,
+    transparent 80px);
+  pointer-events: none;
+}
+.hero__shell {
+  position: relative;
+  /* Content shell — centers hero contents at a comfortable
+     reading max while the navy gradient .hero stays 100 vw. */
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 72px);
+}
+.pages.a4-mode .hero__shell {
+  max-width: none;
+  padding: 0 56px;
+}
+
+/* Top utility row — IASC logo on the left, action buttons right. */
+.hero__utility {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 36px;
+}
+.hero__brand { display: inline-flex; align-items: center; }
+.hero__logo {
+  height: 26px;
+  width: auto;
+  display: block;
+  filter: brightness(0) invert(1);   /* render the navy SVG as white */
+}
+.hero__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.hero__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.hero__btn:hover { background: rgba(255,255,255,0.12); }
+.hero__btn--primary {
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+.hero__btn--primary:hover { background: #00B0EE; }
+/* OCHA-icon glyph inside hero buttons. <img> renders white via the
+   filter trick (since the SVG uses currentColor + #009edb fallback,
+   and we want it pure white in the navy hero context). */
+.hero__btn-icon {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  vertical-align: -2px;
+  filter: brightness(0) invert(1);
+}
+.hero__btn-icon--char {
+  width: auto;
+  height: auto;
+  filter: none;
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Masthead — kicker + oversized condensed title + subline. */
+.hero__masthead { max-width: 920px; margin-bottom: 40px; }
+.hero__kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 12.5px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--brand-primary--pale);
+  margin-bottom: 18px;
+}
+.hero__kicker-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--brand-primary);
+  display: inline-block;
+}
+.hero__title {
+  margin: 0;
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: clamp(36px, 6vw, 76px);
+  line-height: 0.96;
+  letter-spacing: -0.018em;
+  color: #fff;
+}
+.hero__subline {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-family: var(--font-cond);
+  font-size: 16px;
+  color: var(--brand-primary--pale);
+  letter-spacing: .04em;
+}
+.hero__subline strong {
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+.hero__sep { opacity: .5; }
+
+/* KPI rail — 5 cells, white-on-navy, separated by hairline rules.
+   Overrides the default .kpi card style when its parent is .hero__rail. */
+.hero__rail {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.14);
+}
+.hero__rail .kpi {
+  background: transparent;
+  border-left: 1px solid rgba(255,255,255,0.14);
+  border-radius: 0;
+  padding: 22px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 0;
+}
+.hero__rail .kpi:first-child { border-left: none; }
+.hero__rail .kpi .kpi-icon {
+  width: 36px;
+  height: 36px;
+  margin-bottom: 8px;
+  align-self: flex-start;
+  justify-self: flex-start;
+}
+.hero__rail .kpi .kpi-icon svg path,
+.hero__rail .kpi .kpi-icon svg circle,
+.hero__rail .kpi .kpi-icon svg polygon { fill: var(--brand-primary--light); }
+.hero__rail .kpi .value {
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 56px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: #fff;
+  grid-column: auto;
+  grid-row: auto;
+}
+.hero__rail .kpi .value .unit {
+  font-size: .55em;
+  margin-left: 2px;
+  color: var(--brand-primary--pale);
+}
+.hero__rail .kpi .label {
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+  line-height: 1.35;
+  letter-spacing: 0;
+  text-transform: none;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+/* ── Page-1 v2 layout (.overview-layout--v2) ────────────────
+   Hero takes the top of the page, then the map sits full-width
+   below it, then the two prose blocks share a 2-column row. */
+.overview-layout--v2 {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 28px 24px;
+  margin-top: 28px;
+  /* On desktop, .page--hero keeps its horizontal padding from .page
+     (only padding-top is reset to 0 so the hero sits flush at top).
+     That means non-hero content here inherits the same horizontal
+     inset as every other .page — DO NOT add horizontal padding here
+     or Page 1's content will sit further in than every other page.
+     Mobile / tablet re-add this padding because .page--hero is
+     `padding: 0` there to let the hero escape on small screens. */
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+}
+/* Specificity bumped via the chained class selector — the v1
+   rule `.overview-layout .map-wrap { grid-column: span 9 }`
+   sits later in source order with the same (0,2,0) specificity
+   and was winning the cascade. Chaining both classes together
+   gives (0,3,0) so the v2 layout (full-width map, prose row
+   below) is the one that actually applies. */
+.overview-layout.overview-layout--v2 .map-wrap { grid-column: 1 / -1; grid-row: 1; min-height: 0; }
+.overview-layout.overview-layout--v2 .overview-block--overview { grid-column: span 6; grid-row: 2; }
+.overview-layout.overview-layout--v2 .overview-block--lotm     { grid-column: span 6; grid-row: 2; }
+.overview-layout--v2 .map-wrap {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+/* Map container matches the world-map.svg's natural aspect ratio
+   (868.5 / 523.77 ≈ 1.66) so when its width grows to fill the
+   shell, its height grows in step. Combined with the map's
+   `preserveAspectRatio="xMinYMid meet"` this guarantees the map
+   image fills the container edge-to-edge — no empty space on
+   the right at any viewport. */
+.overview-layout--v2 .map-wrap .map-container {
+  width: 100%;
+  aspect-ratio: 868.5 / 523.77;
+  height: auto;
+  flex: 0 0 auto;
+}
+.overview-layout--v2 .overview-block {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+/* Override the v1 .overview-block h3 styling for v2 — use the
+   kicker-rule treatment (Roboto Condensed, .18em letterspaced,
+   navy text, warm-rule underline). Specificity needs to match
+   `.overview-block h3` (0,1,1). */
+.overview-layout--v2 .overview-block h3 {
+  font-family: var(--font-cond);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text-title);
+  border-bottom: 1px solid var(--section-alt-rule);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+/* The cover (.page--hero) holds ONLY the hero band — no other
+   content. Drop all .page padding so the navy gradient fills the
+   sheet edge-to-edge and there's no stray white/grey gap below
+   the hero. The hero's `margin-bottom` still gives breathing
+   room before the next section on screen. */
+.page--hero { padding: 0 !important; }
+
+/* ── Mega-footer (web only) ─────────────────────────────────
+   Full-width navy band that closes the dashboard on screen.
+   Hidden in print + A4 export — the per-page .page-foot
+   handles PDF page-numbering. */
+.mega-footer {
+  background: var(--brand-primary--navy);
+  color: #fff;
+  padding: 36px 0 32px;
+  margin-top: 0;
+}
+.mega-footer__shell {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 72px);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.mega-footer__brand {
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: .04em;
+  color: #fff;
+}
+.mega-footer__meta {
+  font-family: var(--font-cond);
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  text-align: right;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+
+/* Hide mega-footer in A4 export and print — the per-page foot
+   keeps page numbers in the PDF. The web view shows the mega
+   footer instead of repeating the small page foot at the bottom. */
+.pages.a4-mode ~ .mega-footer { display: none; }
+@media print { .mega-footer { display: none !important; } }
+
+/* End of v2 primitives ===================================== */
+
 /* Reset ---------------------------------------------------- */
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
@@ -132,6 +684,13 @@ body {
   background: var(--bg-page);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* The Page-1 hero uses `width: 100vw` + negative margins to break
+     out of its container and become a true full-bleed band. On some
+     browsers 100vw includes the vertical scrollbar width and causes
+     a few pixels of horizontal scroll on the body. Clipping here is
+     safe because nothing legitimately scrolls horizontally — wide
+     tables scroll inside their own container. */
+  overflow-x: hidden;
 }
 /* A4 (print + PNG export) drops the root to 13 px so the compact
    layout fits an A4 landscape sheet. */
@@ -203,9 +762,14 @@ a:hover { text-decoration: underline; }
   flex-direction: column;
   align-items: stretch;
   gap: 0;
-  padding: clamp(20px, 3vw, 40px) clamp(20px, 6vw, 72px);
-  max-width: 1500px;
-  margin: 0 auto;
+  /* v2: container has NO horizontal padding so each .page can host
+     its own alternating background (white / warm-paper) that runs
+     edge-to-edge across the viewport. Each .page provides its own
+     horizontal padding instead. `.pages.a4-mode` below resets to
+     the per-sheet model for PDF export. */
+  padding: 0;
+  max-width: none;
+  margin: 0;
   background: var(--bg-paper);
 }
 
@@ -223,14 +787,58 @@ a:hover { text-decoration: underline; }
   max-width: none;
   margin: 0;
   min-height: auto;
-  padding: clamp(48px, 5vw, 72px) 0;   /* generous vertical rhythm */
+  /* v2: .page provides only the vertical rhythm. Horizontal padding
+     lives INSIDE each content shell (see `.page > .section-head`
+     etc. below) so hero shell + page content shell share the exact
+     same internal-padding pattern — content edges line up across
+     every page on every viewport. The alternating warm-paper bg
+     can still fill the viewport edge-to-edge because .page itself
+     has no horizontal padding. */
+  padding: clamp(48px, 5vw, 72px) 0;
   background: transparent;
   box-shadow: none;
   display: flex;
   flex-direction: column;
-  /* Darker, slightly heavier page-to-page separator than the lighter
-     --border-rule used inside each page (page-head underline etc). */
-  border-top: 2px solid #A9B6C2;
+  /* No page separator on screen — alternating warm-paper / white
+     section backgrounds provide the visual page-to-page rhythm. */
+}
+/* Alternating white / grey rhythm on screen.
+   .pages now has 8 children: Cover (.page--hero) at index 1,
+   then Sections 01–07 at indices 2–8. Cover is always navy
+   (hero gradient covers any background), so for the rhythm
+   we want even-indexed sections to be white and odd-indexed
+   sections grey. With cover at index 1 (odd, doesn't matter)
+   the pattern walks: 2 white, 3 grey, 4 white, 5 grey, 6
+   white, 7 grey, 8 white. `.pages.a4-mode .page` below
+   forces white in PDF / PNG export regardless. */
+.pages > .page:nth-child(even),
+.pages > section.page:nth-of-type(even) {
+  background: var(--bg-paper);
+}
+.pages > .page:nth-child(odd),
+.pages > section.page:nth-of-type(odd) {
+  background: var(--section-alt-bg);
+}
+
+/* v2 content shell — centres each .page's CONTENT at a comfortable
+   reading max while the .page BACKGROUND (warm-paper, navy hero,
+   etc.) keeps spanning the full viewport. Same pattern as the
+   Claude Design mockup's `.heroShell`: max-width 1500 px + internal
+   horizontal padding so content edges sit at the SAME x-coordinate
+   on every page. .page itself has no horizontal padding. */
+.page > .section-head,
+.page > .chart-grid,
+.page > .observation,
+.page > .table-wrap,
+.page > .highlights-grid,
+.page > .resources,
+.page > .overview-layout--v2 {
+  max-width: 1500px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(20px, 4vw, 72px);
+  padding-right: clamp(20px, 4vw, 72px);
 }
 .page:first-child { border-top: 0; padding-top: clamp(8px, 1vw, 16px); }
 .page:last-child  { padding-bottom: clamp(24px, 3vw, 40px); }
@@ -295,6 +903,27 @@ a:hover { text-decoration: underline; }
   z-index: 5;
 }
 .pages.a4-mode .page:hover .page-png-btn { opacity: 1; }
+
+/* ── v2 Hero in A4 mode (PDF + PNG export) ────────────────────
+   Fires when JS toggles `.pages.a4-mode` for export — whether on
+   screen during PNG capture or in real print. The hero compresses
+   so the whole Page 1 (hero + map + prose) fits one A4 landscape
+   sheet (1500 × 1061 inner box). Numbers tuned to leave ~530 px
+   for map and ~250 px for the prose row beneath. */
+.pages.a4-mode .hero { padding: 26px 0 34px; }
+.pages.a4-mode .hero__utility { padding-bottom: 28px; }
+.pages.a4-mode .hero__masthead { margin-bottom: 32px; }
+.pages.a4-mode .hero__title { font-size: 60px; }
+.pages.a4-mode .hero__subline { font-size: 14px; margin-top: 14px; }
+.pages.a4-mode .hero__rail .kpi { padding: 16px 18px 18px; }
+.pages.a4-mode .hero__rail .kpi .value { font-size: 44px; }
+.pages.a4-mode .hero__rail .kpi .label { font-size: 12px; margin-top: 6px; }
+.pages.a4-mode .hero__rail .kpi .kpi-icon { width: 30px; height: 30px; margin-bottom: 6px; }
+/* Tighten the page-1 v2 grid in A4 too. */
+.pages.a4-mode .overview-layout--v2 {
+  margin-top: 22px;
+  gap: 22px 22px;
+}
 
 /* Page header band (on each page) --------------------------- */
 .page-head {
@@ -424,8 +1053,8 @@ a:hover { text-decoration: underline; }
   margin-bottom: 12px;
 }
 .overview-block div {
-  font-size: 1em;          /* body text must be at least 1em on screen */
-  line-height: 1.55;
+  font-size: 17px;
+  line-height: 1.6;
   color: var(--text);
 }
 /* A4 export scales everything down to fit the 1123 × 794 sheet. */
@@ -681,6 +1310,61 @@ a:hover { text-decoration: underline; }
 }
 .framework-item p { font-size: 1em; color: var(--text); line-height: 1.6; }
 
+/* ── v2 Page 2 — highlights-grid + framework--v2 + link-list ──
+   Two-column layout: lead prose + link list on the left,
+   2 × 2 framework on the right with hairline rules between
+   cells (no big colored number tiles). */
+.highlights-grid {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 56px;
+  margin-top: 24px;
+  flex: 1;
+  align-items: start;
+}
+.highlights-lead {}
+.highlights-body {
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--text);
+}
+.highlights-body p { margin: 0 0 12px; }
+.highlights-body p:last-child { margin: 0; }
+.highlights-body strong { color: var(--text-strong); }
+.link-list { margin-top: 28px; border-top: 1px solid var(--section-alt-rule); }
+
+.framework--v2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;                                /* hairline gap shows through */
+  background: var(--section-alt-rule);       /* the hairline colour */
+  border: 1px solid var(--section-alt-rule);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.framework--v2 .framework-item {
+  grid-column: auto;                       /* override the v1 span 6 rule */
+  background: #fff;
+  border-top: 0;                           /* override the v1 3 px navy rule */
+  padding: 26px 28px;
+  font-size: 1em;
+  line-height: 1.55;
+}
+.framework--v2 .framework-item h4 {
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 26px;
+  text-transform: none;
+  letter-spacing: -0.005em;
+  color: var(--text-title);
+  margin-bottom: 10px;
+}
+.framework--v2 .framework-item p {
+  font-size: 16px;
+  line-height: 1.55;
+  color: #374151;
+}
+
 .highlight-links {
   font-size: 1em;
   color: var(--text-muted);
@@ -728,6 +1412,13 @@ a:hover { text-decoration: underline; }
   gap: 32px;
   min-height: 0;
 }
+/* On screen the chart grid sits at its natural content height so the
+   alternating page bg (white / grey) shows clearly around the cards.
+   In `.a4-mode` we re-enable flex:1 so the grid fills the A4 sheet
+   exactly between the section-head and the observation callout. */
+.pages.a4-mode .page > .chart-grid { flex: 1; }
+/* v2: observation callout sits right under the chart grid. Auto height. */
+.page > .observation { flex: 0 0 auto; }
 /* Slide 3: 4 charts in a 2 × 2 grid, matching the PPT layout. */
 .chart-grid.characteristics {
   grid-template-columns: repeat(2, 1fr);
@@ -745,6 +1436,10 @@ a:hover { text-decoration: underline; }
   padding: 22px 24px;
   border-radius: 6px;
   min-height: 0;
+  /* White card on alternating bg: pops against grey on Page 4,
+     reads as a subtle bordered region on the white pages (3/5/7).
+     The grey shows around the card via the chart-grid `gap` and
+     the page-level vertical padding above and below. */
   background: #fff;
 }
 .chart-card h3 {
@@ -833,47 +1528,111 @@ a:hover { text-decoration: underline; }
 }
 
 /* Tables ---------------------------------------------------- */
+/* ── Tables (Pages 5 + 6) — v2 redesign ───────────────────────
+   Navy-underline TH instead of solid-blue background; condensed
+   search toolbar with a count badge on the right. The table sits
+   inside a .table-wrap card that contains its own scroll on
+   narrow screens (mobile fix from commit 9a1db13). */
+.table-wrap {
+  margin-top: 22px;
+  border: 1px solid var(--border-soft);
+  /* White card on the alternating page bg — same pattern as
+     .chart-card: white pops against the grey on Page 6, reads
+     as a subtle bordered region on white Page 5. */
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  /* No flex-grow on screen — let the table size to its content so
+     the grey page bg shows clearly above and below. In `.a4-mode`
+     we re-enable flex:1 so the table fills the A4 sheet exactly. */
+}
+.pages.a4-mode .table-wrap { flex: 1; }
 .table-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  gap: 14px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-soft);
+  background: #fafbfc;
 }
-.table-toolbar input.search {
-  padding: 6px 10px;
-  font: inherit;
-  font-size: 12px;
+/* Search input wrapped in a <label class="table-search"> so the
+   OCHA Search icon sits flush-left inside the input frame. */
+.table-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 360px;
+  background: #fff;
   border: 1px solid var(--border);
-  border-radius: 4px;
-  width: 220px;
+  padding: 7px 12px;
 }
+.table-search__icon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  /* SVG uses currentColor — but for an <img> tag, currentColor is
+     not honoured. Fade to muted via opacity instead. */
+  opacity: .55;
+}
+.table-search input.search {
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 16px;
+  color: var(--ocha-ink);
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+}
+.table-meta {
+  font-family: var(--font-cond);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
 table.data {
   width: 100%;
   border-collapse: collapse;
-  font-size: 1em;
+  font-size: 16px;
 }
 table.data th {
   text-align: left;
-  padding: 7px 8px;
+  padding: 12px 14px;
+  font-family: var(--font-cond);
   font-weight: 700;
-  color: var(--text-inv);
-  background: var(--brand-primary);
-  font-size: 10px;
+  font-size: 11.5px;
+  color: var(--text-title);
+  background: transparent;
+  letter-spacing: .14em;
   text-transform: uppercase;
-  letter-spacing: .04em;
-  position: sticky;
-  top: 0;
+  border-bottom: 2px solid var(--text-title);
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
-table.data th:hover { background: var(--brand-primary--text); }
-table.data th.sort-asc::after  { content: ' ▴'; }
-table.data th.sort-desc::after { content: ' ▾'; }
+table.data thead { background: #fff; }
+table.data th:hover { color: var(--brand-primary--text); }
+table.data th.sort-asc::after  { content: ' ▴'; color: var(--brand-primary); }
+table.data th.sort-desc::after { content: ' ▾'; color: var(--brand-primary); }
 table.data td {
-  padding: 6px 8px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--border-soft);
   vertical-align: top;
+  color: #1f2937;
+  font-size: 16px;
+  line-height: 1.45;
 }
 table.data tbody tr:nth-child(even) td { background: var(--bg-soft); }
 table.data tbody tr:hover td { background: var(--brand-primary--ice); }
@@ -881,39 +1640,54 @@ table.data td a { color: var(--brand-primary--text); }
 table.data td.num { text-align: right; font-variant-numeric: tabular-nums; }
 .td-missing { color: var(--brand-grey--border); font-style: italic; }
 .td-sub     { color: var(--text-muted); font-size: 10.5px; }
-/* PPT-style numeric row index column on the Leaders table. */
+
+/* Cell-type modifiers (added by render/tables.js — see below). */
+table.data td.td-country {
+  font-weight: 500;
+  color: var(--text-title);
+}
+table.data td.td-position {
+  font-family: var(--font-cond);
+  font-weight: 500;
+}
+table.data td.td-email a { color: var(--brand-primary--dark); }
+
+/* Numeric row index column on the Leaders table. */
 table.data th.col-num,
 table.data td.col-num {
-  width: 32px;
-  text-align: center;
+  width: 40px;
+  text-align: left;
+  font-family: var(--font-cond);
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--text-muted);
+  color: var(--brand-primary--dark);
 }
 
-/* Page 8 — Resources --------------------------------------- */
+/* Page 7 — Resources (v2) ----------------------------------
+   Three columns, each with an icon-less title + 2 px navy
+   bottom rule, then .link-row items. Markup emitted by
+   render/resources.js. */
 .resources {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);       /* 12-col grid, each section spans 4 */
-  gap: 28px 24px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px 36px;
+  margin-top: 22px;
+  flex: 1;
+  align-items: start;
 }
-.resources > *    { grid-column: span 4; }
-.resources h3 {
-  font-size: 13px;
+.resources__col {}
+.resources__head {
+  padding-bottom: 12px;
+  margin-bottom: 6px;
+  border-bottom: 2px solid var(--text-title);
+}
+.resources__title {
+  font-family: var(--font-cond);
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .05em;
-  color: var(--brand-primary--text);
-  border-bottom: 2px solid var(--brand-primary);
-  padding-bottom: 6px;
-  margin-bottom: 14px;
+  font-size: 22px;
+  letter-spacing: -0.005em;
+  color: var(--text-title);
 }
-.resources li {
-  font-size: 1em;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border-soft);
-  line-height: 1.5;
-}
-/* A4 mode: keep the old compact size so the resources page fits one sheet. */
 
 /* Page footer -----------------------------------------------
    Only visible in A4 mode + print — page numbers don't make sense in
@@ -963,12 +1737,15 @@ table.data td.col-num {
 
 /* Tablet ---------------------------------------------------- */
 @media screen and (max-width: 1163px) {
-  .pages { padding: 12px; gap: 14px; }
+  .pages { padding: 0; gap: 0; }
   .page {
     width: 100%;
     max-width: 100%;
     min-height: 0;
-    padding: 20px;
+    /* Vertical only — horizontal inset comes from the content shell
+       so warm-bg sections fill the viewport edge-to-edge and content
+       on every page aligns at the same x-coord. */
+    padding: 28px 0;
   }
   /* Release the fixed A4-landscape lock on the overview page so content
      can grow vertically for readability. */
@@ -1030,6 +1807,21 @@ table.data td.col-num {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
+
+  /* v2 Hero on tablet — .page already has padding: 28px 0 (vertical
+     only) so the hero just needs its top padding suppressed and
+     can keep its 100 vw breakout. Content shell handles horizontal. */
+  .page--hero { padding-top: 0; }
+  .hero { padding: 28px 0 36px; }
+  .overview-layout--v2 {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 18px;
+  }
+  .overview-layout--v2 .map-wrap { min-height: 360px; }
+  .overview-layout--v2 .map-wrap,
+  .overview-layout--v2 .overview-block--overview,
+  .overview-layout--v2 .overview-block--lotm { grid-column: 1 / -1; grid-row: auto; }
 }
 
 /* Mobile ---------------------------------------------------- */
@@ -1040,10 +1832,10 @@ table.data td.col-num {
   .topbar .brand .sub { font-size: 11px; }
   .topbar-actions { gap: 6px; flex: 1 1 auto; justify-content: flex-end; }
   .btn { padding: 8px 10px; font-size: 11.5px; }
-  .pages { padding: 10px; gap: 12px; }
+  .pages { padding: 0; gap: 0; }
   .page {
-    padding: 16px;
-    border-radius: 4px;
+    padding: 24px 0;     /* vertical only — shell provides horizontal inset */
+    border-radius: 0;
   }
 
   /* Typography trims for a phone-friendly read. */
@@ -1130,6 +1922,51 @@ table.data td.col-num {
 
   /* The per-page PNG export button is desktop-only. */
   .page-png-btn { display: none; }
+
+  /* v2 Hero on mobile — full-width navy band with stacked utility row,
+     2-column KPI grid, smaller title. The hero escapes any container
+     padding via its 100 vw breakout; .page is padding 24px 0 (vertical
+     only) so we just need to suppress the top padding for .page--hero. */
+  .page--hero { padding-top: 0; }
+  .hero { padding: 24px 0 28px; }
+  .hero__shell { padding: 0 18px; }
+  .hero__utility { padding-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .hero__masthead { margin-bottom: 22px; }
+  .hero__kicker { font-size: 11px; margin-bottom: 12px; }
+  .hero__title { font-size: clamp(28px, 9vw, 44px); }
+  .hero__subline { font-size: 13px; gap: 8px; }
+  .hero__btn { font-size: 11px; padding: 6px 10px; letter-spacing: .06em; }
+  .hero__logo { height: 22px; }
+
+  /* KPI rail: 5 cells → 2 cols + 1 wide.  We split visually via row
+     borders so the white-on-navy block doesn't show empty cells. */
+  .hero__rail { grid-template-columns: repeat(2, 1fr); }
+  .hero__rail .kpi {
+    padding: 14px 14px 16px;
+    border-left: 1px solid rgba(255,255,255,0.14);
+  }
+  .hero__rail .kpi:first-child { border-left: none; }
+  .hero__rail .kpi:nth-child(odd) { border-left: none; }
+  .hero__rail .kpi:nth-child(n+3) { border-top: 1px solid rgba(255,255,255,0.14); }
+  .hero__rail .kpi:last-child {
+    grid-column: 1 / -1;     /* 5th KPI spans full width on mobile */
+  }
+  .hero__rail .kpi .value { font-size: 36px; }
+  .hero__rail .kpi .label { font-size: 12px; }
+  .hero__rail .kpi .kpi-icon { width: 28px; height: 28px; margin-bottom: 4px; }
+
+  /* Page-1 v2 layout collapse — single column on phone. Horizontal
+     padding comes from the content shell rule (clamp 20-72), so we
+     don't need to add it here. */
+  .overview-layout--v2 {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto !important;
+    gap: 16px;
+  }
+  .overview-layout--v2 .map-wrap,
+  .overview-layout--v2 .overview-block--overview,
+  .overview-layout--v2 .overview-block--lotm { grid-column: 1 / -1 !important; grid-row: auto !important; }
+  .overview-layout--v2 .map-wrap { min-height: 280px; }
 }
 
 /* Print — the layout itself is driven by `.pages.a4-mode` (added by
