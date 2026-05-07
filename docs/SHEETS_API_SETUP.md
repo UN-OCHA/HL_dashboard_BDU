@@ -50,23 +50,48 @@ The script lives at [`scripts/sheets_api.gs`](../scripts/sheets_api.gs).
 
 All requests are POST + JSON. Token always required.
 
-### Read a tab
+### Use the bundled Python helper (recommended)
 
 ```bash
-curl -sL -X POST "$URL" -H 'Content-Type: application/json' -d '{
+export HL_SHEET_URL="https://script.google.com/macros/s/.../exec"
+export HL_SHEET_TOKEN="<your shared secret>"
+
+python3 scripts/sheet_call.py read         "11. Reference links"
+python3 scripts/sheet_call.py read         "1. Text & KPIs" "A1:B5"
+python3 scripts/sheet_call.py append       "11. Reference links" rows.json
+python3 scripts/sheet_call.py update_range "11. Reference links" "A3:C5" values.json
+python3 scripts/sheet_call.py clear_range  "11. Reference links" "A3:C30"
+```
+
+`rows.json` / `values.json` are JSON arrays of arrays:
+`[["Highlight","HC Leadership Profile","https://..."], ...]`
+
+### ⚠ Why not curl?
+
+curl trips over Apps Script's 302 redirect to
+`script.googleusercontent.com`: the redirect handler drops the POST
+body and you end up at a Google Docs 404 page (HTML "Pagina niet
+gevonden"). Python's `urllib.request` follows the chain correctly,
+so we ship the Python helper above. If you absolutely need curl,
+the workaround is to make the request twice — once to capture the
+redirect URL, then re-POST to that URL with the body. Easier to use
+the Python helper.
+
+### Raw payload shapes
+
+#### Read a tab
+```json
+{
   "token":  "...",
   "action": "read",
   "tab":    "11. Reference links",
-  "range":  "A1:C20"
-}'
+  "range":  "A1:C20"   // optional — whole tab if omitted
+}
 ```
 
-`range` is optional — without it you get the whole tab.
-
-### Append rows
-
-```bash
-curl -sL -X POST "$URL" -H 'Content-Type: application/json' -d '{
+#### Append rows
+```json
+{
   "token":  "...",
   "action": "append",
   "tab":    "11. Reference links",
@@ -74,42 +99,49 @@ curl -sL -X POST "$URL" -H 'Content-Type: application/json' -d '{
     ["Highlight", "HC Leadership Profile", "https://interagencystandingcommittee.org/"],
     ["Highlight", "Contact hls@un.org",     "mailto:hls@un.org"]
   ]
-}'
+}
 ```
+Rows are appended after the last non-empty row. All inner arrays
+must be the same length.
 
-Rows are appended to the bottom of the tab (after the last non-empty
-row). All inner arrays must be the same length.
-
-### Update a specific range
-
-```bash
-curl -sL -X POST "$URL" -H 'Content-Type: application/json' -d '{
+#### Update a specific range
+```json
+{
   "token":  "...",
   "action": "update_range",
   "tab":    "11. Reference links",
   "range":  "A3:C5",
-  "values": [
-    ["Highlight", "HC Leadership Profile", "https://interagencystandingcommittee.org/"],
-    ["Highlight", "HC TOR",                "https://interagencystandingcommittee.org/"],
-    ["Highlight", "RC Leadership Profile", "https://interagencystandingcommittee.org/"]
-  ]
-}'
+  "values": [["…","…","…"], ["…","…","…"], ["…","…","…"]]
+}
 ```
+`values` dimensions must match `range`.
 
-Number of rows × cols in `values` must match the dimensions of `range`.
-
-### Clear a range
-
-```bash
-curl -sL -X POST "$URL" -H 'Content-Type: application/json' -d '{
+#### Clear a range
+```json
+{
   "token":  "...",
   "action": "clear_range",
   "tab":    "11. Reference links",
   "range":  "A3:C30"
-}'
+}
 ```
+Clears cell contents only — doesn't delete rows or change formatting.
 
-Clears cell contents only — does not delete rows or change formatting.
+## One-shot: seed the Reference links tab
+
+If the `11. Reference links` tab doesn't exist yet (fresh sheet, or
+someone deleted it), don't call `append` — it'll fail with "Tab not
+found". Instead, run the bundled `initReferenceLinksTab()` function
+from the Apps Script editor:
+
+1. Open the script (Extensions → Apps Script in the sheet).
+2. In the toolbar, **function selector → `initReferenceLinksTab`**.
+3. Click **Run**.
+4. The tab is created, banner + header rows added, and 13 default
+   reference rows (Highlight + Guidance + Voices + Talent
+   initiatives) are seeded.
+
+Idempotent — running it twice just re-writes the same rows.
 
 ## Security model
 

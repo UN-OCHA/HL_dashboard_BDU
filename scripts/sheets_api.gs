@@ -188,3 +188,45 @@ function log(event, details) {
   // Cheap audit trail without external dependencies.
   Logger.log("[" + event + "] " + JSON.stringify(details || {}));
 }
+
+
+/* ── ONE-SHOT: Create + seed "11. Reference links" tab ────────
+   Run this from the Apps Script editor → Run dropdown → select
+   `initReferenceLinksTab` → Run. After it finishes, the tab is
+   populated and the dashboard's Section 02 link list + Page 7
+   Resources can read it. Idempotent — running twice just
+   re-writes the same rows in the same place. */
+function initReferenceLinksTab() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var name = "11. Reference links";
+  var sh = ss.getSheetByName(name);
+  if (!sh) sh = ss.insertSheet(name);
+
+  // Banner row + header row.
+  sh.getRange(1, 1, 1, 3).setValues([[
+    "Reference links — drives Section 02 link list (rows where section = Highlight) AND Resources page (everything else)",
+    "", ""
+  ]]);
+  sh.getRange(2, 1, 1, 3).setValues([["section", "label", "url"]]);
+  sh.getRange(2, 1, 1, 3).setFontWeight("bold");
+  sh.setFrozenRows(2);
+
+  // Default rows.
+  var rows = [
+    ["Highlight",          "HC Leadership Profile",                       "https://interagencystandingcommittee.org/"],
+    ["Highlight",          "HC Terms of Reference",                       "https://interagencystandingcommittee.org/"],
+    ["Highlight",          "RC Leadership Profile",                       "https://interagencystandingcommittee.org/"],
+    ["Highlight",          "Contact hls@un.org",                          "mailto:hls@un.org"],
+    ["Guidance",           "Humanitarian Reset",                          "https://interagencystandingcommittee.org/"],
+    ["Guidance",           "Inter-Agency Standing Committee (IASC)",      "https://interagencystandingcommittee.org/"],
+    ["Guidance",           "OCHA Humanitarian Leadership Strengthening",  "https://www.unocha.org/"],
+    ["Guidance",           "Leadership in Humanitarian Action Handbook",  "https://interagencystandingcommittee.org/"],
+    ["Guidance",           "Leading an Emergency Response",               "https://interagencystandingcommittee.org/"],
+    ["Voices",             "ERG's Humanifesto",                           "https://interagencystandingcommittee.org/"],
+    ["Voices",             "I Was There: voices of humanitarian leadership", "https://interagencystandingcommittee.org/"],
+    ["Voices",             "Humanitarian Leadership stories",             "https://interagencystandingcommittee.org/"],
+    ["Talent initiatives", "RC/HC Talent Pipeline",                       "https://unsceb.org/"]
+  ];
+  sh.getRange(3, 1, rows.length, 3).setValues(rows);
+  return "Created/updated " + name + " with " + rows.length + " rows";
+}
