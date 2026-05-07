@@ -266,7 +266,10 @@
   /* No background or border here — those are on .observation__inner. */
 }
 .observation__inner {
-  background: var(--section-alt-bg);
+  /* Pale OCHA blue (--brand-primary--ice = #E3EDF6) — distinct from
+     both the white pages and the grey alternating bg, so the
+     callout reads as "this is a call-out" on every section. */
+  background: var(--brand-primary--ice);
   border-left: 3px solid var(--brand-primary);
   padding: 18px 24px;
 }
@@ -381,13 +384,15 @@ img.link-row__trail:hover { opacity: 1; }
 .hero__shell {
   position: relative;
   /* Content shell — centers hero contents at a comfortable
-     reading max while the navy gradient .hero stays 100 vw. */
-  max-width: 1500px;
+     reading max while the navy gradient .hero stays 100 vw.
+     1320 px on screen (Bootstrap-standard editorial cap), 1500 px
+     in A4 / PDF export to fill the print sheet inner box. */
+  max-width: 1320px;
   margin: 0 auto;
   padding: 0 clamp(20px, 4vw, 72px);
 }
 .pages.a4-mode .hero__shell {
-  max-width: none;
+  max-width: 1500px;
   padding: 0 56px;
 }
 
@@ -557,19 +562,21 @@ img.link-row__trail:hover { opacity: 1; }
 .overview-layout--v2 {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: minmax(0, 1.5fr) minmax(0, 1fr);
+  /* On screen, rows size to content (auto) so the map is its
+     natural aspect-ratio height and the prose row is its natural
+     reading height — no awkward white space at the bottom of
+     Section 01 from a `1fr` row stretching to fill the page.
+     A4 / PDF mode below restores `1.5fr / 1fr` so the grid fills
+     the print sheet height exactly. */
+  grid-template-rows: auto auto;
   gap: 28px 24px;
   margin-top: 28px;
-  /* On desktop, .page--hero keeps its horizontal padding from .page
-     (only padding-top is reset to 0 so the hero sits flush at top).
-     That means non-hero content here inherits the same horizontal
-     inset as every other .page — DO NOT add horizontal padding here
-     or Page 1's content will sit further in than every other page.
-     Mobile / tablet re-add this padding because .page--hero is
-     `padding: 0` there to let the hero escape on small screens. */
   padding: 0;
-  flex: 1;
   min-height: 0;
+}
+.pages.a4-mode .overview-layout--v2 {
+  grid-template-rows: minmax(0, 1.5fr) minmax(0, 1fr);
+  flex: 1;
 }
 /* Specificity bumped via the chained class selector — the v1
    rule `.overview-layout .map-wrap { grid-column: span 9 }`
@@ -636,7 +643,7 @@ img.link-row__trail:hover { opacity: 1; }
   margin-top: 0;
 }
 .mega-footer__shell {
-  max-width: 1500px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 0 clamp(20px, 4vw, 72px);
   display: flex;
@@ -833,12 +840,23 @@ a:hover { text-decoration: underline; }
 .page > .highlights-grid,
 .page > .resources,
 .page > .overview-layout--v2 {
-  max-width: 1500px;
+  /* 1320 px on screen (editorial cap), 1500 px in A4 / PDF export
+     so the print sheet's inner box (1500 × 1061) fills properly. */
+  max-width: 1320px;
   width: 100%;
   margin-left: auto;
   margin-right: auto;
   padding-left: clamp(20px, 4vw, 72px);
   padding-right: clamp(20px, 4vw, 72px);
+}
+.pages.a4-mode .page > .section-head,
+.pages.a4-mode .page > .chart-grid,
+.pages.a4-mode .page > .observation,
+.pages.a4-mode .page > .table-wrap,
+.pages.a4-mode .page > .highlights-grid,
+.pages.a4-mode .page > .resources,
+.pages.a4-mode .page > .overview-layout--v2 {
+  max-width: 1500px;
 }
 .page:first-child { border-top: 0; padding-top: clamp(8px, 1vw, 16px); }
 .page:last-child  { padding-bottom: clamp(24px, 3vw, 40px); }
