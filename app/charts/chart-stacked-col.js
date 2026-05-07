@@ -134,6 +134,26 @@ var ChartStackedCol = (function () {
         };
       }).filter(Boolean).sort(function (a, b) { return a.midY - b.midY; });
 
+      // Symmetric pre-spread: when two adjacent segments have midYs
+      // within LABEL_ROW_H of each other (e.g. region trends with two
+      // ~3% segments stacked next to each other), splay the pair around
+      // their shared midpoint so BOTH labels move — the upper one shifts
+      // up, the lower one shifts down. Without this, the push-down pass
+      // below would leave the upper label sitting flat at its midY
+      // (straight horizontal leader) while only pushing the lower one
+      // down, so the two leaders run parallel for ~20 px before
+      // diverging and visually merge into a single line. With this
+      // pre-pass each leader bends in the opposite direction from the
+      // column edge onward, so they fan apart immediately.
+      for (var k = 0; k < specs.length - 1; k++) {
+        var pairDy = specs[k + 1].midY - specs[k].midY;
+        if (pairDy < LABEL_ROW_H) {
+          var pairMid = (specs[k].midY + specs[k + 1].midY) / 2;
+          specs[k].y     = pairMid - LABEL_ROW_H / 2;
+          specs[k + 1].y = pairMid + LABEL_ROW_H / 2;
+        }
+      }
+
       // Push-down pass: ensure every label is at least LABEL_ROW_H
       // below the previous one.
       for (var i = 1; i < specs.length; i++) {

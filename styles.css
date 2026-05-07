@@ -601,11 +601,10 @@ img.link-row__trail:hover { opacity: 1; }
   padding: 0;
   border-radius: 0;
 }
-/* Override the v1 .overview-block h3 styling for v2 — use the
-   kicker-rule treatment (Roboto Condensed, .18em letterspaced,
-   navy text, warm-rule underline). Specificity needs to match
-   `.overview-block h3` (0,1,1). */
-.overview-layout .overview-block h3 {
+/* Section 01 prose-block headings ("Overview", "Leadership on the
+   move") use the kicker-rule treatment: Roboto Condensed, .18em
+   letterspaced, navy text, warm-rule underline. */
+.overview-block h3 {
   font-family: var(--font-cond);
   font-size: 12px;
   font-weight: 700;
@@ -799,7 +798,6 @@ a:hover { text-decoration: underline; }
 .page > .section-head,
 .page > .chart-grid,
 .page > .observation,
-.page > .table-wrap,
 .page > .highlights-grid,
 .page > .resources,
 .page > .overview-layout {
@@ -815,12 +813,27 @@ a:hover { text-decoration: underline; }
 .pages.a4-mode .page > .section-head,
 .pages.a4-mode .page > .chart-grid,
 .pages.a4-mode .page > .observation,
-.pages.a4-mode .page > .table-wrap,
 .pages.a4-mode .page > .highlights-grid,
 .pages.a4-mode .page > .resources,
 .pages.a4-mode .page > .overview-layout {
   max-width: 1500px;
 }
+
+/* Tables (Pages 5 + 6) sit inside a dedicated .table-shell wrapper
+   that carries the same max-width + horizontal padding as the
+   sibling content-shell elements, so the .table-wrap card inside
+   ends up edge-aligned with section-head text, chart-grid edges,
+   etc. The shell handles centering and inset; .table-wrap is just
+   the card itself (border + toolbar + table). */
+.page > .table-shell {
+  max-width: 1320px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(20px, 4vw, 72px);
+  padding-right: clamp(20px, 4vw, 72px);
+}
+.pages.a4-mode .page > .table-shell { max-width: 1500px; }
 .page:first-child { border-top: 0; padding-top: clamp(8px, 1vw, 16px); }
 .page:last-child  { padding-bottom: clamp(24px, 3vw, 40px); }
 
@@ -918,68 +931,11 @@ a:hover { text-decoration: underline; }
 .overview-block div p:last-child { margin-bottom: 0; }
 .overview-block div strong { color: var(--text-strong); }
 
-/* KPIs ------------------------------------------------------
-   .kpi cards are rendered into the navy hero rail by
-   render/kpis.js. The white-on-navy variant lives under
-   `.hero__rail .kpi` in the hero block earlier in the file. */
-.kpi {
-  background: var(--bg-soft);
-  border-left: 3px solid var(--brand-primary);
-  padding: 10px 14px;
-  display: grid;
-  grid-template-columns: 28px 1fr;
-  grid-template-rows: auto auto;
-  align-items: center;
-  gap: 2px 12px;
-  min-height: 0;
-  border-radius: 3px;
-}
-.kpi .kpi-icon {
-  grid-row: 1 / span 2;
-  align-self: center;
-  justify-self: center;
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.kpi .kpi-icon svg { width: 100%; height: 100%; display: block; }
-.kpi .kpi-icon svg path,
-.kpi .kpi-icon svg circle,
-.kpi .kpi-icon svg polygon { fill: var(--brand-primary); }
-.kpi .value { grid-column: 2; grid-row: 1; }
-.kpi .label {
-  grid-column: 2;
-  grid-row: 2;
-  margin-top: 2px;
-  font-size: 9.5px;
-  line-height: 1.2;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-  color: var(--text-muted);
-}
-.kpi .unit  { font-size: 11px; }
-.kpi .value {
-  font-family: var(--font-cond);
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--text-title);
-}
-.kpi .unit {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--brand-primary--text);
-}
-.kpi .label {
-  margin-top: 6px;
-  font-size: 10.5px;
-  line-height: 1.3;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: .04em;
-}
+/* KPIs are rendered exclusively into the navy hero rail by
+   render/kpis.js. All visual rules live under `.hero__rail .kpi*`
+   in the hero block earlier in the file. The v1 grey-card .kpi
+   rules were removed when KPIs moved into the hero — every
+   property they set was already overridden by the hero variant. */
 
 /* Map ------------------------------------------------------- */
 .map-wrap {
@@ -1020,7 +976,7 @@ a:hover { text-decoration: underline; }
   font: 600 14px/1 var(--font-sans);
   color: var(--text);
   cursor: pointer;
-  border-radius: 3px;
+  border-radius: 0;
   padding: 0;
   display: flex;
   align-items: center;
@@ -1086,7 +1042,7 @@ a:hover { text-decoration: underline; }
   box-shadow: var(--shadow-2);
   padding: 8px 10px;
   font-size: 11.5px;
-  border-radius: 4px;
+  border-radius: 0;
   z-index: 100;
   max-width: 220px;
 }
@@ -1220,7 +1176,7 @@ a:hover { text-decoration: underline; }
   flex-direction: column;
   border: 1px solid var(--border-soft);
   padding: 22px 24px;
-  border-radius: 6px;
+  border-radius: 0;
   min-height: 0;
   /* White card on alternating bg: pops against grey on Page 4,
      reads as a subtle bordered region on the white pages (3/5/7).
@@ -1508,7 +1464,7 @@ table.data td.col-num {
   padding: 12px 14px;
   background: #FFF4F3;
   border: 1px solid var(--brand-red);
-  border-radius: 4px;
+  border-radius: 0;
   color: #8C1A13;
   font-size: 12px;
 }
@@ -1573,7 +1529,7 @@ table.data td.col-num {
      `.pages.a4-mode .page` already manages its own overflow for
      export and we don't want to conflict with that. */
   .page { min-width: 0; max-width: 100%; }
-  .page > table.data {
+  .table-wrap > table.data {
     display: block;
     max-width: 100%;
     overflow-x: auto;
@@ -1651,15 +1607,15 @@ table.data td.col-num {
   .page { min-width: 0; max-width: 100%; }
   table.data { font-size: 11px; }
   table.data th, table.data td { padding: 8px 8px; white-space: nowrap; }
-  .page > table.data {
+  .table-wrap > table.data {
     display: block;
     max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
   /* Toolbar sits above the table — keep it inside the page width. */
-  .page > .table-toolbar { flex-wrap: wrap; gap: 8px; }
-  .page > .table-toolbar input.search { flex: 1 1 100%; min-width: 0; }
+  .table-wrap > .table-toolbar { flex-wrap: wrap; gap: 8px; }
+  .table-wrap > .table-toolbar input.search { flex: 1 1 100%; min-width: 0; }
 
   /* Long-form paragraphs need more room. */
   .overview-block div,

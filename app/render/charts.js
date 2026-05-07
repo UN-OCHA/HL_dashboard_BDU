@@ -205,12 +205,11 @@ var RenderCharts = (function () {
       s.appendChild(document.createTextNode(it.label));
       leg.appendChild(s);
     });
-    // Insert AFTER the head row (or the bare h3 in legacy markup) so
-    // the legend sits between title and chart. The anchor must be a
-    // DIRECT child of `card`, otherwise insertBefore throws — that
-    // bit us in v1→v2 when the title moved into .chart-card__head.
-    var anchor = card.querySelector(":scope > .chart-card__head")
-              || card.querySelector(":scope > h3");
+    // Insert AFTER the head row so the legend sits between title and
+    // chart. The anchor MUST be a direct child of `card`, otherwise
+    // insertBefore throws ("not a child of this node") — using
+    // :scope guards against the title being nested inside a wrapper.
+    var anchor = card.querySelector(":scope > .chart-card__head");
     if (anchor && anchor.nextSibling) {
       card.insertBefore(leg, anchor.nextSibling);
     } else {

@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=1778154398" />
+  <link rel="stylesheet" href="styles.css?v=1778242000" />
 
   <!-- Export libraries (PNG + PDF). Self-hosted in vendor/ so the PDF export
        works even when offline and isn't blocked on a third-party CDN. -->
@@ -23,7 +23,7 @@
   <script src="app/charts/chart-hbar.js?v=1778154398" defer></script>
   <script src="app/charts/chart-donut.js?v=1778154398" defer></script>
   <script src="app/charts/chart-line.js?v=1778154398" defer></script>
-  <script src="app/charts/chart-stacked-col.js?v=1778154398" defer></script>
+  <script src="app/charts/chart-stacked-col.js?v=1778240000" defer></script>
 
   <!-- App modules -->
   <script src="app/config.js?v=1778154398" defer></script>
@@ -287,26 +287,28 @@
         </div>
       </div>
 
-      <div class="table-wrap">
-        <div class="table-toolbar">
-          <label class="table-search">
-            <img src="assets/icons/search.svg" alt="" class="table-search__icon">
-            <input type="search" class="search" id="leaders-search" placeholder="Search country, name, position…" />
-          </label>
-          <span class="table-meta" id="leaders-count" aria-hidden="true"></span>
+      <div class="table-shell">
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <label class="table-search">
+              <img src="assets/icons/search.svg" alt="" class="table-search__icon">
+              <input type="search" class="search" id="leaders-search" placeholder="Search country, name, position…" />
+            </label>
+            <span class="table-meta" id="leaders-count" aria-hidden="true"></span>
+          </div>
+          <table class="data" id="leaders-table">
+            <thead>
+              <tr>
+                <th class="col-num">#</th>
+                <th data-sort="country">Country</th>
+                <th data-sort="duty_station">Duty station</th>
+                <th data-sort="name">Name</th>
+                <th data-sort="position">Position</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
-        <table class="data" id="leaders-table">
-          <thead>
-            <tr>
-              <th class="col-num">#</th>
-              <th data-sort="country">Country</th>
-              <th data-sort="duty_station">Duty station</th>
-              <th data-sort="name">Name</th>
-              <th data-sort="position">Position</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
       </div>
 
       <div class="page-foot"><span class="brand-foot">OCHA · HLS</span><span class="page-num">5</span></div>
@@ -324,28 +326,30 @@
         </div>
       </div>
 
-      <div class="table-wrap">
-        <div class="table-toolbar">
-          <label class="table-search">
-            <img src="assets/icons/search.svg" alt="" class="table-search__icon">
-            <input type="search" class="search" id="contacts-search" placeholder="Search country, name…" />
-          </label>
-          <span class="table-meta" id="contacts-count" aria-hidden="true"></span>
+      <div class="table-shell">
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <label class="table-search">
+              <img src="assets/icons/search.svg" alt="" class="table-search__icon">
+              <input type="search" class="search" id="contacts-search" placeholder="Search country, name…" />
+            </label>
+            <span class="table-meta" id="contacts-count" aria-hidden="true"></span>
+          </div>
+          <table class="data" id="contacts-table">
+            <thead>
+              <tr>
+                <th data-sort="country">Country</th>
+                <th data-sort="name">Name</th>
+                <th data-sort="position">Position</th>
+                <th data-sort="email">Email</th>
+                <th data-sort="phone">Phone</th>
+                <th data-sort="pa_name">Special assistant</th>
+                <th data-sort="ea_name">Executive assistant</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
-        <table class="data" id="contacts-table">
-          <thead>
-            <tr>
-              <th data-sort="country">Country</th>
-              <th data-sort="name">Name</th>
-              <th data-sort="position">Position</th>
-              <th data-sort="email">Email</th>
-              <th data-sort="phone">Phone</th>
-              <th data-sort="pa_name">Special assistant</th>
-              <th data-sort="ea_name">Executive assistant</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
       </div>
 
       <div class="page-foot"><span class="brand-foot">OCHA · HLS</span><span class="page-num">6</span></div>

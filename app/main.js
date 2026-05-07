@@ -2,9 +2,9 @@
  * main.js — Orchestrates the dashboard:
  *   1. Load 10 sheet tabs in parallel (SheetsLoader)
  *   2. Render each section from the resulting state
- *   3. Wire top-bar buttons + per-page PNG export buttons
- *
- * Re-runs the render pipeline when "Refresh data" is clicked.
+ *   3. Wire the hero "Download PDF" button and per-page PNG export
+ *      buttons (no in-page refresh — sheet edits propagate via the
+ *      gviz cache, hard reload always pulls fresh data).
  */
 
 /* global SheetsLoader, RenderHeader, RenderKpis, RenderMap, RenderHighlights,
@@ -79,9 +79,6 @@
   }
 
   function wireUi() {
-    // Refresh button removed in v2 — sheet edits propagate within
-    // ~2 min via the gviz cache + 60 s client cache, and a hard
-    // page reload always pulls fresh data.
     var pdf = document.getElementById("btn-pdf");
     if (pdf) {
       pdf.addEventListener("click", function () {
