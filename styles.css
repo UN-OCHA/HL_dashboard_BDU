@@ -346,11 +346,11 @@ img.link-row__trail:hover { opacity: 1; }
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
-  /* Breathing room between the navy band and the section 01 head
-     that follows. Set as margin-bottom (rather than rolling it into
-     the gradient padding) so the gradient ends crisply at the bottom
-     edge of the hero — the gap below is white/warm-bg, not navy. */
-  margin-bottom: clamp(40px, 4vw, 72px);
+  /* No margin-bottom: the cover page sits on the alternating grey
+     background, so any space below the hero would render as a grey
+     strip inside the cover. The next .page (Section 01) has its
+     own padding-top, which is what gives the breathing room
+     between the navy hero and the section-head. */
   padding: 40px 0 56px;
   background: linear-gradient(180deg, var(--hero-from) 0%, var(--hero-to) 100%);
   color: #fff;
@@ -619,9 +619,9 @@ img.link-row__trail:hover { opacity: 1; }
 
 /* The cover (.page--hero) holds ONLY the hero band — no other
    content. Drop all .page padding so the navy gradient fills the
-   sheet edge-to-edge and there's no stray white/grey gap below
-   the hero. The hero's `margin-bottom` still gives breathing
-   room before the next section on screen. */
+   sheet edge-to-edge with no stray grey strip below the hero.
+   Breathing room before Section 01 comes from the next .page's
+   own padding-top. */
 .page--hero { padding: 0 !important; }
 
 /* ── Mega-footer (web only) ─────────────────────────────────
