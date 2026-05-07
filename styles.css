@@ -556,10 +556,10 @@ img.link-row__trail:hover { opacity: 1; }
   grid-row: auto;
 }
 
-/* ── Page-1 v2 layout (.overview-layout--v2) ────────────────
+/* ── Page-1 v2 layout (.overview-layout) ────────────────
    Hero takes the top of the page, then the map sits full-width
    below it, then the two prose blocks share a 2-column row. */
-.overview-layout--v2 {
+.overview-layout {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   /* On screen, rows size to content (auto) so the map is its
@@ -574,20 +574,14 @@ img.link-row__trail:hover { opacity: 1; }
   padding: 0;
   min-height: 0;
 }
-.pages.a4-mode .overview-layout--v2 {
+.pages.a4-mode .overview-layout {
   grid-template-rows: minmax(0, 1.5fr) minmax(0, 1fr);
   flex: 1;
 }
-/* Specificity bumped via the chained class selector — the v1
-   rule `.overview-layout .map-wrap { grid-column: span 9 }`
-   sits later in source order with the same (0,2,0) specificity
-   and was winning the cascade. Chaining both classes together
-   gives (0,3,0) so the v2 layout (full-width map, prose row
-   below) is the one that actually applies. */
-.overview-layout.overview-layout--v2 .map-wrap { grid-column: 1 / -1; grid-row: 1; min-height: 0; }
-.overview-layout.overview-layout--v2 .overview-block--overview { grid-column: span 6; grid-row: 2; }
-.overview-layout.overview-layout--v2 .overview-block--lotm     { grid-column: span 6; grid-row: 2; }
-.overview-layout--v2 .map-wrap {
+.overview-layout .map-wrap                 { grid-column: 1 / -1; grid-row: 1; min-height: 0; }
+.overview-layout .overview-block--overview { grid-column: span 6; grid-row: 2; }
+.overview-layout .overview-block--lotm     { grid-column: span 6; grid-row: 2; }
+.overview-layout .map-wrap {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -598,13 +592,13 @@ img.link-row__trail:hover { opacity: 1; }
    `preserveAspectRatio="xMinYMid meet"` this guarantees the map
    image fills the container edge-to-edge — no empty space on
    the right at any viewport. */
-.overview-layout--v2 .map-wrap .map-container {
+.overview-layout .map-wrap .map-container {
   width: 100%;
   aspect-ratio: 868.5 / 523.77;
   height: auto;
   flex: 0 0 auto;
 }
-.overview-layout--v2 .overview-block {
+.overview-layout .overview-block {
   background: transparent;
   padding: 0;
   border-radius: 0;
@@ -613,7 +607,7 @@ img.link-row__trail:hover { opacity: 1; }
    kicker-rule treatment (Roboto Condensed, .18em letterspaced,
    navy text, warm-rule underline). Specificity needs to match
    `.overview-block h3` (0,1,1). */
-.overview-layout--v2 .overview-block h3 {
+.overview-layout .overview-block h3 {
   font-family: var(--font-cond);
   font-size: 12px;
   font-weight: 700;
@@ -801,7 +795,7 @@ a:hover { text-decoration: underline; }
      every page on every viewport. The alternating warm-paper bg
      can still fill the viewport edge-to-edge because .page itself
      has no horizontal padding. */
-  padding: clamp(48px, 5vw, 72px) 0;
+  padding: clamp(36px, 4vw, 56px) 0;
   background: transparent;
   box-shadow: none;
   display: flex;
@@ -839,7 +833,7 @@ a:hover { text-decoration: underline; }
 .page > .table-wrap,
 .page > .highlights-grid,
 .page > .resources,
-.page > .overview-layout--v2 {
+.page > .overview-layout {
   /* 1320 px on screen (editorial cap), 1500 px in A4 / PDF export
      so the print sheet's inner box (1500 × 1061) fills properly. */
   max-width: 1320px;
@@ -855,7 +849,7 @@ a:hover { text-decoration: underline; }
 .pages.a4-mode .page > .table-wrap,
 .pages.a4-mode .page > .highlights-grid,
 .pages.a4-mode .page > .resources,
-.pages.a4-mode .page > .overview-layout--v2 {
+.pages.a4-mode .page > .overview-layout {
   max-width: 1500px;
 }
 .page:first-child { border-top: 0; padding-top: clamp(8px, 1vw, 16px); }
@@ -938,7 +932,7 @@ a:hover { text-decoration: underline; }
 .pages.a4-mode .hero__rail .kpi .label { font-size: 12px; margin-top: 6px; }
 .pages.a4-mode .hero__rail .kpi .kpi-icon { width: 30px; height: 30px; margin-bottom: 6px; }
 /* Tighten the page-1 v2 grid in A4 too. */
-.pages.a4-mode .overview-layout--v2 {
+.pages.a4-mode .overview-layout {
   margin-top: 22px;
   gap: 22px 22px;
 }
@@ -1022,73 +1016,17 @@ a:hover { text-decoration: underline; }
 }
 .overview-head .date strong { color: var(--text); font-size: 13px; }
 
-/* Overview layout — single 12-column grid, same structure on fluid
-   and A4 so the dashboard reads the same way everywhere:
-     top row     → map (span 9)  |  KPIs (span 3, stacked)
-     bottom row  → Overview (6)  |  Leadership on the move (6) */
-.overview-layout {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: minmax(0, 1.4fr) minmax(0, 1fr);
-  gap: 32px 24px;
-  min-height: 0;
-}
-.overview-layout .map-wrap             { grid-column: span 9; grid-row: 1; min-height: 0; }
-.overview-layout .kpi-col              { grid-column: span 3; grid-row: 1; }
-.overview-layout .overview-block--overview { grid-column: span 6; grid-row: 2; }
-.overview-layout .overview-block--lotm     { grid-column: span 6; grid-row: 2; }
-
-.overview-layout .map-wrap {
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-.overview-layout .map-wrap .map-container { flex: 1 1 auto; min-height: 0; }
-
-/* OVERVIEW + LEADERSHIP ON THE MOVE sidebar ----------------- */
-.overview-text {
-  display: flex;
-  flex-direction: column;
-  gap: 28px;                  /* generous gap between the two blocks */
-  min-height: 0;
-  padding-left: 8px;
-}
-.overview-block {
-  padding: 20px 22px;
-  background: var(--bg-soft);
-  border-radius: 4px;
-  overflow: hidden;
-}
-.overview-block h3 {
-  font-size: .875em;                /* 14 px @ 1em root — still caps-style meta */
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  color: var(--brand-primary--text);
-  border-bottom: 2px solid var(--brand-primary);
-  padding-bottom: 6px;
-  margin-bottom: 12px;
-}
+/* Overview-block prose styling (used inside .overview-layout). The
+   layout / grid rules for .overview-layout itself live in the v2
+   primitives section near the top of this file. */
 .overview-block div {
   font-size: 17px;
   line-height: 1.6;
   color: var(--text);
 }
-/* A4 export scales everything down to fit the 1123 × 794 sheet. */
-.overview-block div p { margin: 0 0 6px; }
+.overview-block div p { margin: 0 0 8px; }
 .overview-block div p:last-child { margin-bottom: 0; }
 .overview-block div strong { color: var(--text-strong); }
-
-/* KPI column — 5 small rectangles stacked vertically inside the
-   3-col sidebar on the right of the map (same on fluid and A4). */
-.overview-layout .kpi-col {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-auto-rows: 1fr;
-  gap: 10px;
-  align-content: stretch;
-}
 
 /* KPIs ------------------------------------------------------ */
 .kpi-row {
@@ -1304,31 +1242,7 @@ a:hover { text-decoration: underline; }
   color: var(--brand-primary--dark);
   margin-bottom: 8px;
 }
-/* 12-column grid: 4 framework blocks arranged as 2 × 2 (6 col each). */
-.framework {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 24px;
-  margin-top: 28px;
-  margin-bottom: 22px;
-}
-.framework .framework-item { grid-column: span 6; }
-.framework-item {
-  border-top: 3px solid var(--brand-primary);
-  padding: 10px 12px;
-  background: var(--bg-soft);
-}
-.framework-item h4 {
-  font-size: .875em;      /* 14 px @ 1em — caps meta, still reads as a section label */
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .05em;
-  color: var(--brand-primary--text);
-  margin-bottom: 10px;
-}
-.framework-item p { font-size: 1em; color: var(--text); line-height: 1.6; }
-
-/* ── v2 Page 2 — highlights-grid + framework--v2 + link-list ──
+/* ── Page 2 — highlights-grid + framework + link-list ──
    Two-column layout: lead prose + link list on the left,
    2 × 2 framework on the right with hairline rules between
    cells (no big colored number tiles). */
@@ -1351,7 +1265,7 @@ a:hover { text-decoration: underline; }
 .highlights-body strong { color: var(--text-strong); }
 .link-list { margin-top: 28px; border-top: 1px solid var(--section-alt-rule); }
 
-.framework--v2 {
+.framework {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1px;                                /* hairline gap shows through */
@@ -1360,15 +1274,13 @@ a:hover { text-decoration: underline; }
   margin-top: 0;
   margin-bottom: 0;
 }
-.framework--v2 .framework-item {
-  grid-column: auto;                       /* override the v1 span 6 rule */
+.framework .framework-item {
   background: #fff;
-  border-top: 0;                           /* override the v1 3 px navy rule */
   padding: 26px 28px;
   font-size: 1em;
   line-height: 1.55;
 }
-.framework--v2 .framework-item h4 {
+.framework .framework-item h4 {
   font-family: var(--font-cond);
   font-weight: 700;
   font-size: 26px;
@@ -1377,7 +1289,7 @@ a:hover { text-decoration: underline; }
   color: var(--text-title);
   margin-bottom: 10px;
 }
-.framework--v2 .framework-item p {
+.framework .framework-item p {
   font-size: 16px;
   line-height: 1.55;
   color: #374151;
@@ -1831,15 +1743,15 @@ table.data td.col-num {
      can keep its 100 vw breakout. Content shell handles horizontal. */
   .page--hero { padding-top: 0; }
   .hero { padding: 28px 0 36px; }
-  .overview-layout--v2 {
+  .overview-layout {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto;
     gap: 18px;
   }
-  .overview-layout--v2 .map-wrap { min-height: 360px; }
-  .overview-layout--v2 .map-wrap,
-  .overview-layout--v2 .overview-block--overview,
-  .overview-layout--v2 .overview-block--lotm { grid-column: 1 / -1; grid-row: auto; }
+  .overview-layout .map-wrap { min-height: 360px; }
+  .overview-layout .map-wrap,
+  .overview-layout .overview-block--overview,
+  .overview-layout .overview-block--lotm { grid-column: 1 / -1; grid-row: auto; }
 }
 
 /* Mobile ---------------------------------------------------- */
@@ -1976,15 +1888,15 @@ table.data td.col-num {
   /* Page-1 v2 layout collapse — single column on phone. Horizontal
      padding comes from the content shell rule (clamp 20-72), so we
      don't need to add it here. */
-  .overview-layout--v2 {
+  .overview-layout {
     grid-template-columns: 1fr !important;
     grid-template-rows: auto !important;
     gap: 16px;
   }
-  .overview-layout--v2 .map-wrap,
-  .overview-layout--v2 .overview-block--overview,
-  .overview-layout--v2 .overview-block--lotm { grid-column: 1 / -1 !important; grid-row: auto !important; }
-  .overview-layout--v2 .map-wrap { min-height: 280px; }
+  .overview-layout .map-wrap,
+  .overview-layout .overview-block--overview,
+  .overview-layout .overview-block--lotm { grid-column: 1 / -1 !important; grid-row: auto !important; }
+  .overview-layout .map-wrap { min-height: 280px; }
 }
 
 /* Print — the layout itself is driven by `.pages.a4-mode` (added by
