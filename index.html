@@ -15,7 +15,7 @@
        Used only inside .cover__title-serif and .cover__standfirst. -->
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@1,400;1,500&family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=v3hk2" />
+  <link rel="stylesheet" href="styles.css?v=v3hk3" />
 
   <!-- Export libraries (PNG + PDF). Self-hosted in vendor/ so the PDF export
        works even when offline and isn't blocked on a third-party CDN. -->
@@ -64,9 +64,15 @@
             <a class="cover__brand" href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener">
               <img src="assets/iasc-logo.svg" alt="Inter-Agency Standing Committee" class="cover__logo">
             </a>
-            <div class="cover__meta">
-              <div class="cover__meta-issue">Issue · <strong id="head-month">—</strong></div>
-              <div class="cover__meta-updated">Updated <span id="head-updated">—</span></div>
+            <div class="cover__head-right">
+              <button class="cover__action cd-button cd-button--outline" id="btn-pdf" title="Download the report as a multi-page A4 PDF">
+                <img src="assets/icons/download.svg" alt="" class="cover__action-icon">
+                <span>Download A4 PDF</span>
+              </button>
+              <div class="cover__meta">
+                <div class="cover__meta-issue">Issue · <strong id="head-month">—</strong></div>
+                <div class="cover__meta-updated">Updated <span id="head-updated">—</span></div>
+              </div>
             </div>
           </header>
 
@@ -85,13 +91,6 @@
 
           <!-- 5 KPIs rendered by render/kpis.js into this strip -->
           <div class="cover__stats" id="kpi-row"></div>
-
-          <footer class="cover__colophon">
-            <button class="cover__pdf-link" id="btn-pdf" title="Download the report as a multi-page A4 PDF">
-              <span>Download A4 PDF</span>
-              <span class="cover__pdf-arrow" aria-hidden="true">→</span>
-            </button>
-          </footer>
 
         </div>
       </article>

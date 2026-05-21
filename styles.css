@@ -392,7 +392,7 @@ img.link-row__trail:hover { opacity: 1; }
   padding: 0 clamp(20px, 4vw, 72px);
   width: 100%;
   display: grid;
-  grid-template-rows: auto 1fr auto auto;
+  grid-template-rows: auto 1fr auto;   /* head · masthead · stats */
   row-gap: clamp(32px, 6vh, 64px);
   min-height: min(80vh, 700px);
   align-content: stretch;
@@ -404,21 +404,35 @@ img.link-row__trail:hover { opacity: 1; }
   min-height: 0;
 }
 
-/* ── Row 1: Masthead head — IASC logo left, issue/updated meta right.
- *           Asymmetric on purpose: logo and meta block sit at the
- *           extremes of the row, not evenly distributed across it. */
+/* ── Row 1: Masthead head — IASC logo left, action chip + meta stacked
+ *           right. The right column carries TWO things: the OCHA outlined
+ *           "Download A4 PDF" chip on top (primary action — top-right is
+ *           where the eye lands and is the established CTA convention),
+ *           and the issue / updated meta block below it (masthead context).
+ *           Chip-above-meta keeps action discoverable while preserving the
+ *           magazine masthead feel. */
 .cover__head {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: flex-start;
   gap: 24px;
 }
-.cover__brand { display: inline-flex; align-items: center; }
+.cover__brand {
+  display: inline-flex;
+  align-items: center;
+  padding-top: 4px;   /* visually align logo baseline with chip top edge */
+}
 .cover__logo {
   height: 28px;
   width: auto;
   display: block;
   filter: brightness(0) invert(1);   /* render the navy SVG as white */
+}
+.cover__head-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
 }
 .cover__meta {
   text-align: right;
@@ -431,6 +445,43 @@ img.link-row__trail:hover { opacity: 1; }
 }
 .cover__meta-issue { color: rgba(255,255,255,0.92); }
 .cover__meta-issue strong { font-weight: 700; color: #fff; letter-spacing: .18em; }
+
+/* ── OCHA outlined chip on navy — adapts the OCHA design system's
+ *    `cd-button--outline` variant for a dark-mode hero context.
+ *    1 px white outline · transparent fill · uppercase Roboto Condensed
+ *    label · OCHA download icon (whitened via brightness/invert) ·
+ *    hover inverts to a soft white fill. Matches the v2 chip's
+ *    discoverability without the SaaS-filled-CTA energy. */
+.cover__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.55);
+  color: #fff;
+  font-family: var(--font-cond);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  padding: 9px 18px;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease;
+}
+.cover__action:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: #fff;
+}
+.cover__action:focus-visible {
+  outline: 2px solid var(--brand-primary--light);
+  outline-offset: 3px;
+}
+.cover__action-icon {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  filter: brightness(0) invert(1);   /* render OCHA blue SVG as white */
+}
 
 /* ── Row 2: Masthead — kicker, title (sans + serif italic), standfirst.
  *           Title block is anchored LEFT and spans ~75 % of the grid;
@@ -563,45 +614,11 @@ img.link-row__trail:hover { opacity: 1; }
   max-width: 22ch;
 }
 
-/* ── Row 4: Colophon — single text-link PDF download, bottom-right.
- *           No SaaS button chip; reads as an editorial "turn the page"
- *           hint. Crimson Pro italic arrow gives a small character
- *           moment. */
-.cover__colophon {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
-.cover__pdf-link {
-  background: transparent;
-  border: 0;
-  color: rgba(255,255,255,0.92);
-  font-family: var(--font-cond);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  cursor: pointer;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.55);
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  transition: border-color .15s ease, color .15s ease;
-}
-.cover__pdf-link:hover { border-color: #fff; color: #fff; }
-.cover__pdf-link:focus-visible {
-  outline: 2px solid var(--brand-primary--light);
-  outline-offset: 4px;
-}
-.cover__pdf-arrow {
-  font-family: 'Crimson Pro', Georgia, serif;
-  font-style: italic;
-  font-weight: 400;
-  font-size: 18px;
-  letter-spacing: 0;
-  text-transform: none;
-}
+/* (Row 4 colophon removed — the OCHA outlined chip in row 1 head is
+ *  now the single, discoverable PDF action. Decision: a tool whose
+ *  primary action is downloading the report should make that action
+ *  conventionally findable rather than hide it in an editorial
+ *  flourish. See commit message for the full reasoning.) */
 
 /* ── Page-1 v2 layout (.overview-layout) ────────────────
    Hero takes the top of the page, then the map sits full-width
@@ -747,8 +764,8 @@ a { color: var(--brand-primary--text); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 /* Generic .btn (per-page PNG export buttons + any incidental action
-   chips). The cover band has its own .cover__pdf-link text-link
-   colophon — does NOT use .btn. */
+   chips). The cover band has its own .cover__action outlined chip
+   (OCHA cd-button--outline pattern on navy) — does NOT use .btn. */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -1682,8 +1699,15 @@ table.data td.col-num {
     row-gap: 26px;
     min-height: 0;
   }
-  .cover__head { grid-template-columns: 1fr; gap: 10px; }
+  .cover__head { grid-template-columns: 1fr; gap: 14px; }
+  .cover__brand { padding-top: 0; }
+  .cover__head-right {
+    flex-direction: column-reverse;   /* meta first, chip last → chip stays visible at bottom */
+    align-items: flex-start;
+    gap: 12px;
+  }
   .cover__meta { text-align: left; font-size: 10.5px; }
+  .cover__action { font-size: 11px; letter-spacing: .14em; padding: 8px 14px; }
   .cover__logo { height: 22px; }
 
   .cover__masthead { max-width: 100%; }
@@ -1712,9 +1736,6 @@ table.data td.col-num {
   .cover__stats .kpi .value { font-size: 32px; }
   .cover__stats .kpi .label { font-size: 10.5px; max-width: none; }
 
-  .cover__colophon { justify-content: flex-start; }
-  .cover__pdf-link { font-size: 11px; letter-spacing: .14em; padding: 5px 0; }
-  .cover__pdf-arrow { font-size: 15px; }
 
   /* Page-1 v2 layout collapse — single column on phone. Horizontal
      padding comes from the content shell rule (clamp 20-72), so we
