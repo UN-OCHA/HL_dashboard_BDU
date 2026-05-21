@@ -269,5 +269,24 @@ var FilterBar = (function () {
   }
   function escapeAttr(s) { return escapeHtml(s); }
 
-  return { mount: mount, get: get, isEmpty: isEmpty, refreshSummary: refreshSummary };
+  /**
+   * Public setter — toggles a filter clause from outside the chip bar
+   * (e.g. a chart click handler). Same toggle semantics as picking an
+   * option from the dropdown: setting the same value twice clears it,
+   * setting a different value swaps. Always re-renders chip UI and
+   * dispatches hl:filterchange.
+   */
+  function toggle(state, key, value) {
+    var bar = document.getElementById("filter-bar");
+    if (!bar) return;
+    selectOption(state || window.__HL_STATE__ || {}, key, value, bar);
+  }
+
+  return {
+    mount:           mount,
+    get:             get,
+    isEmpty:         isEmpty,
+    refreshSummary:  refreshSummary,
+    toggle:          toggle
+  };
 })();

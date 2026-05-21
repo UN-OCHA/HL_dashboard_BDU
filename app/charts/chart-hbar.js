@@ -171,9 +171,25 @@ var ChartHbar = (function () {
         g.appendChild(rowG);
       }
 
+      // Per-segment click support — independent of onBarClick. Wires
+      // a click listener directly to each <rect> so the caller can
+      // react to a specific bar (series × row) rather than the whole
+      // row. Used by Page 3 charts to cross-filter by the bar's
+      // series (e.g. clicking the "WEOG" bar in the ASG row sets the
+      // weog filter clause).
+      function attachSegmentClick(rect, segInfo) {
+        if (typeof opts.onSegmentClick !== "function") return;
+        rect.style.cursor = "pointer";
+        rect.setAttribute("class", "c-bar c-bar--clickable");
+        rect.addEventListener("click", function (ev) {
+          ev.stopPropagation();      // don't also trigger onBarClick
+          opts.onSegmentClick(segInfo);
+        });
+      }
+
       if (mode === "stacked") {
         var xAcc = 0;
-        series.forEach(function (s) {
+        series.forEach(function (s, si) {
           var v = d.values[s.key] || 0;
           if (v <= 0) return;
           var w = (v / niceMax) * innerW;
@@ -184,6 +200,8 @@ var ChartHbar = (function () {
           r.setAttribute("height", barH);
           r.setAttribute("fill", s.color);
           r.setAttribute("class", "c-bar");
+          r.setAttribute("data-series-key", s.key);
+          attachSegmentClick(r, { rowLabel: d.label, seriesKey: s.key, seriesLabel: s.label, value: v, rowIndex: i, seriesIndex: si });
           rowG.appendChild(r);
           // label
           if (w > 24) {
@@ -210,6 +228,8 @@ var ChartHbar = (function () {
           r.setAttribute("height", barH);
           r.setAttribute("fill", s.color);
           r.setAttribute("class", "c-bar");
+          r.setAttribute("data-series-key", s.key);
+          attachSegmentClick(r, { rowLabel: d.label, seriesKey: s.key, seriesLabel: s.label, value: v, rowIndex: i, seriesIndex: si });
           rowG.appendChild(r);
           // label
           var t = document.createElementNS(svgNS, "text");

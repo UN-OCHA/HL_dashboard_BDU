@@ -74,6 +74,24 @@ var ChartDonut = (function () {
       path.setAttribute("fill", colors[i % colors.length]);
       path.setAttribute("stroke", "#fff");
       path.setAttribute("stroke-width", "2");
+      path.setAttribute("data-segment-label", d.label);
+      // Per-slice click handler — wires the donut to cross-filtering.
+      // Callback signature: ({label, value, index, fraction}).
+      if (typeof opts.onSegmentClick === "function") {
+        path.style.cursor = "pointer";
+        path.setAttribute("class", "c-arc c-arc--clickable");
+        (function (slice, idx) {
+          path.addEventListener("click", function (ev) {
+            ev.stopPropagation();
+            opts.onSegmentClick({
+              label: slice.label,
+              value: slice.value,
+              index: idx,
+              fraction: slice.value / total
+            });
+          });
+        })(d, i);
+      }
       svg.appendChild(path);
 
       var pct = d.value / total;

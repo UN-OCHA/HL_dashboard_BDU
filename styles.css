@@ -1559,6 +1559,25 @@ a:hover { text-decoration: underline; }
 .c-row--clickable .c-bar { transition: opacity .12s ease; }
 .c-row--clickable:hover .c-bar { opacity: 0.78; }
 
+/* Per-segment click state — hbar individual <rect> bars + donut arc
+ * <path>s. Same suppress-mouse-click-focus pattern as .c-row--clickable.
+ * Quiet hover lift so the user knows the segment is interactive. */
+.c-bar--clickable,
+.c-arc--clickable {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity .12s ease;
+}
+.c-bar--clickable:focus,
+.c-arc--clickable:focus { outline: none; }
+.c-bar--clickable:focus-visible,
+.c-arc--clickable:focus-visible {
+  outline: 2px solid var(--brand-primary--light);
+  outline-offset: 2px;
+}
+.c-bar--clickable:hover,
+.c-arc--clickable:hover { opacity: 0.78; }
+
 /* Per-chart source + as-of line (OCHA requirement) */
 .chart-source {
   margin-top: 6px;
