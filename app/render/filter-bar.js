@@ -73,7 +73,76 @@ var FilterBar = (function () {
     bindClearAll(bar);
     bindOutsideClose(bar);
     bindEscapeKey(bar);
+
+    // Restore filter from URL (e.g. when someone opens a shared link
+    // like ".../#gender=Female&weog=Non-WEOG"). Validates each value
+    // against the group's option list — unknown values are dropped
+    // silently so a stale URL doesn't break the page.
+    var restored = readUrlFilter();
+    if (Object.keys(restored).length > 0) {
+      window.__HL_FILTER__ = restored;
+      syncChipUiFromFilter(bar);
+      // Dispatch so Page 3 re-renders against the restored filter.
+      dispatchChange();
+    }
     refreshSummary(state);
+  }
+
+  /** Parse `window.location.hash` into a filter object. */
+  function readUrlFilter() {
+    var hash = (window.location && window.location.hash) || "";
+    if (!hash || hash === "#") return {};
+    // Allow either "#a=b&c=d" or "#?a=b&c=d" (some apps add a "?").
+    var qs = hash.replace(/^#\??/, "");
+    if (!qs) return {};
+    var out = {};
+    new URLSearchParams(qs).forEach(function (v, k) {
+      var g = GROUPS.find(function (gg) { return gg.key === k; });
+      if (!g) return;
+      // Case-insensitive match against the known options.
+      var match = g.options.find(function (opt) {
+        return opt.toLowerCase() === String(v).toLowerCase();
+      });
+      if (match) out[k] = match;
+    });
+    return out;
+  }
+
+  /** Serialise the current filter into `window.location.hash`. */
+  function writeUrlFilter() {
+    var filter = window.__HL_FILTER__ || {};
+    var keys = Object.keys(filter).filter(function (k) { return filter[k]; });
+    var hash = "";
+    if (keys.length > 0) {
+      var params = new URLSearchParams();
+      keys.forEach(function (k) { params.set(k, filter[k]); });
+      hash = "#" + params.toString();
+    }
+    // history.replaceState (vs assigning location.hash) avoids
+    // polluting the back-button history with every chip click.
+    if (window.history && window.history.replaceState) {
+      var url = window.location.pathname + window.location.search + hash;
+      window.history.replaceState(null, "", url);
+    } else if (window.location) {
+      window.location.hash = hash;
+    }
+  }
+
+  /** Apply the current filter object to the chip-bar UI. */
+  function syncChipUiFromFilter(bar) {
+    var filter = window.__HL_FILTER__ || {};
+    bar.querySelectorAll(".filter-chip-group").forEach(function (group) {
+      var key  = group.getAttribute("data-filter-key");
+      var chip = group.querySelector(".filter-chip");
+      var v    = chip && chip.querySelector(".filter-chip__value");
+      if (filter[key]) {
+        chip.classList.add("filter-chip--active");
+        if (v) v.textContent = " · " + filter[key];
+      } else {
+        chip.classList.remove("filter-chip--active");
+        if (v) v.textContent = "";
+      }
+    });
   }
 
   function renderGroup(g) {
@@ -244,6 +313,9 @@ var FilterBar = (function () {
   }
 
   function dispatchChange() {
+    // Mirror filter state into the URL so refreshes preserve it and
+    // links are shareable. Always runs alongside the event dispatch.
+    writeUrlFilter();
     document.dispatchEvent(new CustomEvent("hl:filterchange", {
       detail: { filter: window.__HL_FILTER__ || {} }
     }));

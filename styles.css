@@ -1274,6 +1274,38 @@ a:hover { text-decoration: underline; }
   vertical-align: middle;
   border-radius: 1px;
 }
+/* ── Chart empty state ───────────────────────────────────────────
+ * Rendered into a chart container when a filter combo leaves zero
+ * leaders in that chart's dimension. Vertically centred in the
+ * card so the surrounding chart-card geometry stays stable (no
+ * grid collapse, no layout shift). Small editorial voice — not
+ * an error, just a polite "nothing to show". */
+.chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 140px;
+  height: 100%;
+  text-align: center;
+  padding: 18px;
+}
+.chart-empty__kicker {
+  font-family: var(--font-cond);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.chart-empty__hint {
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
 /* ── Hover/tap chart tooltip ─────────────────────────────────────
  * Anchored tooltip that appears next to a specific chart row when
  * hovered or tapped. Used today by the agency chart's "Other" bar

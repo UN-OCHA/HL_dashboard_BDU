@@ -56,11 +56,41 @@ var RenderCharts = (function () {
     FilterBar.toggle(st, key, value);
   }
 
+  // ── Empty-state renderer. When a Page 3 filter combo yields 0
+  //    leaders in this chart's dimension, render a polite "No
+  //    leaders match" message in place of an empty SVG. Returns
+  //    true when the chart should bail out of normal render.
+  function renderEmptyState(el) {
+    while (el.firstChild) el.removeChild(el.firstChild);
+    var msg = document.createElement("div");
+    msg.className = "chart-empty";
+    msg.innerHTML =
+      '<span class="chart-empty__kicker">No leaders match</span>' +
+      '<span class="chart-empty__hint">Adjust filters or clear all to see more</span>';
+    el.appendChild(msg);
+    // Also drop any legend the previous render left behind.
+    removeLegend(el);
+  }
+
+  /** True when a chart's data array is effectively empty (no values to plot). */
+  function hasNoData(rows, valueKeys) {
+    if (!rows || rows.length === 0) return true;
+    if (!valueKeys) {
+      // Donut shape: [{label, value}].
+      return rows.every(function (r) { return !r.value; });
+    }
+    // Grouped-hbar shape: [{grade, weog, non_weog}, …] or similar.
+    return rows.every(function (r) {
+      return valueKeys.every(function (k) { return !r[k]; });
+    });
+  }
+
   /* PPT slide 3 — Country of origin, grade × region.
      Click any WEOG / Non-WEOG bar → toggle the `weog` filter clause. */
   function renderCountryByGrade(state) {
     var el = document.getElementById("chart-country-by-grade");
     if (!el) return;
+    if (hasNoData(state.country_by_grade, ["weog", "non_weog"])) return renderEmptyState(el);
     var data = (state.country_by_grade || []).map(function (r) {
       return { label: r.grade, values: { weog: r.weog, non_weog: r.non_weog } };
     });
@@ -93,6 +123,7 @@ var RenderCharts = (function () {
   function renderGenderByGrade(state) {
     var el = document.getElementById("chart-gender-by-grade");
     if (!el) return;
+    if (hasNoData(state.gender_by_grade, ["female", "male"])) return renderEmptyState(el);
     var data = (state.gender_by_grade || []).map(function (r) {
       return { label: r.grade, values: { female: r.female, male: r.male } };
     });
@@ -119,6 +150,7 @@ var RenderCharts = (function () {
   function renderRoles(state) {
     var el = document.getElementById("chart-roles");
     if (!el) return;
+    if (hasNoData(state.roles_donut)) return renderEmptyState(el);
     // OCHA rule: pie/donut max 5 slices (top 4 + Others). Collapse long tail.
     var data = topNWithOthers(state.roles_donut || [], 4);
     var total = data.reduce(function (s, d) { return s + d.value; }, 0);
@@ -154,6 +186,7 @@ var RenderCharts = (function () {
   function renderAgency(state) {
     var el = document.getElementById("chart-agency");
     if (!el) return;
+    if (hasNoData(state.agency_donut)) return renderEmptyState(el);
     var data = (state.agency_donut || [])
       .slice()
       .sort(function (a, b) { return b.value - a.value; });
