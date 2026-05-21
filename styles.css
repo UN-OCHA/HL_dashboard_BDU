@@ -851,6 +851,7 @@ a:hover { text-decoration: underline; }
 .page > .section-head,
 .page > .chart-grid,
 .page > .observation,
+.page > .filter-bar,
 .page > .highlights-grid,
 .page > .resources,
 .page > .overview-layout {
@@ -866,11 +867,18 @@ a:hover { text-decoration: underline; }
 .pages.a4-mode .page > .section-head,
 .pages.a4-mode .page > .chart-grid,
 .pages.a4-mode .page > .observation,
+.pages.a4-mode .page > .filter-bar,
 .pages.a4-mode .page > .highlights-grid,
 .pages.a4-mode .page > .resources,
 .pages.a4-mode .page > .overview-layout {
   max-width: 1500px;
 }
+
+/* Filter bar — hidden entirely in A4 / PDF export (the static cohort
+ * is the canonical artefact; filters are an exploration tool on
+ * screen only). */
+.pages.a4-mode .page > .filter-bar { display: none; }
+@media print { .page > .filter-bar { display: none; } }
 
 /* Tables (Pages 5 + 6) sit inside a dedicated .table-shell wrapper
    that carries the same max-width + horizontal padding as the
@@ -1345,6 +1353,186 @@ a:hover { text-decoration: underline; }
   font-size: 11.5px;
   color: var(--text-muted);
   font-style: italic;
+}
+
+/* ── Page-3 filter chip bar ──────────────────────────────────────
+ * Sticky bar at the top of Section 03 with 5 dropdown chip groups
+ * (Gender / Origin / Role / Grade / Agency). The active filter
+ * summary line appears below the chips only when ≥ 1 filter is
+ * active. Hidden in A4 / print (filter UI doesn't belong in the
+ * canonical export — see media rules above).
+ *
+ * Layout: max-width follows the same content-shell rules as
+ * section-head et al. (1320 px on screen, 1500 px in A4). */
+.filter-bar {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 20;       /* above chart cards so dropdowns can overlay */
+  background: var(--bg-paper);
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.filter-bar[hidden] { display: none; }
+
+/* Wrapper for the 5 chip groups. Wraps on narrow viewports. */
+.filter-bar__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* A chip group is a relative container so its dropdown menu can be
+ * absolutely positioned underneath. */
+.filter-chip-group { position: relative; }
+
+/* The chip itself — outlined pill with caret. Editorial / OCHA tone. */
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  background: #fff;
+  border: 1px solid var(--border-soft);
+  color: var(--text-title);
+  font-family: var(--font-cond);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color .12s ease, background .12s ease;
+}
+.filter-chip:hover { border-color: var(--brand-primary--light); }
+.filter-chip:focus-visible {
+  outline: 2px solid var(--brand-primary--light);
+  outline-offset: 2px;
+}
+.filter-chip__value {
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--brand-primary--text);
+}
+.filter-chip__caret {
+  font-size: 9px;
+  opacity: 0.6;
+  margin-left: -2px;
+}
+
+/* Active state — chip in UN Blue when its filter clause is set. */
+.filter-chip--active {
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+  color: #fff;
+}
+.filter-chip--active .filter-chip__value { color: rgba(255,255,255,0.92); }
+.filter-chip--active .filter-chip__caret { color: #fff; }
+.filter-chip--active:hover { background: var(--brand-primary--dark); border-color: var(--brand-primary--dark); }
+
+/* Dropdown menu — small white card, hairline border, list of options. */
+.filter-chip__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 180px;
+  max-height: 260px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-2);
+  z-index: 21;
+}
+.filter-chip__menu[hidden] { display: none; }
+.filter-chip__menu li {
+  padding: 6px 14px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+.filter-chip__menu li:hover,
+.filter-chip__menu li:focus { background: var(--brand-primary--ice); outline: none; }
+
+/* Filter summary — appears below the chips when ≥ 1 filter is active. */
+.filter-bar__summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-soft);
+  font-family: var(--font-cond);
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+.filter-bar__summary[hidden] { display: none; }
+.filter-bar__count {
+  font-weight: 700;
+  color: var(--text-title);
+  letter-spacing: .04em;
+}
+.filter-bar__active-chips { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+
+.filter-bar__active-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px 3px 10px;
+  background: var(--brand-primary--ice);
+  color: var(--text-title);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.filter-bar__active-chip-x {
+  background: transparent;
+  border: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+.filter-bar__active-chip-x:hover { color: var(--text-title); }
+.filter-bar__active-chip-x:focus-visible {
+  outline: 2px solid var(--brand-primary--light);
+  outline-offset: 1px;
+}
+
+.filter-bar__clear {
+  background: transparent;
+  border: 0;
+  color: var(--brand-primary--text);
+  font-family: var(--font-cond);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 4px 0;
+  margin-left: auto;
+  border-bottom: 1px solid transparent;
+}
+.filter-bar__clear:hover { border-bottom-color: var(--brand-primary--text); }
+.filter-bar__clear:focus-visible {
+  outline: 2px solid var(--brand-primary--light);
+  outline-offset: 2px;
+}
+
+/* Mobile — chips stack tighter; summary line wraps. */
+@media screen and (max-width: 767px) {
+  .filter-bar { padding-top: 6px; padding-bottom: 6px; gap: 8px; }
+  .filter-chip { font-size: 11px; padding: 6px 10px; letter-spacing: .1em; }
+  .filter-bar__summary { font-size: 11px; }
+  .filter-bar__clear { font-size: 10.5px; }
 }
 
 /* Clickable hbar rows — quiet hover state so the user knows the row

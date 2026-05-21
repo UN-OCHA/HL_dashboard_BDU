@@ -8,7 +8,8 @@
  */
 
 /* global SheetsLoader, RenderHeader, RenderKpis, RenderMap, RenderHighlights,
-          RenderCharts, RenderTables, RenderResources, RenderFooter, Exporter */
+          RenderCharts, RenderTables, RenderResources, RenderFooter, Exporter,
+          FilterBar */
 
 (function () {
   "use strict";
@@ -52,6 +53,16 @@
     safeRender("tables",     function () { RenderTables.render(state); });
     safeRender("resources",  function () { RenderResources.render(state); });
     safeRender("footer",     function () { RenderFooter.render(state); });
+    // Mount the Page 3 filter chip bar (idempotent: only mounts once).
+    safeRender("filter-bar", function () {
+      if (typeof FilterBar !== "undefined" && !window.__HL_FILTER_BAR_MOUNTED__) {
+        FilterBar.mount(state);
+        window.__HL_FILTER_BAR_MOUNTED__ = true;
+      } else if (typeof FilterBar !== "undefined") {
+        // Re-render summary in case totals shifted (e.g. data refresh)
+        FilterBar.refreshSummary(state);
+      }
+    });
   }
 
   function safeRender(label, fn) {
@@ -68,6 +79,16 @@
     if (!lastState) return;
     RenderCharts.render(lastState);
   };
+
+  // Re-render Page 3 charts whenever the chip-bar filter changes.
+  // RenderCharts.render() reads FilterBar.get() internally and routes
+  // through Aggregate.run() when the filter is non-empty. The other
+  // sections (KPIs, map, tables, etc.) are NOT re-rendered — the
+  // filter scope is Page 3 only per the design decision.
+  document.addEventListener("hl:filterchange", function () {
+    if (!lastState) return;
+    safeRender("charts (filter)", function () { RenderCharts.render(lastState); });
+  });
 
   function load() {
     return SheetsLoader.loadAll()

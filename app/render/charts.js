@@ -3,18 +3,48 @@
  * 2 long-term trend charts (Page 4) to their data.
  */
 
-/* global RenderCharts:true, ChartHbar, ChartDonut, ChartLine, HLConfig, DisclosureAgency */
+/* global RenderCharts:true, ChartHbar, ChartDonut, ChartLine, HLConfig,
+          DisclosureAgency, FilterBar, Aggregate */
 
 var RenderCharts = (function () {
   "use strict";
 
   function render(state) {
-    renderCountryByGrade(state);
-    renderGenderByGrade(state);
-    renderRoles(state);
-    renderAgency(state);
+    // Page 3 charts respect the chip-bar filter. When no filter is
+    // active, Page 3 still renders from the curated pre-aggregated
+    // tabs (Valijon's truth, no Tab 9 data gaps). When ≥ 1 filter is
+    // active, we compute via Aggregate.run() — uses the partial
+    // Tab 9 data, which is acceptable since the user explicitly
+    // narrowed the cohort.
+    var effective = applyPage3Filter(state);
+    renderCountryByGrade(effective);
+    renderGenderByGrade(effective);
+    renderRoles(effective);
+    renderAgency(effective);
+    // Page 4 trends never react to filters (long-term institutional
+    // arc — not a "cohort slice" lens). Always render from raw state.
     renderGenderTrends(state);
     renderRegionTrends(state);
+  }
+
+  /**
+   * Return a state-shaped object where the four Page 3 chart data
+   * arrays are derived from Aggregate.run() if a filter is active.
+   * Leaves all other state untouched (state.leaders is replaced with
+   * the filtered subset so DisclosureAgency's tooltip reflects the
+   * current view).
+   */
+  function applyPage3Filter(state) {
+    if (typeof FilterBar === "undefined" || FilterBar.isEmpty()) return state;
+    var filter  = FilterBar.get();
+    var derived = Aggregate.run(state, filter);
+    return Object.assign({}, state, {
+      country_by_grade: derived.country_by_grade,
+      gender_by_grade:  derived.gender_by_grade,
+      roles_donut:      derived.roles_donut,
+      agency_donut:     derived.agency_donut,
+      leaders:          derived.leaders
+    });
   }
 
   /* PPT slide 3 — Country of origin, grade × region. */
