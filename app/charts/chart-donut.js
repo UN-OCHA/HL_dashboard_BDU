@@ -61,23 +61,87 @@ var ChartDonut = (function () {
     var LABEL_ROW_H = 14;
     var labelSpecs = [];
 
+    // Donut geometry for the stroke-based slice rendering. Each slice
+    // is a <circle> with stroke (no fill) at the donut's mid-radius;
+    // stroke-width equals (radius - inner). We use stroke-dasharray to
+    // make only the slice's arc visible, and rotate each circle so its
+    // dash starts at the slice's a0 angle. This setup lets us animate
+    // stroke-dashoffset for a true "trim path" sweep (see CSS).
+    var midR = (radius + inner) / 2;
+    var thickness = radius - inner;
+    var circumference = 2 * Math.PI * midR;
+
     var angle = -Math.PI / 2;
     data.forEach(function (d, i) {
       var sweep = (d.value / total) * Math.PI * 2;
       var a0 = angle;
       var a1 = angle + sweep;
       angle = a1;
-
-      var p = arcPath(cx, cy, radius, inner, a0, a1);
-      var path = document.createElementNS(svgNS, "path");
-      path.setAttribute("d", p);
-      path.setAttribute("fill", colors[i % colors.length]);
-      path.setAttribute("stroke", "#fff");
-      path.setAttribute("stroke-width", "2");
-      svg.appendChild(path);
-
       var pct = d.value / total;
+      var isFullCircle = pct >= 0.9999;
+      var sliceLen = sweep * midR;   // arc length at midline
+
+      // Stroked-circle slice. SVG circles start their stroke at the
+      // 3-o'clock position (angle 0). Our angle system starts at -π/2
+      // (12 o'clock) and increases clockwise. To align the dash start
+      // with this slice's a0 we rotate the circle by a0 degrees around
+      // the donut's centre.
+      var arc = document.createElementNS(svgNS, "circle");
+      arc.setAttribute("cx", cx);
+      arc.setAttribute("cy", cy);
+      arc.setAttribute("r", midR);
+      arc.setAttribute("fill", "none");
+      arc.setAttribute("stroke", colors[i % colors.length]);
+      arc.setAttribute("stroke-width", thickness);
+      arc.setAttribute("stroke-dasharray", sliceLen + " " + Math.max(0, circumference - sliceLen));
+      var rotDeg = a0 * 180 / Math.PI;
+      arc.setAttribute("transform", "rotate(" + rotDeg + " " + cx + " " + cy + ")");
+      arc.setAttribute("data-segment-label", d.label);
+      // Custom property for the trim-path animation. CSS reads
+      // --slice-len to set stroke-dashoffset's `from` value in the
+      // hl-arc-trim @keyframes; final state is dashoffset 0.
+      arc.style.setProperty("--slice-len", sliceLen);
+
+      if (typeof opts.onSegmentClick === "function") {
+        arc.style.cursor = "pointer";
+        arc.setAttribute("class", "c-arc c-arc--clickable");
+        (function (slice, idx) {
+          arc.addEventListener("click", function (ev) {
+            ev.stopPropagation();
+            opts.onSegmentClick({
+              label: slice.label,
+              value: slice.value,
+              index: idx,
+              fraction: slice.value / total
+            });
+          });
+        })(d, i);
+      } else {
+        arc.setAttribute("class", "c-arc");
+      }
+      svg.appendChild(arc);
+
+      // Hairline white separator at the slice's start angle (skip for
+      // a 100% single-slice donut — there's only one boundary and it
+      // looks like a stray notch at 12 o'clock).
+      if (!isFullCircle && data.length > 1) {
+        var sep = document.createElementNS(svgNS, "line");
+        sep.setAttribute("x1", cx + Math.cos(a0) * inner);
+        sep.setAttribute("y1", cy + Math.sin(a0) * inner);
+        sep.setAttribute("x2", cx + Math.cos(a0) * radius);
+        sep.setAttribute("y2", cy + Math.sin(a0) * radius);
+        sep.setAttribute("stroke", "#fff");
+        sep.setAttribute("stroke-width", "2");
+        sep.setAttribute("class", "c-arc-sep");
+        svg.appendChild(sep);
+      }
+
       var mid = (a0 + a1) / 2;
+
+      // Full-circle case: skip direct AND inline labels — the center
+      // text already reads "Total leaders / N" and labeling the rim
+      // with "100%" or the single category name would just clutter.
+      if (isFullCircle) return;
 
       if (direct) {
         var onRight = Math.cos(mid) >= 0;
@@ -214,6 +278,22 @@ var ChartDonut = (function () {
            " L" + x0i + "," + y0i +
            " A" + rInner + "," + rInner + " 0 " + large + " 0 " + x1i + "," + y1i +
            " Z";
+  }
+
+  /**
+   * Full-circle ring path — outer circle (clockwise) + inner circle
+   * (counter-clockwise), combined into one <path d="…M…M…"> with
+   * `fill-rule: evenodd` to punch the inner radius out of the outer.
+   * Used for the 100%-single-slice case where arcPath() above
+   * degenerates (start point == end point yields an empty render).
+   */
+  function ringPath(cx, cy, rOuter, rInner) {
+    return "M " + (cx - rOuter) + "," + cy +
+           " A " + rOuter + "," + rOuter + " 0 1 1 " + (cx + rOuter) + "," + cy +
+           " A " + rOuter + "," + rOuter + " 0 1 1 " + (cx - rOuter) + "," + cy + " Z " +
+           "M " + (cx - rInner) + "," + cy +
+           " A " + rInner + "," + rInner + " 0 1 0 " + (cx + rInner) + "," + cy +
+           " A " + rInner + "," + rInner + " 0 1 0 " + (cx - rInner) + "," + cy + " Z";
   }
 
   return { render: render };

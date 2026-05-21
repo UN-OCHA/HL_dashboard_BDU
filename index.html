@@ -16,7 +16,7 @@
        Italic (400, 500) — used inside .cover__title-serif and .cover__standfirst. -->
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;1,400;1,500&family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=v3hk7" />
+  <link rel="stylesheet" href="styles.css?v=v3int11" />
 
   <!-- Export libraries (PNG + PDF). Self-hosted in vendor/ so the PDF export
        works even when offline and isn't blocked on a third-party CDN. -->
@@ -24,8 +24,8 @@
   <script src="vendor/jspdf.umd.min.js?v=1778154398" defer></script>
 
   <!-- Charts (small purpose-built SVG renderers) -->
-  <script src="app/charts/chart-hbar.js?v=1778154398" defer></script>
-  <script src="app/charts/chart-donut.js?v=1778154398" defer></script>
+  <script src="app/charts/chart-hbar.js?v=v3int5" defer></script>
+  <script src="app/charts/chart-donut.js?v=v3int10" defer></script>
   <script src="app/charts/chart-line.js?v=1778154398" defer></script>
   <script src="app/charts/chart-stacked-col.js?v=1778240000" defer></script>
 
@@ -33,16 +33,21 @@
   <script src="app/config.js?v=1778154398" defer></script>
   <script src="app/csv-parser.js?v=1778154398" defer></script>
   <script src="app/sheets-loader.js?v=1778154398" defer></script>
+  <!-- Aggregation engine (Phase 2 cross-filtering foundation). Loads
+       before render/ modules so they can consume Aggregate.run(). -->
+  <script src="app/aggregate.js?v=v3int4" defer></script>
   <script src="app/render/header.js?v=1778154398" defer></script>
   <script src="app/render/kpis.js?v=1778154398" defer></script>
   <script src="app/render/map.js?v=1778154398" defer></script>
   <script src="app/render/highlights.js?v=1778154398" defer></script>
-  <script src="app/render/charts.js?v=1778154398" defer></script>
+  <script src="app/render/disclosure-agency.js?v=v3int2" defer></script>
+  <script src="app/render/filter-bar.js?v=v3int7" defer></script>
+  <script src="app/render/charts.js?v=v3int7" defer></script>
   <script src="app/render/tables.js?v=1778154398" defer></script>
   <script src="app/render/resources.js?v=1778154398" defer></script>
   <script src="app/render/footer.js?v=1778154398" defer></script>
   <script src="app/export.js?v=1778154398" defer></script>
-  <script src="app/main.js?v=1778154398" defer></script>
+  <script src="app/main.js?v=v3int4" defer></script>
 </head>
 <body>
 
@@ -196,6 +201,11 @@
         </div>
       </div>
 
+      <!-- Page-3 filter chip bar. Hidden until filter-bar.js mounts
+           it (after sheet data loads) and unhides. Five chip groups:
+           Gender · Origin · Role · Grade · Agency. -->
+      <div class="filter-bar" id="filter-bar" hidden role="region" aria-label="Page 3 cohort filters"></div>
+
       <div class="chart-grid characteristics">
         <!-- Exact mirror of PPT slides 3 and 4. -->
         <div class="chart-card">
@@ -228,6 +238,11 @@
             <span class="chart-card__tag">Fig. 3.4</span>
           </div>
           <div class="chart" id="chart-agency"></div>
+          <!-- Hover/tap tooltip — populated by render/disclosure-agency.js
+               when the user hovers (or taps, on touch) the "Other" bar
+               on the agency chart. Hidden by default. Positioned
+               absolutely relative to .chart-card. -->
+          <div class="chart-tooltip" id="chart-agency-tooltip" hidden aria-hidden="true" role="tooltip"></div>
           <div class="chart-source" data-source-for="agency_donut">Source: OCHA HLS</div>
         </div>
       </div>

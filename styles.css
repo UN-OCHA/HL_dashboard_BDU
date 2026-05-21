@@ -851,6 +851,7 @@ a:hover { text-decoration: underline; }
 .page > .section-head,
 .page > .chart-grid,
 .page > .observation,
+.page > .filter-bar,
 .page > .highlights-grid,
 .page > .resources,
 .page > .overview-layout {
@@ -866,11 +867,18 @@ a:hover { text-decoration: underline; }
 .pages.a4-mode .page > .section-head,
 .pages.a4-mode .page > .chart-grid,
 .pages.a4-mode .page > .observation,
+.pages.a4-mode .page > .filter-bar,
 .pages.a4-mode .page > .highlights-grid,
 .pages.a4-mode .page > .resources,
 .pages.a4-mode .page > .overview-layout {
   max-width: 1500px;
 }
+
+/* Filter bar — hidden entirely in A4 / PDF export (the static cohort
+ * is the canonical artefact; filters are an exploration tool on
+ * screen only). */
+.pages.a4-mode .page > .filter-bar { display: none; }
+@media print { .page > .filter-bar { display: none; } }
 
 /* Tables (Pages 5 + 6) sit inside a dedicated .table-shell wrapper
    that carries the same max-width + horizontal padding as the
@@ -1266,6 +1274,430 @@ a:hover { text-decoration: underline; }
   vertical-align: middle;
   border-radius: 1px;
 }
+/* ── Page-3 chart paint-in animation ─────────────────────────────
+ * When a Page-3 filter changes the chart re-renders fresh: bars
+ * "paint" from left to right (scaleX 0 → 1, transform-origin left
+ * center), donut arcs scale up from the donut's own centre (scale
+ * 0.55 → 1). Both ~360 ms ease-out — slower than a fade because the
+ * eye reads the growth as the chart drawing itself, not vanishing
+ * and re-appearing.
+ *
+ * Triggers on every DOM insertion of .c-bar / .c-arc, so re-renders
+ * fire fresh animations every time. Page 4 charts are unscoped (the
+ * trends never re-render under filters; their initial paint is
+ * instant which is the right behavior for a long-term arc).
+ *
+ * Honours prefers-reduced-motion — animations are disabled there. */
+@keyframes hl-bar-paint {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* Trim-path donut sweep. Each slice is a stroked <circle> (set up in
+ * chart-donut.js) with stroke-dasharray = "sliceLen rest". To animate
+ * the slice drawing itself clockwise from its a0, we start with
+ * stroke-dashoffset = sliceLen (the visible dash is shifted entirely
+ * out of the visible range) and animate to 0 (dash slides into place).
+ *
+ * --slice-len is set per-element in JS from the slice's arc length.
+ * Falls back to a generous default (9999) so any unset slice still
+ * renders cleanly without animation. */
+@keyframes hl-arc-trim {
+  from { stroke-dashoffset: var(--slice-len, 9999); }
+  to   { stroke-dashoffset: 0; }
+}
+
+/* hbar bars on Page 3 (Country×grade, Gender×grade, Agency) — grow
+ * from their left edge. ease-in-out gives the "easy ease" feel —
+ * slow start, slow finish. */
+.chart-grid.characteristics .c-bar {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: hl-bar-paint 520ms ease-in-out;
+}
+
+/* Donut arcs (Page 3 roles) — trim-path sweep. 740 ms ease-in-out
+ * lets the rotation read clearly without feeling sluggish. */
+.chart-grid.characteristics .c-arc {
+  animation: hl-arc-trim 740ms ease-in-out;
+}
+
+/* Slice separators — fade in after the trim sweep finishes. */
+.chart-grid.characteristics .c-arc-sep {
+  animation: hl-text-fade 320ms ease-in-out 520ms backwards;
+}
+
+/* The donut's centre text and value-labels next to bars: hold them
+ * back briefly with a fade-in that completes just after the bar /
+ * arc finishes painting. Keeps the visual rhythm tight. */
+@keyframes hl-text-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.chart-grid.characteristics .c-value-label,
+.chart-grid.characteristics .c-donut-center,
+.chart-grid.characteristics .c-donut-sub {
+  animation: hl-text-fade 320ms ease-in-out 340ms backwards;
+}
+
+/* Empty-state placeholder — keep a fade here (it's not a chart
+ * shape, just a message replacing the chart). */
+@keyframes hl-msg-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.chart > .chart-empty     { animation: hl-msg-fade 320ms ease-in-out; }
+.chart-card .chart-legend { animation: hl-msg-fade 320ms ease-in-out; }
+.filter-bar__summary      { animation: hl-msg-fade 320ms ease-in-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-grid.characteristics .c-bar,
+  .chart-grid.characteristics .c-arc,
+  .chart-grid.characteristics .c-arc-sep,
+  .chart-grid.characteristics .c-value-label,
+  .chart-grid.characteristics .c-donut-center,
+  .chart-grid.characteristics .c-donut-sub,
+  .chart > .chart-empty,
+  .chart-card .chart-legend,
+  .filter-bar__summary { animation: none; }
+}
+
+/* ── Chart empty state ───────────────────────────────────────────
+ * Rendered into a chart container when a filter combo leaves zero
+ * leaders in that chart's dimension. Vertically centred in the
+ * card so the surrounding chart-card geometry stays stable (no
+ * grid collapse, no layout shift). Small editorial voice — not
+ * an error, just a polite "nothing to show". */
+.chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 140px;
+  height: 100%;
+  text-align: center;
+  padding: 18px;
+}
+.chart-empty__kicker {
+  font-family: var(--font-cond);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.chart-empty__hint {
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* ── Hover/tap chart tooltip ─────────────────────────────────────
+ * Anchored tooltip that appears next to a specific chart row when
+ * hovered or tapped. Used today by the agency chart's "Other" bar
+ * (Page 3, Fig 3.4) — see render/disclosure-agency.js.
+ *
+ * Positioning: absolute inside .chart-card (which is position: relative
+ * by virtue of .chart-card establishing a stacking context via flex).
+ * The JS sets `top` / `left` based on the anchor row's bounding box.
+ *
+ * Style: small white card, hairline border, condensed kicker + tight
+ * dl listing of agency-vs-count. Reads as a quiet annotation, not a
+ * modal. Fades in/out cheaply via the `hidden` attribute. */
+.chart-card { position: relative; }   /* anchor for the absolute tooltip */
+.chart-tooltip {
+  position: absolute;
+  z-index: 10;
+  min-width: 220px;
+  max-width: 320px;
+  background: #fff;
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-2);
+  padding: 10px 12px 12px;
+  font-family: var(--font-sans);
+  color: var(--text);
+  pointer-events: auto;   /* needed so mouseenter on tooltip keeps it open */
+}
+.chart-tooltip[hidden] { display: none; }
+.chart-tooltip__head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.chart-tooltip__kicker {
+  font-family: var(--font-cond);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text-title);
+}
+.chart-tooltip__meta {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  flex: 1;
+}
+.chart-tooltip__list {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 14px;
+  row-gap: 2px;
+  margin: 0;
+  font-size: 11.5px;
+}
+.chart-tooltip__list .agency-name {
+  margin: 0;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--border-soft);
+  font-family: var(--font-cond);
+  color: var(--text-title);
+  font-weight: 500;
+}
+.chart-tooltip__list .agency-count {
+  margin: 0;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--border-soft);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--text-title);
+  text-align: right;
+  cursor: help;     /* signals the names-on-hover native title attribute */
+}
+.chart-tooltip__list .agency-name:last-of-type,
+.chart-tooltip__list .agency-count:last-of-type { border-bottom: 0; }
+.chart-tooltip__empty {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Page-3 filter chip bar ──────────────────────────────────────
+ * Sticky bar at the top of Section 03 with 5 dropdown chip groups
+ * (Gender / Origin / Role / Grade / Agency). The active filter
+ * summary line appears below the chips only when ≥ 1 filter is
+ * active. Hidden in A4 / print (filter UI doesn't belong in the
+ * canonical export — see media rules above).
+ *
+ * Layout: max-width follows the same content-shell rules as
+ * section-head et al. (1320 px on screen, 1500 px in A4). */
+.filter-bar {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 20;       /* above chart cards so dropdowns can overlay */
+  background: var(--bg-paper);
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.filter-bar[hidden] { display: none; }
+
+/* Wrapper for the 5 chip groups. Wraps on narrow viewports. */
+.filter-bar__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* A chip group is a relative container so its dropdown menu can be
+ * absolutely positioned underneath. */
+.filter-chip-group { position: relative; }
+
+/* The chip itself — outlined pill with caret. Editorial / OCHA tone. */
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  background: #fff;
+  border: 1px solid var(--border-soft);
+  color: var(--text-title);
+  font-family: var(--font-cond);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color .12s ease, background .12s ease;
+}
+.filter-chip:hover { border-color: var(--brand-primary--light); }
+.filter-chip:focus-visible {
+  outline: 2px solid var(--brand-primary--light);
+  outline-offset: 2px;
+}
+.filter-chip__value {
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--brand-primary--text);
+}
+.filter-chip__caret {
+  font-size: 9px;
+  opacity: 0.6;
+  margin-left: -2px;
+}
+
+/* Active state — chip in UN Blue when its filter clause is set. */
+.filter-chip--active {
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+  color: #fff;
+}
+.filter-chip--active .filter-chip__value { color: rgba(255,255,255,0.92); }
+.filter-chip--active .filter-chip__caret { color: #fff; }
+.filter-chip--active:hover { background: var(--brand-primary--dark); border-color: var(--brand-primary--dark); }
+
+/* Dropdown menu — small white card, hairline border, list of options. */
+.filter-chip__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 180px;
+  max-height: 260px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-2);
+  z-index: 21;
+}
+.filter-chip__menu[hidden] { display: none; }
+.filter-chip__menu li {
+  padding: 6px 14px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+.filter-chip__menu li:hover,
+.filter-chip__menu li:focus { background: var(--brand-primary--ice); outline: none; }
+
+/* Filter summary — appears below the chips when ≥ 1 filter is active. */
+.filter-bar__summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-soft);
+  font-family: var(--font-cond);
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+.filter-bar__summary[hidden] { display: none; }
+.filter-bar__count {
+  font-weight: 700;
+  color: var(--text-title);
+  letter-spacing: .04em;
+}
+.filter-bar__active-chips { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+
+.filter-bar__active-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px 3px 10px;
+  background: var(--brand-primary--ice);
+  color: var(--text-title);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.filter-bar__active-chip-x {
+  background: transparent;
+  border: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+.filter-bar__active-chip-x:hover { color: var(--text-title); }
+.filter-bar__active-chip-x:focus-visible {
+  outline: 2px solid var(--brand-primary--light);
+  outline-offset: 1px;
+}
+
+.filter-bar__clear {
+  background: transparent;
+  border: 0;
+  color: var(--brand-primary--text);
+  font-family: var(--font-cond);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 4px 0;
+  margin-left: auto;
+  border-bottom: 1px solid transparent;
+}
+.filter-bar__clear:hover { border-bottom-color: var(--brand-primary--text); }
+.filter-bar__clear:focus-visible {
+  outline: 2px solid var(--brand-primary--light);
+  outline-offset: 2px;
+}
+
+/* Mobile — chips stack tighter; summary line wraps. */
+@media screen and (max-width: 767px) {
+  .filter-bar { padding-top: 6px; padding-bottom: 6px; gap: 8px; }
+  .filter-chip { font-size: 11px; padding: 6px 10px; letter-spacing: .1em; }
+  .filter-bar__summary { font-size: 11px; }
+  .filter-bar__clear { font-size: 10.5px; }
+}
+
+/* Clickable hbar rows — quiet hover state so the user knows the row
+ * is interactive. Applied only when ChartHbar gets an onBarClick
+ * callback (the JS adds the `c-row--clickable` class).
+ *
+ * Focus handling: the SVG <g> has tabindex="0" for keyboard a11y,
+ * which means some browsers (notably Safari, and Chrome on certain
+ * SVG-focus paths) draw a default focus ring on mouse click — not
+ * just keyboard. The triple-rule below blocks that: suppress focus
+ * outline by default + on `:focus` (catches mouse-click focus across
+ * browsers), then explicitly re-enable on `:focus-visible` so true
+ * keyboard navigation still gets a visible ring. */
+.c-row--clickable {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;  /* iOS Safari tap flash */
+  user-select: none;                          /* no text selection on click */
+}
+.c-row--clickable:focus { outline: none; }
+.c-row--clickable:focus-visible {
+  outline: 2px solid var(--brand-primary--light);
+  outline-offset: 2px;
+}
+.c-row--clickable .c-bar { transition: opacity .12s ease; }
+.c-row--clickable:hover .c-bar { opacity: 0.78; }
+
+/* Per-segment click state — hbar individual <rect> bars + donut arc
+ * <path>s. Same suppress-mouse-click-focus pattern as .c-row--clickable.
+ * Quiet hover lift so the user knows the segment is interactive. */
+.c-bar--clickable,
+.c-arc--clickable {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity .12s ease;
+}
+.c-bar--clickable:focus,
+.c-arc--clickable:focus { outline: none; }
+.c-bar--clickable:focus-visible,
+.c-arc--clickable:focus-visible {
+  outline: 2px solid var(--brand-primary--light);
+  outline-offset: 2px;
+}
+.c-bar--clickable:hover,
+.c-arc--clickable:hover { opacity: 0.78; }
+
 /* Per-chart source + as-of line (OCHA requirement) */
 .chart-source {
   margin-top: 6px;

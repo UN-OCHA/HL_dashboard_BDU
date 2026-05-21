@@ -3,24 +3,94 @@
  * 2 long-term trend charts (Page 4) to their data.
  */
 
-/* global RenderCharts:true, ChartHbar, ChartDonut, ChartLine, HLConfig */
+/* global RenderCharts:true, ChartHbar, ChartDonut, ChartLine, HLConfig,
+          DisclosureAgency, FilterBar, Aggregate */
 
 var RenderCharts = (function () {
   "use strict";
 
   function render(state) {
-    renderCountryByGrade(state);
-    renderGenderByGrade(state);
-    renderRoles(state);
-    renderAgency(state);
+    // Page 3 charts respect the chip-bar filter. When no filter is
+    // active, Page 3 still renders from the curated pre-aggregated
+    // tabs (Valijon's truth, no Tab 9 data gaps). When ≥ 1 filter is
+    // active, we compute via Aggregate.run() — uses the partial
+    // Tab 9 data, which is acceptable since the user explicitly
+    // narrowed the cohort.
+    var effective = applyPage3Filter(state);
+    renderCountryByGrade(effective);
+    renderGenderByGrade(effective);
+    renderRoles(effective);
+    renderAgency(effective);
+    // Page 4 trends never react to filters (long-term institutional
+    // arc — not a "cohort slice" lens). Always render from raw state.
     renderGenderTrends(state);
     renderRegionTrends(state);
   }
 
-  /* PPT slide 3 — Country of origin, grade × region. */
+  /**
+   * Return a state-shaped object where the four Page 3 chart data
+   * arrays are derived from Aggregate.run() if a filter is active.
+   * Leaves all other state untouched (state.leaders is replaced with
+   * the filtered subset so DisclosureAgency's tooltip reflects the
+   * current view).
+   */
+  function applyPage3Filter(state) {
+    if (typeof FilterBar === "undefined" || FilterBar.isEmpty()) return state;
+    var filter  = FilterBar.get();
+    var derived = Aggregate.run(state, filter);
+    return Object.assign({}, state, {
+      country_by_grade: derived.country_by_grade,
+      gender_by_grade:  derived.gender_by_grade,
+      roles_donut:      derived.roles_donut,
+      agency_donut:     derived.agency_donut,
+      leaders:          derived.leaders
+    });
+  }
+
+  // ── Click → filter helper. Routes a chart-click to the chip bar,
+  //    which handles toggle semantics + chip-UI sync + dispatch of
+  //    `hl:filterchange`. Page 3 charts use this for cross-filtering.
+  function dispatchFilter(key, value) {
+    if (typeof FilterBar === "undefined") return;
+    var st = window.__HL_STATE__;
+    FilterBar.toggle(st, key, value);
+  }
+
+  // ── Empty-state renderer. When a Page 3 filter combo yields 0
+  //    leaders in this chart's dimension, render a polite "No
+  //    leaders match" message in place of an empty SVG. Returns
+  //    true when the chart should bail out of normal render.
+  function renderEmptyState(el) {
+    while (el.firstChild) el.removeChild(el.firstChild);
+    var msg = document.createElement("div");
+    msg.className = "chart-empty";
+    msg.innerHTML =
+      '<span class="chart-empty__kicker">No leaders match</span>' +
+      '<span class="chart-empty__hint">Adjust filters or clear all to see more</span>';
+    el.appendChild(msg);
+    // Also drop any legend the previous render left behind.
+    removeLegend(el);
+  }
+
+  /** True when a chart's data array is effectively empty (no values to plot). */
+  function hasNoData(rows, valueKeys) {
+    if (!rows || rows.length === 0) return true;
+    if (!valueKeys) {
+      // Donut shape: [{label, value}].
+      return rows.every(function (r) { return !r.value; });
+    }
+    // Grouped-hbar shape: [{grade, weog, non_weog}, …] or similar.
+    return rows.every(function (r) {
+      return valueKeys.every(function (k) { return !r[k]; });
+    });
+  }
+
+  /* PPT slide 3 — Country of origin, grade × region.
+     Click any WEOG / Non-WEOG bar → toggle the `weog` filter clause. */
   function renderCountryByGrade(state) {
     var el = document.getElementById("chart-country-by-grade");
     if (!el) return;
+    if (hasNoData(state.country_by_grade, ["weog", "non_weog"])) return renderEmptyState(el);
     var data = (state.country_by_grade || []).map(function (r) {
       return { label: r.grade, values: { weog: r.weog, non_weog: r.non_weog } };
     });
@@ -32,7 +102,11 @@ var RenderCharts = (function () {
         { key: "weog",     label: "WEOG",     color: cWeog },
         { key: "non_weog", label: "Non-WEOG", color: cNonWeog }
       ],
-      mode: "grouped"
+      mode: "grouped",
+      onSegmentClick: function (info) {
+        // info.seriesLabel is "WEOG" or "Non-WEOG" — the filter value.
+        dispatchFilter("weog", info.seriesLabel);
+      }
     });
     injectLegend(el, [
       { label: "WEOG",     color: cWeog },
@@ -40,22 +114,31 @@ var RenderCharts = (function () {
     ]);
   }
 
-  /* PPT slide 4 — Grade and gender. */
+  /* PPT slide 4 — Grade and gender.
+     Click any Female / Male bar → toggle the `gender` filter clause.
+     Distinct blue duo from Fig 3.1 (which uses navy + signature UN Blue)
+     so the eye instantly knows which chart it's reading: country/origin
+     uses the deepest pair, gender uses a mid + light pair. Stays
+     entirely within OCHA's UN Blue ramp per brand guidance. */
   function renderGenderByGrade(state) {
     var el = document.getElementById("chart-gender-by-grade");
     if (!el) return;
+    if (hasNoData(state.gender_by_grade, ["female", "male"])) return renderEmptyState(el);
     var data = (state.gender_by_grade || []).map(function (r) {
       return { label: r.grade, values: { female: r.female, male: r.male } };
     });
-    var cFemale = "#009EDB"; // UN Blue
-    var cMale   = "#002E6E"; // Navy
+    var cFemale = "#0074B7"; // UN Blue ramp step 3 (mid-dark)
+    var cMale   = "#64BDEA"; // UN Blue ramp step 5 (light)
     ChartHbar.render(el, {
       data: data,
       series: [
         { key: "female", label: "Female", color: cFemale },
         { key: "male",   label: "Male",   color: cMale }
       ],
-      mode: "grouped"
+      mode: "grouped",
+      onSegmentClick: function (info) {
+        dispatchFilter("gender", info.seriesLabel);
+      }
     });
     injectLegend(el, [
       { label: "Female", color: cFemale },
@@ -63,14 +146,14 @@ var RenderCharts = (function () {
     ]);
   }
 
+  /* Roles donut — click a slice → toggle the `role` filter clause. */
   function renderRoles(state) {
     var el = document.getElementById("chart-roles");
     if (!el) return;
+    if (hasNoData(state.roles_donut)) return renderEmptyState(el);
     // OCHA rule: pie/donut max 5 slices (top 4 + Others). Collapse long tail.
     var data = topNWithOthers(state.roles_donut || [], 4);
     var total = data.reduce(function (s, d) { return s + d.value; }, 0);
-    // Single-hue: UN Blue ramp (dark → light) across the slices, largest dark.
-    // Keeps the page-3 palette monochromatic as requested.
     var BLUE_RAMP = ["#002E6E", "#0074B7", "#009EDB", "#64BDEA", "#C5DFEF"];
     var colors = data.map(function (_, i) { return BLUE_RAMP[i % BLUE_RAMP.length]; });
     ChartDonut.render(el, {
@@ -78,11 +161,16 @@ var RenderCharts = (function () {
       colors: colors,
       centerValue: String(total),
       centerLabel: "Total leaders",
-      directLabels: true      // per OCHA — prefer direct labels over legend
+      directLabels: true,
+      onSegmentClick: function (info) {
+        // info.label is the canonical role string ("RC/HC", "DSRSG/RC/HC", …)
+        // — same vocabulary the chip dropdown uses. "Others" is a
+        // collapsed bucket from topNWithOthers() and isn't a real
+        // filter value, so ignore clicks on it.
+        if (!info.label || info.label.toLowerCase() === "others") return;
+        dispatchFilter("role", info.label);
+      }
     });
-    // Donut places direct labels only when they don't collide. When
-    // they would overlap it sets data-used-legend-fallback="1" on the
-    // <svg> root; we then inject an OCHA-styled legend above the chart.
     var svg = el.querySelector("svg");
     if (svg && svg.getAttribute("data-used-legend-fallback") === "1") {
       injectLegend(el, data.map(function (d, i) {
@@ -94,11 +182,11 @@ var RenderCharts = (function () {
     }
   }
 
+  /* Agency hbar — click a bar → toggle the `agency` filter clause. */
   function renderAgency(state) {
     var el = document.getElementById("chart-agency");
     if (!el) return;
-    // Agency usually has 6-8 categories — far beyond OCHA's donut limit (5 slices).
-    // Render as horizontal bar with all agencies sorted by count, OCHA Blue.
+    if (hasNoData(state.agency_donut)) return renderEmptyState(el);
     var data = (state.agency_donut || [])
       .slice()
       .sort(function (a, b) { return b.value - a.value; });
@@ -108,10 +196,17 @@ var RenderCharts = (function () {
     ChartHbar.render(el, {
       data: hbar,
       series: [{ key: "v", label: "Leaders", color: "#009EDB" }],
-      mode: "grouped"
+      mode: "grouped",
+      // Row click toggles the agency filter. Hovering "Other" still
+      // shows the breakdown tooltip via DisclosureAgency.attach()
+      // below — the two interactions are independent.
+      onBarClick: function (info) {
+        if (!info.label) return;
+        dispatchFilter("agency", info.label);
+      }
     });
-    // No legend — single-series bars are self-evident.
     removeLegend(el);
+    DisclosureAgency.attach(state);
   }
 
   // Collapse a categorical distribution to top-N plus an aggregated "Others"

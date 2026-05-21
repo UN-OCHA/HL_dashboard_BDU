@@ -147,9 +147,49 @@ var ChartHbar = (function () {
       yl.textContent = d.label;
       g.appendChild(yl);
 
+      // If a click callback is provided, wrap each row's bars + label in a
+      // single <g class="c-row" data-bar-label=...> so the whole row is one
+      // hit target. Otherwise plain bars (no extra DOM, no cursor change).
+      var rowG = g;
+      if (typeof opts.onBarClick === "function") {
+        rowG = document.createElementNS(svgNS, "g");
+        rowG.setAttribute("class", "c-row c-row--clickable");
+        rowG.setAttribute("data-bar-label", d.label);
+        rowG.setAttribute("tabindex", "0");
+        rowG.setAttribute("role", "button");
+        rowG.setAttribute("aria-label", d.label + " — click for details");
+        rowG.style.cursor = "pointer";
+        rowG.addEventListener("click", function () {
+          opts.onBarClick({ label: d.label, value: rowValue(d, series), index: i });
+        });
+        rowG.addEventListener("keydown", function (ev) {
+          if (ev.key === "Enter" || ev.key === " ") {
+            ev.preventDefault();
+            opts.onBarClick({ label: d.label, value: rowValue(d, series), index: i });
+          }
+        });
+        g.appendChild(rowG);
+      }
+
+      // Per-segment click support — independent of onBarClick. Wires
+      // a click listener directly to each <rect> so the caller can
+      // react to a specific bar (series × row) rather than the whole
+      // row. Used by Page 3 charts to cross-filter by the bar's
+      // series (e.g. clicking the "WEOG" bar in the ASG row sets the
+      // weog filter clause).
+      function attachSegmentClick(rect, segInfo) {
+        if (typeof opts.onSegmentClick !== "function") return;
+        rect.style.cursor = "pointer";
+        rect.setAttribute("class", "c-bar c-bar--clickable");
+        rect.addEventListener("click", function (ev) {
+          ev.stopPropagation();      // don't also trigger onBarClick
+          opts.onSegmentClick(segInfo);
+        });
+      }
+
       if (mode === "stacked") {
         var xAcc = 0;
-        series.forEach(function (s) {
+        series.forEach(function (s, si) {
           var v = d.values[s.key] || 0;
           if (v <= 0) return;
           var w = (v / niceMax) * innerW;
@@ -160,7 +200,9 @@ var ChartHbar = (function () {
           r.setAttribute("height", barH);
           r.setAttribute("fill", s.color);
           r.setAttribute("class", "c-bar");
-          g.appendChild(r);
+          r.setAttribute("data-series-key", s.key);
+          attachSegmentClick(r, { rowLabel: d.label, seriesKey: s.key, seriesLabel: s.label, value: v, rowIndex: i, seriesIndex: si });
+          rowG.appendChild(r);
           // label
           if (w > 24) {
             var t = document.createElementNS(svgNS, "text");
@@ -170,7 +212,7 @@ var ChartHbar = (function () {
             t.setAttribute("class", "c-value-label");
             t.setAttribute("fill", "#fff");
             t.textContent = valueFmt(v);
-            g.appendChild(t);
+            rowG.appendChild(t);
           }
           xAcc += w;
         });
@@ -186,19 +228,28 @@ var ChartHbar = (function () {
           r.setAttribute("height", barH);
           r.setAttribute("fill", s.color);
           r.setAttribute("class", "c-bar");
-          g.appendChild(r);
+          r.setAttribute("data-series-key", s.key);
+          attachSegmentClick(r, { rowLabel: d.label, seriesKey: s.key, seriesLabel: s.label, value: v, rowIndex: i, seriesIndex: si });
+          rowG.appendChild(r);
           // label
           var t = document.createElementNS(svgNS, "text");
           t.setAttribute("x", w + 4);
           t.setAttribute("y", y + barH / 2 + 3);
           t.setAttribute("class", "c-value-label");
           t.textContent = valueFmt(v);
-          g.appendChild(t);
+          rowG.appendChild(t);
         });
       }
     });
 
     container.appendChild(svg);
+  }
+
+  /** Sum a data row's values across all series (used for click payloads). */
+  function rowValue(d, series) {
+    return series.reduce(function (s, ss) {
+      return s + (Number(d.values[ss.key]) || 0);
+    }, 0);
   }
 
   function niceCeil(v) {
