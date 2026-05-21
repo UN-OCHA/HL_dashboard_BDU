@@ -33,6 +33,9 @@
   <script src="app/config.js?v=1778154398" defer></script>
   <script src="app/csv-parser.js?v=1778154398" defer></script>
   <script src="app/sheets-loader.js?v=1778154398" defer></script>
+  <!-- Aggregation engine (Phase 2 cross-filtering foundation). Loads
+       before render/ modules so they can consume Aggregate.run(). -->
+  <script src="app/aggregate.js?v=v3int4" defer></script>
   <script src="app/render/header.js?v=1778154398" defer></script>
   <script src="app/render/kpis.js?v=1778154398" defer></script>
   <script src="app/render/map.js?v=1778154398" defer></script>

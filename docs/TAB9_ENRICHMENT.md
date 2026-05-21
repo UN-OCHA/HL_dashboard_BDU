@@ -2,7 +2,8 @@
 
 The `9. Leaders (roster)` tab was bulk-enriched on **2026-05-21** from
 `data/HC trends report 2025.xlsx` (Luiza Fernandes export) via
-`scripts/enrich_tab9_from_xlsx.py`.
+`scripts/enrich_tab9_from_xlsx.py`, and a new `grade` column was added
+the same day to support cross-filtering by UN grade (ASG / D2 / D1).
 
 ## What was filled
 
@@ -49,6 +50,55 @@ For each, please fill in directly in the master sheet:
   e.g. `OCHA`, `UNICEF`, `World Food Programme`, `United Nations Development Programme - UNDP`)
 - `eod` — entrance on duty (YYYY-MM-DD)
 - `eoa` — end of assignment (leave empty for current leaders)
+- `grade` — `ASG`, `D2`, or `D1` (see next section)
+
+## Grade column (new — added 2026-05-21)
+
+A new `grade` column (column L) was added to support the Page 3
+cross-filtering work. Eleven leaders were pre-classified from
+`position` using deterministic rules:
+
+| `position` value | Derived `grade` | Pre-filled |
+|---|---|---|
+| DSRSG/RC/HC | ASG | ✓ (7 leaders) |
+| DSC/RC/HC | D2 | ✓ (2 leaders) |
+| Deputy HC | D1 | ✓ (2 leaders) |
+| RC/HC (alone) | ambiguous — could be ASG or D2 | left empty |
+| RC/HC a.i. | ambiguous | left empty |
+| RC/HC OiC | excluded from charts (per PPT footnote) | left empty |
+
+### Sixteen leaders need a `grade` decision
+
+Per the existing pre-aggregated charts (Tabs 5 and 6), the cohort
+splits **14 ASG · 11 D2 · 2 D1**. Eleven are pre-filled by the rules
+above (7 ASG · 2 D2 · 2 D1). The remaining ones to classify are the
+sixteen `RC/HC` / `RC/HC a.i.` leaders — please fill `ASG` or `D2`
+for each:
+
+| Country | Name |
+|---|---|
+| Cameroon | Issa Sanogo |
+| Chad | François Batalingaya |
+| Colombia | Mireia Villar Forner |
+| Eritrea | Nahla Valji |
+| Mali | Hanaa Singer |
+| Mozambique | Catherine Sozi |
+| Myanmar | Gwyn Lewis (a.i.) |
+| Niger | Mama Keita |
+| Nigeria | Mohamed Fall |
+| Pakistan | Mohamed Yahya |
+| Sudan | Denise Brown |
+| Syrian Arab Republic | Nathalie Fustier (a.i.) |
+| Ukraine | Matthias Schmale |
+| Venezuela | Gianluca Rampolla del Tindaro |
+| Yemen | Julien Harneis |
+| Zimbabwe | Edward Kallon |
+
+When filled, the counts should land at **7 ASG + 9 D2** across the
+sixteen (so the cohort totals match Tab 5 / Tab 6 exactly).
+
+OiC leaders (Maurice Azonnankpo, Aboubacar Kampo) can be left empty —
+they're excluded from the analytical cohort per the PPT footnote.
 
 ## Re-running the enrichment
 
