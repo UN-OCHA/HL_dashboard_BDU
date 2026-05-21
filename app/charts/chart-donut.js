@@ -61,6 +61,16 @@ var ChartDonut = (function () {
     var LABEL_ROW_H = 14;
     var labelSpecs = [];
 
+    // Donut geometry for the stroke-based slice rendering. Each slice
+    // is a <circle> with stroke (no fill) at the donut's mid-radius;
+    // stroke-width equals (radius - inner). We use stroke-dasharray to
+    // make only the slice's arc visible, and rotate each circle so its
+    // dash starts at the slice's a0 angle. This setup lets us animate
+    // stroke-dashoffset for a true "trim path" sweep (see CSS).
+    var midR = (radius + inner) / 2;
+    var thickness = radius - inner;
+    var circumference = 2 * Math.PI * midR;
+
     var angle = -Math.PI / 2;
     data.forEach(function (d, i) {
       var sweep = (d.value / total) * Math.PI * 2;
@@ -68,31 +78,35 @@ var ChartDonut = (function () {
       var a1 = angle + sweep;
       angle = a1;
       var pct = d.value / total;
-      // Single-slice 100% case (every leader matches the filter, or the
-      // dataset only has one bucket). Standard SVG arc commands
-      // degenerate when start point == end point — the path renders
-      // nothing. Switch to a ring composed of two semi-arcs with
-      // `fill-rule: evenodd` so the inner radius is "punched out".
       var isFullCircle = pct >= 0.9999;
+      var sliceLen = sweep * midR;   // arc length at midline
 
-      var path = document.createElementNS(svgNS, "path");
-      if (isFullCircle) {
-        path.setAttribute("d", ringPath(cx, cy, radius, inner));
-        path.setAttribute("fill-rule", "evenodd");
-      } else {
-        path.setAttribute("d", arcPath(cx, cy, radius, inner, a0, a1));
-      }
-      path.setAttribute("fill", colors[i % colors.length]);
-      path.setAttribute("stroke", "#fff");
-      path.setAttribute("stroke-width", "2");
-      path.setAttribute("data-segment-label", d.label);
-      // Per-slice click handler — wires the donut to cross-filtering.
-      // Callback signature: ({label, value, index, fraction}).
+      // Stroked-circle slice. SVG circles start their stroke at the
+      // 3-o'clock position (angle 0). Our angle system starts at -π/2
+      // (12 o'clock) and increases clockwise. To align the dash start
+      // with this slice's a0 we rotate the circle by a0 degrees around
+      // the donut's centre.
+      var arc = document.createElementNS(svgNS, "circle");
+      arc.setAttribute("cx", cx);
+      arc.setAttribute("cy", cy);
+      arc.setAttribute("r", midR);
+      arc.setAttribute("fill", "none");
+      arc.setAttribute("stroke", colors[i % colors.length]);
+      arc.setAttribute("stroke-width", thickness);
+      arc.setAttribute("stroke-dasharray", sliceLen + " " + Math.max(0, circumference - sliceLen));
+      var rotDeg = a0 * 180 / Math.PI;
+      arc.setAttribute("transform", "rotate(" + rotDeg + " " + cx + " " + cy + ")");
+      arc.setAttribute("data-segment-label", d.label);
+      // Custom property for the trim-path animation. CSS reads
+      // --slice-len to set stroke-dashoffset's `from` value in the
+      // hl-arc-trim @keyframes; final state is dashoffset 0.
+      arc.style.setProperty("--slice-len", sliceLen);
+
       if (typeof opts.onSegmentClick === "function") {
-        path.style.cursor = "pointer";
-        path.setAttribute("class", "c-arc c-arc--clickable");
+        arc.style.cursor = "pointer";
+        arc.setAttribute("class", "c-arc c-arc--clickable");
         (function (slice, idx) {
-          path.addEventListener("click", function (ev) {
+          arc.addEventListener("click", function (ev) {
             ev.stopPropagation();
             opts.onSegmentClick({
               label: slice.label,
@@ -102,8 +116,25 @@ var ChartDonut = (function () {
             });
           });
         })(d, i);
+      } else {
+        arc.setAttribute("class", "c-arc");
       }
-      svg.appendChild(path);
+      svg.appendChild(arc);
+
+      // Hairline white separator at the slice's start angle (skip for
+      // a 100% single-slice donut — there's only one boundary and it
+      // looks like a stray notch at 12 o'clock).
+      if (!isFullCircle && data.length > 1) {
+        var sep = document.createElementNS(svgNS, "line");
+        sep.setAttribute("x1", cx + Math.cos(a0) * inner);
+        sep.setAttribute("y1", cy + Math.sin(a0) * inner);
+        sep.setAttribute("x2", cx + Math.cos(a0) * radius);
+        sep.setAttribute("y2", cy + Math.sin(a0) * radius);
+        sep.setAttribute("stroke", "#fff");
+        sep.setAttribute("stroke-width", "2");
+        sep.setAttribute("class", "c-arc-sep");
+        svg.appendChild(sep);
+      }
 
       var mid = (a0 + a1) / 2;
 

@@ -1292,29 +1292,40 @@ a:hover { text-decoration: underline; }
   from { transform: scaleX(0); }
   to   { transform: scaleX(1); }
 }
-@keyframes hl-arc-paint {
-  from { transform: scale(0.55); opacity: 0.6; }
-  to   { transform: scale(1);    opacity: 1; }
+
+/* Trim-path donut sweep. Each slice is a stroked <circle> (set up in
+ * chart-donut.js) with stroke-dasharray = "sliceLen rest". To animate
+ * the slice drawing itself clockwise from its a0, we start with
+ * stroke-dashoffset = sliceLen (the visible dash is shifted entirely
+ * out of the visible range) and animate to 0 (dash slides into place).
+ *
+ * --slice-len is set per-element in JS from the slice's arc length.
+ * Falls back to a generous default (9999) so any unset slice still
+ * renders cleanly without animation. */
+@keyframes hl-arc-trim {
+  from { stroke-dashoffset: var(--slice-len, 9999); }
+  to   { stroke-dashoffset: 0; }
 }
 
 /* hbar bars on Page 3 (Country×grade, Gender×grade, Agency) — grow
- * from their left edge. `transform-box: fill-box` makes
- * `transform-origin` resolve against each rect's own bounding box,
- * which gives a per-bar growth from x=0 of the rect. */
+ * from their left edge. */
 .chart-grid.characteristics .c-bar {
   transform-box: fill-box;
   transform-origin: left center;
   animation: hl-bar-paint 360ms ease-out;
 }
 
-/* Donut arcs (Page 3 roles) — scale up from the SVG centre.
- * `transform-box: view-box` resolves transform-origin against the
- * SVG's viewBox, so 50% 50% is the donut's centre and every slice
- * scales toward / away from it together. */
+/* Donut arcs (Page 3 roles) — trim-path sweep, each slice draws
+ * itself clockwise from a0 to a1. 520 ms feels right: a hair slower
+ * than the bar paint, because the eye reads the rotation as motion. */
 .chart-grid.characteristics .c-arc {
-  transform-box: view-box;
-  transform-origin: 50% 50%;
-  animation: hl-arc-paint 360ms ease-out;
+  animation: hl-arc-trim 520ms ease-out;
+}
+
+/* Slice separators (white hairlines at each boundary) — fade in
+ * after the trim sweep completes so they don't precede the painting. */
+.chart-grid.characteristics .c-arc-sep {
+  animation: hl-text-fade 240ms ease-out 360ms backwards;
 }
 
 /* The donut's centre text and value-labels next to bars: hold them
@@ -1343,6 +1354,7 @@ a:hover { text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) {
   .chart-grid.characteristics .c-bar,
   .chart-grid.characteristics .c-arc,
+  .chart-grid.characteristics .c-arc-sep,
   .chart-grid.characteristics .c-value-label,
   .chart-grid.characteristics .c-donut-center,
   .chart-grid.characteristics .c-donut-sub,
