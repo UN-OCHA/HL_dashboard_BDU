@@ -1274,40 +1274,78 @@ a:hover { text-decoration: underline; }
   vertical-align: middle;
   border-radius: 1px;
 }
-/* ── Subtle filter-change transition ─────────────────────────────
- * When the user changes a Page 3 filter, each affected chart's
- * old SVG is removed and a new one is inserted. CSS animations on
- * `.chart > *` re-trigger every time a fresh child is inserted, so
- * each render fades in from 0.35 → 1 over 180 ms. No JS plumbing
- * needed — the animation property below is enough.
+/* ── Page-3 chart paint-in animation ─────────────────────────────
+ * When a Page-3 filter changes the chart re-renders fresh: bars
+ * "paint" from left to right (scaleX 0 → 1, transform-origin left
+ * center), donut arcs scale up from the donut's own centre (scale
+ * 0.55 → 1). Both ~360 ms ease-out — slower than a fade because the
+ * eye reads the growth as the chart drawing itself, not vanishing
+ * and re-appearing.
  *
- * Scope: only Page 3 chart containers (.chart inside chart-card).
- * Page 4 trends never re-render under filters, so no animation
- * there. Honors prefers-reduced-motion. */
-@keyframes hl-chart-fade-in {
-  from { opacity: 0.35; }
+ * Triggers on every DOM insertion of .c-bar / .c-arc, so re-renders
+ * fire fresh animations every time. Page 4 charts are unscoped (the
+ * trends never re-render under filters; their initial paint is
+ * instant which is the right behavior for a long-term arc).
+ *
+ * Honours prefers-reduced-motion — animations are disabled there. */
+@keyframes hl-bar-paint {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes hl-arc-paint {
+  from { transform: scale(0.55); opacity: 0.6; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+/* hbar bars on Page 3 (Country×grade, Gender×grade, Agency) — grow
+ * from their left edge. `transform-box: fill-box` makes
+ * `transform-origin` resolve against each rect's own bounding box,
+ * which gives a per-bar growth from x=0 of the rect. */
+.chart-grid.characteristics .c-bar {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: hl-bar-paint 360ms ease-out;
+}
+
+/* Donut arcs (Page 3 roles) — scale up from the SVG centre.
+ * `transform-box: view-box` resolves transform-origin against the
+ * SVG's viewBox, so 50% 50% is the donut's centre and every slice
+ * scales toward / away from it together. */
+.chart-grid.characteristics .c-arc {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: hl-arc-paint 360ms ease-out;
+}
+
+/* The donut's centre text and value-labels next to bars: hold them
+ * back briefly with a fade-in that completes just after the bar /
+ * arc finishes painting. Keeps the visual rhythm tight. */
+@keyframes hl-text-fade {
+  from { opacity: 0; }
   to   { opacity: 1; }
 }
-.chart > svg,
-.chart > .chart-empty {
-  animation: hl-chart-fade-in 180ms ease-out;
+.chart-grid.characteristics .c-value-label,
+.chart-grid.characteristics .c-donut-center,
+.chart-grid.characteristics .c-donut-sub {
+  animation: hl-text-fade 240ms ease-out 240ms backwards;
 }
 
-/* Also animate the chart-card legend (e.g. for Fig 3.1 / 3.2) so it
- * doesn't snap into place while the chart above it fades. */
-.chart-card .chart-legend {
-  animation: hl-chart-fade-in 180ms ease-out;
+/* Empty-state placeholder — keep a fade here (it's not a chart
+ * shape, just a message replacing the chart). */
+@keyframes hl-msg-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
-
-/* Filter-bar summary line — fades in when it first appears. We can't
- * key off `hidden` toggling (animation only fires on DOM insertion),
- * so the animation fires once on first render; the show/hide between
- * mounted state changes is instant. Good enough for the intended
- * "less abrupt" effect when filters first activate. */
-.filter-bar__summary { animation: hl-chart-fade-in 220ms ease-out; }
+.chart > .chart-empty   { animation: hl-msg-fade 200ms ease-out; }
+.chart-card .chart-legend { animation: hl-msg-fade 240ms ease-out; }
+.filter-bar__summary    { animation: hl-msg-fade 240ms ease-out; }
 
 @media (prefers-reduced-motion: reduce) {
-  .chart > svg,
+  .chart-grid.characteristics .c-bar,
+  .chart-grid.characteristics .c-arc,
+  .chart-grid.characteristics .c-value-label,
+  .chart-grid.characteristics .c-donut-center,
+  .chart-grid.characteristics .c-donut-sub,
   .chart > .chart-empty,
   .chart-card .chart-legend,
   .filter-bar__summary { animation: none; }
