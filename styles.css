@@ -392,7 +392,7 @@ img.link-row__trail:hover { opacity: 1; }
   padding: 0 clamp(20px, 4vw, 72px);
   width: 100%;
   display: grid;
-  grid-template-rows: auto 1fr auto;   /* head · masthead · stats */
+  grid-template-rows: auto 1fr auto auto;   /* head · masthead · stats · action */
   row-gap: clamp(32px, 6vh, 64px);
   min-height: min(80vh, 700px);
   align-content: stretch;
@@ -404,35 +404,21 @@ img.link-row__trail:hover { opacity: 1; }
   min-height: 0;
 }
 
-/* ── Row 1: Masthead head — IASC logo left, action chip + meta stacked
- *           right. The right column carries TWO things: the OCHA outlined
- *           "Download A4 PDF" chip on top (primary action — top-right is
- *           where the eye lands and is the established CTA convention),
- *           and the issue / updated meta block below it (masthead context).
- *           Chip-above-meta keeps action discoverable while preserving the
- *           magazine masthead feel. */
+/* ── Row 1: Masthead head — IASC logo left, issue/updated meta right.
+ *           Asymmetric on purpose: logo and meta block sit at the
+ *           extremes of the row, not evenly distributed across it. */
 .cover__head {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: flex-start;
   gap: 24px;
 }
-.cover__brand {
-  display: inline-flex;
-  align-items: center;
-  padding-top: 4px;   /* visually align logo baseline with chip top edge */
-}
+.cover__brand { display: inline-flex; align-items: center; }
 .cover__logo {
   height: 28px;
   width: auto;
   display: block;
   filter: brightness(0) invert(1);   /* render the navy SVG as white */
-}
-.cover__head-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 14px;
 }
 .cover__meta {
   text-align: right;
@@ -445,43 +431,6 @@ img.link-row__trail:hover { opacity: 1; }
 }
 .cover__meta-issue { color: rgba(255,255,255,0.92); }
 .cover__meta-issue strong { font-weight: 700; color: #fff; letter-spacing: .18em; }
-
-/* ── OCHA outlined chip on navy — adapts the OCHA design system's
- *    `cd-button--outline` variant for a dark-mode hero context.
- *    1 px white outline · transparent fill · uppercase Roboto Condensed
- *    label · OCHA download icon (whitened via brightness/invert) ·
- *    hover inverts to a soft white fill. Matches the v2 chip's
- *    discoverability without the SaaS-filled-CTA energy. */
-.cover__action {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.55);
-  color: #fff;
-  font-family: var(--font-cond);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  padding: 9px 18px;
-  cursor: pointer;
-  transition: background .15s ease, border-color .15s ease;
-}
-.cover__action:hover {
-  background: rgba(255,255,255,0.12);
-  border-color: #fff;
-}
-.cover__action:focus-visible {
-  outline: 2px solid var(--brand-primary--light);
-  outline-offset: 3px;
-}
-.cover__action-icon {
-  width: 14px;
-  height: 14px;
-  display: inline-block;
-  filter: brightness(0) invert(1);   /* render OCHA blue SVG as white */
-}
 
 /* ── Row 2: Masthead — kicker, title (sans + serif italic), standfirst.
  *           Title block is anchored LEFT and spans ~75 % of the grid;
@@ -614,11 +563,40 @@ img.link-row__trail:hover { opacity: 1; }
   max-width: 22ch;
 }
 
-/* (Row 4 colophon removed — the OCHA outlined chip in row 1 head is
- *  now the single, discoverable PDF action. Decision: a tool whose
- *  primary action is downloading the report should make that action
- *  conventionally findable rather than hide it in an editorial
- *  flourish. See commit message for the full reasoning.) */
+/* ── Row 4: Action row — OCHA outlined chip at bottom-right of the
+ *           cover. Adapts cd-button--outline for a dark-mode hero:
+ *           1 px white outline · transparent fill · uppercase Roboto
+ *           Condensed label · hover inverts to soft white fill. Text
+ *           only (no icon) — the position + outlined affordance
+ *           carry the meaning. */
+.cover__action-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+.cover__action {
+  display: inline-flex;
+  align-items: center;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.55);
+  color: #fff;
+  font-family: var(--font-cond);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease;
+}
+.cover__action:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: #fff;
+}
+.cover__action:focus-visible {
+  outline: 2px solid var(--brand-primary--light);
+  outline-offset: 3px;
+}
 
 /* ── Page-1 v2 layout (.overview-layout) ────────────────
    Hero takes the top of the page, then the map sits full-width
@@ -1699,16 +1677,11 @@ table.data td.col-num {
     row-gap: 26px;
     min-height: 0;
   }
-  .cover__head { grid-template-columns: 1fr; gap: 14px; }
-  .cover__brand { padding-top: 0; }
-  .cover__head-right {
-    flex-direction: column-reverse;   /* meta first, chip last → chip stays visible at bottom */
-    align-items: flex-start;
-    gap: 12px;
-  }
+  .cover__head { grid-template-columns: 1fr; gap: 10px; }
   .cover__meta { text-align: left; font-size: 10.5px; }
-  .cover__action { font-size: 11px; letter-spacing: .14em; padding: 8px 14px; }
   .cover__logo { height: 22px; }
+  .cover__action-row { justify-content: flex-start; }
+  .cover__action { font-size: 11px; letter-spacing: .14em; padding: 8px 16px; }
 
   .cover__masthead { max-width: 100%; }
   .cover__kicker { font-size: 10.5px; margin-bottom: 14px; letter-spacing: .18em; }
