@@ -563,39 +563,47 @@ img.link-row__trail:hover { opacity: 1; }
   max-width: 22ch;
 }
 
-/* ── Row 4: Action row — OCHA outlined chip at bottom-right of the
- *           cover. Adapts cd-button--outline for a dark-mode hero:
- *           1 px white outline · transparent fill · uppercase Roboto
- *           Condensed label · hover inverts to soft white fill. Text
- *           only (no icon) — the position + outlined affordance
- *           carry the meaning. */
-.cover__action-row {
+/* ── Row 4: Colophon — text-link PDF download at bottom-right.
+ *           Reads as a publication "turn the page" hint rather than
+ *           a SaaS CTA. Hairline white underline carries the
+ *           clickable affordance without chip chrome. Arrow stays in
+ *           Roboto Condensed (no italic) so it matches the label's
+ *           voice — small character moment without breaking the
+ *           condensed-sans rhythm. */
+.cover__colophon {
   display: flex;
   justify-content: flex-end;
   align-items: center;
 }
-.cover__action {
-  display: inline-flex;
-  align-items: center;
+.cover__pdf-link {
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.55);
-  color: #fff;
+  border: 0;
+  color: rgba(255,255,255,0.92);
   font-family: var(--font-cond);
   font-size: 12px;
   font-weight: 500;
   letter-spacing: .18em;
   text-transform: uppercase;
-  padding: 10px 20px;
   cursor: pointer;
-  transition: background .15s ease, border-color .15s ease;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.55);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  transition: border-color .15s ease, color .15s ease;
 }
-.cover__action:hover {
-  background: rgba(255,255,255,0.12);
-  border-color: #fff;
-}
-.cover__action:focus-visible {
+.cover__pdf-link:hover { border-color: #fff; color: #fff; }
+.cover__pdf-link:focus-visible {
   outline: 2px solid var(--brand-primary--light);
-  outline-offset: 3px;
+  outline-offset: 4px;
+}
+.cover__pdf-arrow {
+  font-family: var(--font-cond);
+  font-style: normal;
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 /* ── Page-1 v2 layout (.overview-layout) ────────────────
@@ -1680,8 +1688,9 @@ table.data td.col-num {
   .cover__head { grid-template-columns: 1fr; gap: 10px; }
   .cover__meta { text-align: left; font-size: 10.5px; }
   .cover__logo { height: 22px; }
-  .cover__action-row { justify-content: flex-start; }
-  .cover__action { font-size: 11px; letter-spacing: .14em; padding: 8px 16px; }
+  .cover__colophon { justify-content: flex-start; }
+  .cover__pdf-link { font-size: 11px; letter-spacing: .14em; padding: 5px 0; }
+  .cover__pdf-arrow { font-size: 13px; }
 
   .cover__masthead { max-width: 100%; }
   .cover__kicker { font-size: 10.5px; margin-bottom: 14px; letter-spacing: .18em; }
