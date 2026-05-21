@@ -1308,24 +1308,23 @@ a:hover { text-decoration: underline; }
 }
 
 /* hbar bars on Page 3 (Country×grade, Gender×grade, Agency) — grow
- * from their left edge. */
+ * from their left edge. ease-in-out gives the "easy ease" feel —
+ * slow start, slow finish. */
 .chart-grid.characteristics .c-bar {
   transform-box: fill-box;
   transform-origin: left center;
-  animation: hl-bar-paint 360ms ease-out;
+  animation: hl-bar-paint 520ms ease-in-out;
 }
 
-/* Donut arcs (Page 3 roles) — trim-path sweep, each slice draws
- * itself clockwise from a0 to a1. 520 ms feels right: a hair slower
- * than the bar paint, because the eye reads the rotation as motion. */
+/* Donut arcs (Page 3 roles) — trim-path sweep. 740 ms ease-in-out
+ * lets the rotation read clearly without feeling sluggish. */
 .chart-grid.characteristics .c-arc {
-  animation: hl-arc-trim 520ms ease-out;
+  animation: hl-arc-trim 740ms ease-in-out;
 }
 
-/* Slice separators (white hairlines at each boundary) — fade in
- * after the trim sweep completes so they don't precede the painting. */
+/* Slice separators — fade in after the trim sweep finishes. */
 .chart-grid.characteristics .c-arc-sep {
-  animation: hl-text-fade 240ms ease-out 360ms backwards;
+  animation: hl-text-fade 320ms ease-in-out 520ms backwards;
 }
 
 /* The donut's centre text and value-labels next to bars: hold them
@@ -1338,7 +1337,7 @@ a:hover { text-decoration: underline; }
 .chart-grid.characteristics .c-value-label,
 .chart-grid.characteristics .c-donut-center,
 .chart-grid.characteristics .c-donut-sub {
-  animation: hl-text-fade 240ms ease-out 240ms backwards;
+  animation: hl-text-fade 320ms ease-in-out 340ms backwards;
 }
 
 /* Empty-state placeholder — keep a fade here (it's not a chart
@@ -1347,9 +1346,9 @@ a:hover { text-decoration: underline; }
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-.chart > .chart-empty   { animation: hl-msg-fade 200ms ease-out; }
-.chart-card .chart-legend { animation: hl-msg-fade 240ms ease-out; }
-.filter-bar__summary    { animation: hl-msg-fade 240ms ease-out; }
+.chart > .chart-empty     { animation: hl-msg-fade 320ms ease-in-out; }
+.chart-card .chart-legend { animation: hl-msg-fade 320ms ease-in-out; }
+.filter-bar__summary      { animation: hl-msg-fade 320ms ease-in-out; }
 
 @media (prefers-reduced-motion: reduce) {
   .chart-grid.characteristics .c-bar,
