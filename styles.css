@@ -1274,6 +1274,45 @@ a:hover { text-decoration: underline; }
   vertical-align: middle;
   border-radius: 1px;
 }
+/* ── Subtle filter-change transition ─────────────────────────────
+ * When the user changes a Page 3 filter, each affected chart's
+ * old SVG is removed and a new one is inserted. CSS animations on
+ * `.chart > *` re-trigger every time a fresh child is inserted, so
+ * each render fades in from 0.35 → 1 over 180 ms. No JS plumbing
+ * needed — the animation property below is enough.
+ *
+ * Scope: only Page 3 chart containers (.chart inside chart-card).
+ * Page 4 trends never re-render under filters, so no animation
+ * there. Honors prefers-reduced-motion. */
+@keyframes hl-chart-fade-in {
+  from { opacity: 0.35; }
+  to   { opacity: 1; }
+}
+.chart > svg,
+.chart > .chart-empty {
+  animation: hl-chart-fade-in 180ms ease-out;
+}
+
+/* Also animate the chart-card legend (e.g. for Fig 3.1 / 3.2) so it
+ * doesn't snap into place while the chart above it fades. */
+.chart-card .chart-legend {
+  animation: hl-chart-fade-in 180ms ease-out;
+}
+
+/* Filter-bar summary line — fades in when it first appears. We can't
+ * key off `hidden` toggling (animation only fires on DOM insertion),
+ * so the animation fires once on first render; the show/hide between
+ * mounted state changes is instant. Good enough for the intended
+ * "less abrupt" effect when filters first activate. */
+.filter-bar__summary { animation: hl-chart-fade-in 220ms ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .chart > svg,
+  .chart > .chart-empty,
+  .chart-card .chart-legend,
+  .filter-bar__summary { animation: none; }
+}
+
 /* ── Chart empty state ───────────────────────────────────────────
  * Rendered into a chart container when a filter combo leaves zero
  * leaders in that chart's dimension. Vertically centred in the
