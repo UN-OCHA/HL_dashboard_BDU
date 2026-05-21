@@ -510,8 +510,28 @@ img.link-row__trail:hover { opacity: 1; }
 }
 .cover__stats .kpi:first-child { border-left: none; padding-left: 0; }
 .cover__stats .kpi:last-child  { padding-right: 0; }
-/* Drop the icon SVGs — editorial typography stands on its own. */
-.cover__stats .kpi .kpi-icon { display: none; }
+/* Icon — small, ice-blue, sits above the number. The OCHA humanitarian
+ * icon set (leadership / gender / country / coordination / map) anchors
+ * each stat without becoming the visual centre — the tabular number
+ * still does that. Sized to ~28 px so it reads at a glance but never
+ * dominates the typography. */
+.cover__stats .kpi .kpi-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 2px;
+}
+.cover__stats .kpi .kpi-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.cover__stats .kpi .kpi-icon svg path,
+.cover__stats .kpi .kpi-icon svg circle,
+.cover__stats .kpi .kpi-icon svg polygon,
+.cover__stats .kpi .kpi-icon svg rect { fill: var(--brand-primary--light); }
 .cover__stats .kpi .value {
   font-family: var(--font-cond);
   font-weight: 700;
@@ -1688,6 +1708,7 @@ table.data td.col-num {
   .cover__stats .kpi:nth-child(odd) { border-left: none; padding-left: 14px; }
   .cover__stats .kpi:nth-child(n+3) { border-top: 1px solid rgba(255,255,255,0.12); }
   .cover__stats .kpi:last-child { grid-column: 1 / -1; }
+  .cover__stats .kpi .kpi-icon { width: 22px; height: 22px; }
   .cover__stats .kpi .value { font-size: 32px; }
   .cover__stats .kpi .label { font-size: 10.5px; max-width: none; }
 
