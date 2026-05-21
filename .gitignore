@@ -15,3 +15,8 @@ __pycache__/
 .venv/
 venv/
 node_modules/
+
+# Skill installs (npx skills add) — keep the lockfile, not the install dir.
+# Re-run `npx skills add nutlope/hallmark` (or any other listed skill) to
+# restore the actual skill files locally.
+.agents/

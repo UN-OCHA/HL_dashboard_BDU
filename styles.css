@@ -159,7 +159,7 @@
      .observation__kicker
      .kicker-rule           small uppercase eyebrow with bottom warm-rule
      .link-row              full-width row with trailing external icon
-     .hero / .hero__*       Page 1 navy gradient hero band (Phase 2 mounts it)
+     .cover / .cover__*     Page 1 navy editorial cover (v3 Hallmark × OCHA)
      .mega-footer           navy bottom bar (Phase 5 mounts it)
 
    These primitives are the canonical building blocks for the
@@ -341,217 +341,246 @@ img.link-row__trail:hover { opacity: 1; }
    trick — gives a true editorial full-bleed regardless of
    .pages padding. In `.pages.a4-mode` (PDF export) we cancel
    the break-out below so the hero sits inside the A4 sheet. */
-.hero {
+/* ── v3 Cover band — Hallmark × OCHA editorial test ───────────
+ * Hallmark · macrostructure: Long Document · tone: editorial-broadsheet
+ * theme: OCHA-locked (UN Blue navy paper · UN Blue ice accent · sans-cond × italic-serif type-pair)
+ * enrichment: none — typography only
+ * pre-emit critique: P5 H5 E4 S5 R5 V5
+ *
+ * Anti-tells deliberately killed:
+ *  · No gradient (canonical AI hero tell #1) → solid navy #002E6E
+ *  · No centred chrome → asymmetric 12-col grid, title left-anchored
+ *  · No equal-rail KPI boxes → hairline-separated stat strip at bottom
+ *  · No symmetric utility row → logo-left + meta-right are different weights
+ *  · No single-font page → Roboto Condensed display × Crimson Pro italic
+ *    type pairing inside the H1 itself (sans line then italic-serif line)
+ *
+ * OCHA hard constraints preserved:
+ *  · UN Blue ramp only (no Hallmark OKLCH play, no exotic accent)
+ *  · OCHA-approved fonts only (Roboto Condensed + Crimson Pro both shipped
+ *    with OCHA brand guide)
+ *  · IASC logo top-left, untouched, white via brightness/invert filter
+ *  · KPI data binding unchanged — render/kpis.js still mounts into #kpi-row
+ *  · A4 export pipeline respected (.pages.a4-mode .cover overrides below) */
+
+.cover {
   position: relative;
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
-  /* No margin-bottom: the cover page sits on the alternating grey
-     background, so any space below the hero would render as a grey
-     strip inside the cover. The next .page (Section 01) has its
-     own padding-top, which is what gives the breathing room
-     between the navy hero and the section-head. */
-  padding: 40px 0 56px;
-  background: linear-gradient(180deg, var(--hero-from) 0%, var(--hero-to) 100%);
+  background: var(--hero-from);   /* solid navy — gradient removed */
   color: #fff;
   overflow: hidden;
+  padding: 32px 0 28px;
+  min-height: min(88vh, 760px);   /* fills the viewport on screen; A4 override below */
 }
-/* In A4 / print mode, hero stays inside its .page-inner box. */
-.pages.a4-mode .hero {
+.pages.a4-mode .cover {
   width: auto;
   margin-left: 0;
   margin-right: 0;
+  min-height: 0;
+  padding: 32px 0 28px;
 }
-/* Fine vertical-grid texture in the hero — purely decorative,
-   pulled almost imperceptible. Uses repeating-linear-gradient
-   so no extra DOM nodes are needed. Stripe alpha was dropped
-   from 0.04 → 0.015 per design feedback (was reading too active
-   against the navy gradient). */
-.hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: repeating-linear-gradient(
-    90deg,
-    rgba(255,255,255,0.015) 0,
-    rgba(255,255,255,0.015) 1px,
-    transparent 1px,
-    transparent 80px);
-  pointer-events: none;
-}
-.hero__shell {
+
+/* Inner shell — same content-shell pattern as the rest of the dashboard
+ * (1320 px screen / 1500 px A4), but the interior layout is an asymmetric
+ * 12-column grid with 4 stacked rows (head · masthead · stats · colophon). */
+.cover__inner {
   position: relative;
-  /* Content shell — centers hero contents at a comfortable
-     reading max while the navy gradient .hero stays 100 vw.
-     1320 px on screen (Bootstrap-standard editorial cap), 1500 px
-     in A4 / PDF export to fill the print sheet inner box. */
   max-width: 1320px;
   margin: 0 auto;
   padding: 0 clamp(20px, 4vw, 72px);
+  width: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  row-gap: clamp(32px, 6vh, 64px);
+  min-height: min(80vh, 700px);
+  align-content: stretch;
 }
-.pages.a4-mode .hero__shell {
+.pages.a4-mode .cover__inner {
   max-width: 1500px;
   padding: 0 56px;
+  row-gap: 36px;
+  min-height: 0;
 }
 
-/* Top utility row — IASC logo on the left, action buttons right. */
-.hero__utility {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding-bottom: 36px;
+/* ── Row 1: Masthead head — IASC logo left, issue/updated meta right.
+ *           Asymmetric on purpose: logo and meta block sit at the
+ *           extremes of the row, not evenly distributed across it. */
+.cover__head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: flex-start;
+  gap: 24px;
 }
-.hero__brand { display: inline-flex; align-items: center; }
-.hero__logo {
-  height: 26px;
+.cover__brand { display: inline-flex; align-items: center; }
+.cover__logo {
+  height: 28px;
   width: auto;
   display: block;
   filter: brightness(0) invert(1);   /* render the navy SVG as white */
 }
-.hero__actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.hero__btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.18);
-  color: #fff;
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: .08em;
+.cover__meta {
+  text-align: right;
+  font-family: var(--font-cond);
+  font-size: 11px;
+  letter-spacing: .2em;
   text-transform: uppercase;
-  padding: 7px 14px;
-  cursor: pointer;
-  transition: background .15s ease;
+  line-height: 1.55;
+  color: rgba(255,255,255,0.62);
 }
-.hero__btn:hover { background: rgba(255,255,255,0.12); }
-.hero__btn--primary {
-  background: var(--brand-primary);
-  border-color: var(--brand-primary);
-}
-.hero__btn--primary:hover { background: #00B0EE; }
-/* OCHA-icon glyph inside hero buttons. <img> renders white via the
-   filter trick (since the SVG uses currentColor + #009edb fallback,
-   and we want it pure white in the navy hero context). */
-.hero__btn-icon {
-  width: 14px;
-  height: 14px;
-  display: inline-block;
-  vertical-align: -2px;
-  filter: brightness(0) invert(1);
-}
-.hero__btn-icon--char {
-  width: auto;
-  height: auto;
-  filter: none;
-  font-size: 14px;
-  line-height: 1;
-}
+.cover__meta-issue { color: rgba(255,255,255,0.92); }
+.cover__meta-issue strong { font-weight: 700; color: #fff; letter-spacing: .18em; }
 
-/* Masthead — kicker + oversized condensed title + subline. */
-.hero__masthead { max-width: 920px; margin-bottom: 40px; }
-.hero__kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--font-sans);
+/* ── Row 2: Masthead — kicker, title (sans + serif italic), standfirst.
+ *           Title block is anchored LEFT and spans ~75 % of the grid;
+ *           it does NOT centre. The asymmetric weight is the design. */
+.cover__masthead {
+  max-width: 78%;
+  align-self: center;
+}
+.cover__kicker {
+  font-family: var(--font-cond);
   font-weight: 500;
-  font-size: 12.5px;
+  font-size: 11.5px;
   letter-spacing: .22em;
   text-transform: uppercase;
   color: var(--brand-primary--pale);
-  margin-bottom: 18px;
+  margin: 0 0 28px;
 }
-.hero__kicker-dot {
-  width: 8px;
-  height: 8px;
-  background: var(--brand-primary);
-  display: inline-block;
-}
-.hero__title {
-  margin: 0;
-  font-family: var(--font-cond);
-  font-weight: 700;
-  font-size: clamp(36px, 6vw, 76px);
-  line-height: 0.96;
-  letter-spacing: -0.018em;
-  color: #fff;
-}
-.hero__subline {
-  margin-top: 18px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  font-family: var(--font-cond);
-  font-size: 16px;
-  color: var(--brand-primary--pale);
-  letter-spacing: .04em;
-}
-.hero__subline strong {
-  font-weight: 700;
-  color: #fff;
-  text-transform: uppercase;
-  letter-spacing: .12em;
-}
-.hero__sep { opacity: .5; }
-
-/* KPI rail — 5 cells, white-on-navy, separated by hairline rules.
-   Overrides the default .kpi card style when its parent is .hero__rail. */
-.hero__rail {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.14);
-}
-.hero__rail .kpi {
-  background: transparent;
-  border-left: 1px solid rgba(255,255,255,0.14);
-  border-radius: 0;
-  padding: 22px 22px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-height: 0;
-}
-.hero__rail .kpi:first-child { border-left: none; }
-.hero__rail .kpi .kpi-icon {
-  width: 36px;
-  height: 36px;
-  margin-bottom: 8px;
-  align-self: flex-start;
-  justify-self: flex-start;
-}
-.hero__rail .kpi .kpi-icon svg path,
-.hero__rail .kpi .kpi-icon svg circle,
-.hero__rail .kpi .kpi-icon svg polygon { fill: var(--brand-primary--light); }
-.hero__rail .kpi .value {
-  font-family: var(--font-cond);
-  font-weight: 700;
-  font-size: 56px;
-  line-height: 1;
+/* Title is two stacked spans — top in Roboto Condensed bold, bottom in
+ * Crimson Pro italic. Real type-pairing character contrast inside the
+ * headline, both OCHA-approved faces. */
+.cover__title {
+  margin: 0 0 28px;
+  line-height: 0.94;
   letter-spacing: -0.02em;
   color: #fff;
-  grid-column: auto;
-  grid-row: auto;
+  font-weight: 400;
 }
-.hero__rail .kpi .value .unit {
-  font-size: .55em;
-  margin-left: 2px;
-  color: var(--brand-primary--pale);
+.cover__title-sans {
+  display: block;
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: clamp(42px, 7.4vw, 96px);
 }
-.hero__rail .kpi .label {
-  margin-top: 10px;
-  font-size: 16px;
-  font-weight: 500;
+.cover__title-serif {
+  display: block;
+  font-family: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(46px, 8vw, 104px);
+  color: var(--brand-primary--light);
+  margin-top: -2px;
+  letter-spacing: -0.022em;
+}
+.cover__standfirst {
+  font-family: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(17px, 1.4vw, 22px);
+  line-height: 1.45;
+  color: rgba(255,255,255,0.82);
+  max-width: 58ch;
+  margin: 0;
+}
+
+/* ── Row 3: Stats strip — 5 KPIs across the full width, hairline
+ *           vertical rules between them, NO card chrome, NO icons.
+ *           Each cell is editorial typography only: large condensed
+ *           tabular number + tiny uppercase Roboto Condensed label.
+ *           Reading order is left-to-right; visual weight is equal
+ *           (the asymmetry has already been used at the title block). */
+.cover__stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-top: 1px solid rgba(255,255,255,0.24);
+  padding-top: 22px;
+}
+.cover__stats .kpi {
+  background: transparent;
+  border: 0;
+  border-left: 1px solid rgba(255,255,255,0.12);
+  border-radius: 0;
+  padding: 0 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+.cover__stats .kpi:first-child { border-left: none; padding-left: 0; }
+.cover__stats .kpi:last-child  { padding-right: 0; }
+/* Drop the icon SVGs — editorial typography stands on its own. */
+.cover__stats .kpi .kpi-icon { display: none; }
+.cover__stats .kpi .value {
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: clamp(36px, 4.4vw, 56px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
   color: #fff;
-  line-height: 1.35;
+}
+.cover__stats .kpi .value .unit {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: .5em;
+  margin-left: 4px;
+  vertical-align: 4px;
+  color: var(--brand-primary--pale);
+  letter-spacing: 0;
+}
+.cover__stats .kpi .label {
+  margin: 0;
+  font-family: var(--font-cond);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.4;
+  max-width: 22ch;
+}
+
+/* ── Row 4: Colophon — single text-link PDF download, bottom-right.
+ *           No SaaS button chip; reads as an editorial "turn the page"
+ *           hint. Crimson Pro italic arrow gives a small character
+ *           moment. */
+.cover__colophon {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+.cover__pdf-link {
+  background: transparent;
+  border: 0;
+  color: rgba(255,255,255,0.92);
+  font-family: var(--font-cond);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.55);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  transition: border-color .15s ease, color .15s ease;
+}
+.cover__pdf-link:hover { border-color: #fff; color: #fff; }
+.cover__pdf-link:focus-visible {
+  outline: 2px solid var(--brand-primary--light);
+  outline-offset: 4px;
+}
+.cover__pdf-arrow {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 18px;
   letter-spacing: 0;
   text-transform: none;
-  grid-column: auto;
-  grid-row: auto;
 }
 
 /* ── Page-1 v2 layout (.overview-layout) ────────────────
@@ -697,8 +726,9 @@ ul, ol { list-style: none; }
 a { color: var(--brand-primary--text); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-/* Generic .btn (default look — overridden by .hero__btn variant for
-   action buttons in the navy hero band). */
+/* Generic .btn (per-page PNG export buttons + any incidental action
+   chips). The cover band has its own .cover__pdf-link text-link
+   colophon — does NOT use .btn. */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -898,21 +928,17 @@ a:hover { text-decoration: underline; }
 }
 .pages.a4-mode .page:hover .page-png-btn { opacity: 1; }
 
-/* ── v2 Hero in A4 mode (PDF + PNG export) ────────────────────
+/* ── v3 Cover in A4 mode (PDF + PNG export) ───────────────────
    Fires when JS toggles `.pages.a4-mode` for export — whether on
-   screen during PNG capture or in real print. The hero compresses
-   so the whole Page 1 (hero + map + prose) fits one A4 landscape
-   sheet (1500 × 1061 inner box). Numbers tuned to leave ~530 px
-   for map and ~250 px for the prose row beneath. */
-.pages.a4-mode .hero { padding: 26px 0 34px; }
-.pages.a4-mode .hero__utility { padding-bottom: 28px; }
-.pages.a4-mode .hero__masthead { margin-bottom: 32px; }
-.pages.a4-mode .hero__title { font-size: 60px; }
-.pages.a4-mode .hero__subline { font-size: 14px; margin-top: 14px; }
-.pages.a4-mode .hero__rail .kpi { padding: 16px 18px 18px; }
-.pages.a4-mode .hero__rail .kpi .value { font-size: 44px; }
-.pages.a4-mode .hero__rail .kpi .label { font-size: 12px; margin-top: 6px; }
-.pages.a4-mode .hero__rail .kpi .kpi-icon { width: 30px; height: 30px; margin-bottom: 6px; }
+   screen during PNG capture or in real print. Cover compresses to
+   fit one A4 landscape sheet (1500 × 1061 inner box). */
+.pages.a4-mode .cover__head { margin-bottom: 0; }
+.pages.a4-mode .cover__title-sans  { font-size: 72px; }
+.pages.a4-mode .cover__title-serif { font-size: 78px; }
+.pages.a4-mode .cover__standfirst  { font-size: 18px; }
+.pages.a4-mode .cover__stats .kpi .value { font-size: 44px; }
+.pages.a4-mode .cover__stats .kpi .label { font-size: 11px; }
+.pages.a4-mode .cover__masthead    { max-width: 88%; }
 /* Tighten the page-1 v2 grid in A4 too. */
 .pages.a4-mode .overview-layout {
   margin-top: 22px;
@@ -931,11 +957,9 @@ a:hover { text-decoration: underline; }
 .overview-block div p:last-child { margin-bottom: 0; }
 .overview-block div strong { color: var(--text-strong); }
 
-/* KPIs are rendered exclusively into the navy hero rail by
-   render/kpis.js. All visual rules live under `.hero__rail .kpi*`
-   in the hero block earlier in the file. The v1 grey-card .kpi
-   rules were removed when KPIs moved into the hero — every
-   property they set was already overridden by the hero variant. */
+/* KPIs are rendered exclusively into the v3 cover stats strip by
+   render/kpis.js (`#kpi-row`). All visual rules live under
+   `.cover__stats .kpi*` in the cover block earlier in the file. */
 
 /* Map ------------------------------------------------------- */
 .map-wrap {
@@ -1536,11 +1560,15 @@ table.data td.col-num {
     -webkit-overflow-scrolling: touch;
   }
 
-  /* v2 Hero on tablet — .page already has padding: 28px 0 (vertical
-     only) so the hero just needs its top padding suppressed and
-     can keep its 100 vw breakout. Content shell handles horizontal. */
+  /* v3 Cover on tablet — .page already has padding: 28px 0 (vertical
+     only) so the cover just needs its top padding suppressed; the
+     100 vw breakout stays. Content shell handles horizontal. */
   .page--hero { padding-top: 0; }
-  .hero { padding: 28px 0 36px; }
+  .cover { padding: 26px 0 30px; min-height: 0; }
+  .cover__inner { min-height: 0; }
+  .cover__title-sans  { font-size: clamp(40px, 8vw, 76px); }
+  .cover__title-serif { font-size: clamp(44px, 8.6vw, 84px); }
+  .cover__masthead { max-width: 92%; }
   .overview-layout {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto;
@@ -1624,37 +1652,48 @@ table.data td.col-num {
   /* The per-page PNG export button is desktop-only. */
   .page-png-btn { display: none; }
 
-  /* v2 Hero on mobile — full-width navy band with stacked utility row,
-     2-column KPI grid, smaller title. The hero escapes any container
-     padding via its 100 vw breakout; .page is padding 24px 0 (vertical
-     only) so we just need to suppress the top padding for .page--hero. */
+  /* v3 Cover on mobile — full-width navy band, head row stacks
+     (logo top, meta below-left), title block becomes single column,
+     stats strip collapses to 2 cols + last row spanning. */
   .page--hero { padding-top: 0; }
-  .hero { padding: 24px 0 28px; }
-  .hero__shell { padding: 0 18px; }
-  .hero__utility { padding-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-  .hero__masthead { margin-bottom: 22px; }
-  .hero__kicker { font-size: 11px; margin-bottom: 12px; }
-  .hero__title { font-size: clamp(28px, 9vw, 44px); }
-  .hero__subline { font-size: 13px; gap: 8px; }
-  .hero__btn { font-size: 11px; padding: 6px 10px; letter-spacing: .06em; }
-  .hero__logo { height: 22px; }
+  .cover { padding: 20px 0 22px; min-height: 0; }
+  .cover__inner {
+    padding: 0 18px;
+    row-gap: 26px;
+    min-height: 0;
+  }
+  .cover__head { grid-template-columns: 1fr; gap: 10px; }
+  .cover__meta { text-align: left; font-size: 10.5px; }
+  .cover__logo { height: 22px; }
 
-  /* KPI rail: 5 cells → 2 cols + 1 wide.  We split visually via row
-     borders so the white-on-navy block doesn't show empty cells. */
-  .hero__rail { grid-template-columns: repeat(2, 1fr); }
-  .hero__rail .kpi {
-    padding: 14px 14px 16px;
-    border-left: 1px solid rgba(255,255,255,0.14);
+  .cover__masthead { max-width: 100%; }
+  .cover__kicker { font-size: 10.5px; margin-bottom: 14px; letter-spacing: .18em; }
+  .cover__title { margin-bottom: 18px; }
+  .cover__title-sans  { font-size: clamp(32px, 9vw, 56px); }
+  .cover__title-serif { font-size: clamp(36px, 10vw, 60px); }
+  .cover__standfirst  { font-size: 15px; line-height: 1.45; }
+
+  /* Stats: 5 cells → 2 cols + 1 wide bottom row.  Horizontal rule
+     between top row and bottom row replaces the vertical hairline. */
+  .cover__stats {
+    grid-template-columns: repeat(2, 1fr);
+    padding-top: 18px;
   }
-  .hero__rail .kpi:first-child { border-left: none; }
-  .hero__rail .kpi:nth-child(odd) { border-left: none; }
-  .hero__rail .kpi:nth-child(n+3) { border-top: 1px solid rgba(255,255,255,0.14); }
-  .hero__rail .kpi:last-child {
-    grid-column: 1 / -1;     /* 5th KPI spans full width on mobile */
+  .cover__stats .kpi {
+    padding: 14px 14px;
+    border-left: 1px solid rgba(255,255,255,0.12);
+    gap: 6px;
   }
-  .hero__rail .kpi .value { font-size: 36px; }
-  .hero__rail .kpi .label { font-size: 12px; }
-  .hero__rail .kpi .kpi-icon { width: 28px; height: 28px; margin-bottom: 4px; }
+  .cover__stats .kpi:first-child { border-left: none; padding-left: 14px; }
+  .cover__stats .kpi:nth-child(odd) { border-left: none; padding-left: 14px; }
+  .cover__stats .kpi:nth-child(n+3) { border-top: 1px solid rgba(255,255,255,0.12); }
+  .cover__stats .kpi:last-child { grid-column: 1 / -1; }
+  .cover__stats .kpi .value { font-size: 32px; }
+  .cover__stats .kpi .label { font-size: 10.5px; max-width: none; }
+
+  .cover__colophon { justify-content: flex-start; }
+  .cover__pdf-link { font-size: 11px; letter-spacing: .14em; padding: 5px 0; }
+  .cover__pdf-arrow { font-size: 15px; }
 
   /* Page-1 v2 layout collapse — single column on phone. Horizontal
      padding comes from the content shell rule (clamp 20-72), so we

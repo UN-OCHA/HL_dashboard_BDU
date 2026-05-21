@@ -10,9 +10,12 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Crimson Pro Italic loaded for the v3 editorial cover (Hallmark test).
+       OCHA-approved serif (per brand guide, secondary face for long-form reading).
+       Used only inside .cover__title-serif and .cover__standfirst. -->
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@1,400;1,500&family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=1778242000" />
+  <link rel="stylesheet" href="styles.css?v=v3hk1" />
 
   <!-- Export libraries (PNG + PDF). Self-hosted in vendor/ so the PDF export
        works even when offline and isn't blocked on a third-party CDN. -->
@@ -44,43 +47,54 @@
 
   <main class="pages" id="pages">
 
-    <!-- ─── Cover — full-bleed navy hero only, no section number.
-         A standalone A4 sheet at the top of the report. Magazine cover
-         feel. Section 01 begins on the next page. -->
+    <!-- ─── Cover — v3 editorial broadsheet (Hallmark × OCHA test).
+         Full-bleed solid navy. Asymmetric grid (no centred chrome,
+         no gradient, no equal-rail KPI strip). Title pairs Roboto
+         Condensed display + Crimson Pro italic on its own line —
+         real type-pairing character contrast within the headline.
+         KPI strip sits at the bottom as hairline-separated editorial
+         stats, not card boxes. Issue marker top-right, IASC logo
+         top-left. PDF download as text colophon, not a SaaS button. -->
     <section class="page page--hero" data-page="cover">
 
-      <!-- v2 navy gradient hero -->
-      <div class="hero">
-        <div class="hero__shell">
-          <div class="hero__utility">
-            <a class="hero__brand" href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener">
-              <img src="assets/iasc-logo.svg" alt="Inter-Agency Standing Committee" class="hero__logo">
+      <article class="cover">
+        <div class="cover__inner">
+
+          <header class="cover__head">
+            <a class="cover__brand" href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener">
+              <img src="assets/iasc-logo.svg" alt="Inter-Agency Standing Committee" class="cover__logo">
             </a>
-            <div class="hero__actions">
-              <button class="hero__btn hero__btn--primary" id="btn-pdf" title="Download the whole report as a multi-page A4 PDF">
-                <img src="assets/icons/download.svg" alt="" class="hero__btn-icon">
-                <span>Download PDF</span>
-              </button>
+            <div class="cover__meta">
+              <div class="cover__meta-issue">Issue · <strong id="head-month">—</strong></div>
+              <div class="cover__meta-updated">Updated <span id="head-updated">—</span></div>
             </div>
+          </header>
+
+          <div class="cover__masthead">
+            <div class="cover__kicker">Inter-Agency Standing Committee · Humanitarian Leadership Section</div>
+            <h1 class="cover__title">
+              <span class="cover__title-sans">Humanitarian Leadership</span>
+              <span class="cover__title-serif">Snapshot</span>
+            </h1>
+            <p class="cover__standfirst">
+              A monthly portrait of the leaders coordinating humanitarian
+              operations — their characteristics, geography, and how the
+              cohort is changing over time.
+            </p>
           </div>
 
-          <div class="hero__masthead">
-            <div class="hero__kicker">
-              <span class="hero__kicker-dot" aria-hidden="true"></span>
-              Inter-Agency Standing Committee
-            </div>
-            <h1 class="hero__title">Humanitarian Leadership Snapshot</h1>
-            <div class="hero__subline">
-              <strong id="head-month">—</strong>
-              <span class="hero__sep" aria-hidden="true">·</span>
-              <span>Updated <span id="head-updated">—</span></span>
-            </div>
-          </div>
+          <!-- 5 KPIs rendered by render/kpis.js into this strip -->
+          <div class="cover__stats" id="kpi-row"></div>
 
-          <!-- 5 KPIs rendered by render/kpis.js into this rail -->
-          <div class="hero__rail" id="kpi-row"></div>
+          <footer class="cover__colophon">
+            <button class="cover__pdf-link" id="btn-pdf" title="Download the report as a multi-page A4 PDF">
+              <span>Download A4 PDF</span>
+              <span class="cover__pdf-arrow" aria-hidden="true">→</span>
+            </button>
+          </footer>
+
         </div>
-      </div>
+      </article>
 
       <button class="btn page-png-btn" data-export-page="cover">PNG</button>
     </section>
