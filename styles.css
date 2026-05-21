@@ -1349,13 +1349,27 @@ a:hover { text-decoration: underline; }
 
 /* Clickable hbar rows — quiet hover state so the user knows the row
  * is interactive. Applied only when ChartHbar gets an onBarClick
- * callback (the JS adds the `c-row--clickable` class). */
-.c-row--clickable .c-bar { transition: opacity .12s ease; }
-.c-row--clickable:hover .c-bar { opacity: 0.78; }
+ * callback (the JS adds the `c-row--clickable` class).
+ *
+ * Focus handling: the SVG <g> has tabindex="0" for keyboard a11y,
+ * which means some browsers (notably Safari, and Chrome on certain
+ * SVG-focus paths) draw a default focus ring on mouse click — not
+ * just keyboard. The triple-rule below blocks that: suppress focus
+ * outline by default + on `:focus` (catches mouse-click focus across
+ * browsers), then explicitly re-enable on `:focus-visible` so true
+ * keyboard navigation still gets a visible ring. */
+.c-row--clickable {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;  /* iOS Safari tap flash */
+  user-select: none;                          /* no text selection on click */
+}
+.c-row--clickable:focus { outline: none; }
 .c-row--clickable:focus-visible {
   outline: 2px solid var(--brand-primary--light);
   outline-offset: 2px;
 }
+.c-row--clickable .c-bar { transition: opacity .12s ease; }
+.c-row--clickable:hover .c-bar { opacity: 0.78; }
 
 /* Per-chart source + as-of line (OCHA requirement) */
 .chart-source {
