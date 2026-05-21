@@ -67,10 +67,21 @@ var ChartDonut = (function () {
       var a0 = angle;
       var a1 = angle + sweep;
       angle = a1;
+      var pct = d.value / total;
+      // Single-slice 100% case (every leader matches the filter, or the
+      // dataset only has one bucket). Standard SVG arc commands
+      // degenerate when start point == end point — the path renders
+      // nothing. Switch to a ring composed of two semi-arcs with
+      // `fill-rule: evenodd` so the inner radius is "punched out".
+      var isFullCircle = pct >= 0.9999;
 
-      var p = arcPath(cx, cy, radius, inner, a0, a1);
       var path = document.createElementNS(svgNS, "path");
-      path.setAttribute("d", p);
+      if (isFullCircle) {
+        path.setAttribute("d", ringPath(cx, cy, radius, inner));
+        path.setAttribute("fill-rule", "evenodd");
+      } else {
+        path.setAttribute("d", arcPath(cx, cy, radius, inner, a0, a1));
+      }
       path.setAttribute("fill", colors[i % colors.length]);
       path.setAttribute("stroke", "#fff");
       path.setAttribute("stroke-width", "2");
@@ -94,8 +105,12 @@ var ChartDonut = (function () {
       }
       svg.appendChild(path);
 
-      var pct = d.value / total;
       var mid = (a0 + a1) / 2;
+
+      // Full-circle case: skip direct AND inline labels — the center
+      // text already reads "Total leaders / N" and labeling the rim
+      // with "100%" or the single category name would just clutter.
+      if (isFullCircle) return;
 
       if (direct) {
         var onRight = Math.cos(mid) >= 0;
@@ -232,6 +247,22 @@ var ChartDonut = (function () {
            " L" + x0i + "," + y0i +
            " A" + rInner + "," + rInner + " 0 " + large + " 0 " + x1i + "," + y1i +
            " Z";
+  }
+
+  /**
+   * Full-circle ring path — outer circle (clockwise) + inner circle
+   * (counter-clockwise), combined into one <path d="…M…M…"> with
+   * `fill-rule: evenodd` to punch the inner radius out of the outer.
+   * Used for the 100%-single-slice case where arcPath() above
+   * degenerates (start point == end point yields an empty render).
+   */
+  function ringPath(cx, cy, rOuter, rInner) {
+    return "M " + (cx - rOuter) + "," + cy +
+           " A " + rOuter + "," + rOuter + " 0 1 1 " + (cx + rOuter) + "," + cy +
+           " A " + rOuter + "," + rOuter + " 0 1 1 " + (cx - rOuter) + "," + cy + " Z " +
+           "M " + (cx - rInner) + "," + cy +
+           " A " + rInner + "," + rInner + " 0 1 0 " + (cx + rInner) + "," + cy +
+           " A " + rInner + "," + rInner + " 0 1 0 " + (cx - rInner) + "," + cy + " Z";
   }
 
   return { render: render };

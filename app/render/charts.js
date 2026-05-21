@@ -85,15 +85,19 @@ var RenderCharts = (function () {
   }
 
   /* PPT slide 4 — Grade and gender.
-     Click any Female / Male bar → toggle the `gender` filter clause. */
+     Click any Female / Male bar → toggle the `gender` filter clause.
+     Distinct blue duo from Fig 3.1 (which uses navy + signature UN Blue)
+     so the eye instantly knows which chart it's reading: country/origin
+     uses the deepest pair, gender uses a mid + light pair. Stays
+     entirely within OCHA's UN Blue ramp per brand guidance. */
   function renderGenderByGrade(state) {
     var el = document.getElementById("chart-gender-by-grade");
     if (!el) return;
     var data = (state.gender_by_grade || []).map(function (r) {
       return { label: r.grade, values: { female: r.female, male: r.male } };
     });
-    var cFemale = "#009EDB"; // UN Blue
-    var cMale   = "#002E6E"; // Navy
+    var cFemale = "#0074B7"; // UN Blue ramp step 3 (mid-dark)
+    var cMale   = "#64BDEA"; // UN Blue ramp step 5 (light)
     ChartHbar.render(el, {
       data: data,
       series: [
