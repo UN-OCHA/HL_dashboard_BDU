@@ -16,7 +16,7 @@
        Italic (400, 500) — used inside .cover__title-serif and .cover__standfirst. -->
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;1,400;1,500&family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=v3int1" />
+  <link rel="stylesheet" href="styles.css?v=v3int2" />
 
   <!-- Export libraries (PNG + PDF). Self-hosted in vendor/ so the PDF export
        works even when offline and isn't blocked on a third-party CDN. -->
@@ -37,8 +37,8 @@
   <script src="app/render/kpis.js?v=1778154398" defer></script>
   <script src="app/render/map.js?v=1778154398" defer></script>
   <script src="app/render/highlights.js?v=1778154398" defer></script>
-  <script src="app/render/disclosure-agency.js?v=v3int1" defer></script>
-  <script src="app/render/charts.js?v=v3int1" defer></script>
+  <script src="app/render/disclosure-agency.js?v=v3int2" defer></script>
+  <script src="app/render/charts.js?v=v3int2" defer></script>
   <script src="app/render/tables.js?v=1778154398" defer></script>
   <script src="app/render/resources.js?v=1778154398" defer></script>
   <script src="app/render/footer.js?v=1778154398" defer></script>
@@ -229,10 +229,11 @@
             <span class="chart-card__tag">Fig. 3.4</span>
           </div>
           <div class="chart" id="chart-agency"></div>
-          <!-- Click-driven drill-down panel — populated by
-               render/disclosure-agency.js when the user clicks the
-               "Other" bar on the agency chart. Hidden by default. -->
-          <div class="chart-disclosure" id="chart-agency-disclosure" hidden aria-hidden="true"></div>
+          <!-- Hover/tap tooltip — populated by render/disclosure-agency.js
+               when the user hovers (or taps, on touch) the "Other" bar
+               on the agency chart. Hidden by default. Positioned
+               absolutely relative to .chart-card. -->
+          <div class="chart-tooltip" id="chart-agency-tooltip" hidden aria-hidden="true" role="tooltip"></div>
           <div class="chart-source" data-source-for="agency_donut">Source: OCHA HLS</div>
         </div>
       </div>

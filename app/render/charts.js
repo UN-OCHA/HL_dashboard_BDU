@@ -105,35 +105,22 @@ var RenderCharts = (function () {
     var hbar = data.map(function (d) {
       return { label: cleanAgencyName(d.label), values: { v: d.value } };
     });
-    // Track whether the "Other" disclosure is open so a second click on
-    // the same bar toggles it closed (and clicking any non-Other bar
-    // closes any open disclosure).
-    var disclosureOpen = false;
+    // Pass onBarClick so the hbar tags each row with data-bar-label
+    // (used by DisclosureAgency to find the "Other" row) and so the
+    // row becomes focusable for keyboard users. The callback itself
+    // is a no-op for Phase 1 — the agency drill-down is hover/tap-driven
+    // via a tooltip, not click-driven. Phase 2 (cross-filtering) will
+    // replace this stub with a real filter dispatch.
     ChartHbar.render(el, {
       data: hbar,
       series: [{ key: "v", label: "Leaders", color: "#009EDB" }],
       mode: "grouped",
-      // Click handler — only the "Other" bar opens a drill-down panel.
-      // The hbar module gives us {label, value, index}; we match on
-      // case-insensitive label === "other" since that's the bucket
-      // Valijon curates in the master sheet's "4. Agency of origin
-      // (bar)" tab.
-      onBarClick: function (info) {
-        var isOther = String(info.label || "").toLowerCase() === "other";
-        if (isOther) {
-          disclosureOpen = !disclosureOpen;
-          DisclosureAgency.render(state, disclosureOpen);
-        } else if (disclosureOpen) {
-          // Clicking a non-Other bar closes any open Other panel.
-          disclosureOpen = false;
-          DisclosureAgency.render(state, false);
-        }
-      }
+      onBarClick: function () { /* Phase 2 will hook this up */ }
     });
     // No legend — single-series bars are self-evident.
     removeLegend(el);
-    // Make sure the panel starts hidden on every fresh render.
-    DisclosureAgency.render(state, false);
+    // Attach the hover/tap tooltip to the "Other" row (idempotent).
+    DisclosureAgency.attach(state);
   }
 
   // Collapse a categorical distribution to top-N plus an aggregated "Others"

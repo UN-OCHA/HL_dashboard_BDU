@@ -1,23 +1,35 @@
 /**
  * render/disclosure-agency.js
  * ──────────────────────────────────────────────────────────────────────────
- * Click-driven drill-down for the agency-of-origin chart (Page 3, Fig 3.4).
+ * Hover-driven tooltip for the agency-of-origin chart (Page 3, Fig 3.4).
  *
- * When the user clicks the "Other" bar on the agency hbar chart, this
- * module derives the list of agencies aggregated into that bucket from
- * the per-leader roster (Tab 9, the leaders array on `state`) and renders
- * a small disclosure panel inside the chart card.
+ * When the user hovers (or taps, on touch devices) the "Other" bar on
+ * the agency hbar chart, this module derives the list of agencies
+ * aggregated into that bucket from the per-leader roster (Tab 9, the
+ * leaders array on `state`) and shows a small anchored tooltip next to
+ * the bar.
+ *
+ * Behaviour
+ *   · Desktop  — hover the "Other" row → tooltip appears. Move into the
+ *                tooltip → stays visible. mouseleave both → fades out.
+ *   · Mobile   — tap the "Other" row → tooltip appears. Tap elsewhere
+ *                or tap the row again → hides.
+ *   · Keyboard — focus the row → tooltip appears. Blur or Esc → hides.
+ *
+ * Only the "Other" row is interactive — the named buckets (UNDP /
+ * UNICEF / OCHA / WFP) don't need a drill-down. We attach the
+ * listeners ONLY to the row whose label is "Other".
  *
  * Data source contract:
  *   · state.leaders[i].agency  — leader's agency of origin (from Tab 9)
- *   · state.agency_donut       — the curated buckets shown on the chart
+ *   · state.leaders[i].position — used to filter OUT OiC arrangements
+ *                                 (PPT footnote: OiC not in charts)
+ *   · state.agency_donut       — the curated buckets shown on the chart;
+ *                                 used to identify which agencies are
+ *                                 NAMED (and therefore not in "Other")
  *
- * Anything in state.leaders whose CLEANED agency name doesn't match one
- * of the explicit (non-"Other") buckets is counted toward "Other".
- *
- * If state.leaders is missing agency data for some leaders (Tab 9 not
- * fully enriched yet), the panel flags the gap explicitly so it's clear
- * the list is partial — never silently misleading.
+ * If Tab 9 is incompletely enriched, the tooltip flags the gap so the
+ * partial list is never silently misleading.
  */
 
 /* global DisclosureAgency:true */
@@ -25,8 +37,13 @@
 var DisclosureAgency = (function () {
   "use strict";
 
-  // Same canonicalisation as render/charts.js → keep in sync. Short form
-  // is what appears on the chart's bars; we match against it.
+  // Hide-delay on mouseleave so the cursor can transit from the row
+  // into the tooltip without flickering it closed.
+  var HIDE_DELAY_MS = 140;
+  var hideTimer = null;
+
+  // Same canonicalisation as render/charts.js → keep in sync. Short
+  // form is what appears on the chart's bars; we match against it.
   function cleanAgencyName(s) {
     var t = String(s || "").trim();
     if (!t) return "";
@@ -49,18 +66,7 @@ var DisclosureAgency = (function () {
     return swap[t] || t;
   }
 
-  /**
-   * Compute the breakdown of the "Other" bucket.
-   *
-   * @param {object} state — global state (state.leaders + state.agency_donut)
-   * @returns {{
-   *   namedBuckets: string[],       // bucket labels shown on the chart (excl. "Other")
-   *   otherCountFromChart: number,  // total "Other" reported on the chart
-   *   breakdown: Array<{label: string, count: number, names: string[]}>,
-   *   countedLeaders: number,       // how many of the cohort had an agency we read
-   *   unknownLeaders: string[]      // leader names with no agency in Tab 9
-   * }}
-   */
+  /** Compute the breakdown of the "Other" bucket from state. */
   function compute(state) {
     var leaders  = state.leaders || [];
     var donut    = state.agency_donut || [];
@@ -75,15 +81,11 @@ var DisclosureAgency = (function () {
     var bucketsLower = namedBuckets.map(function (l) { return l.toLowerCase(); });
     var groups = Object.create(null);   // cleanedAgency → { count, names: [] }
     var unknownLeaders = [];
-    var countedLeaders = 0;
 
     leaders.forEach(function (lead) {
-      // OiC arrangements are listed in the Page 5 directory table but
-      // EXCLUDED from the charts (per the PPT footnote: "OiC
-      // arrangements listed here are not included in the charts and
-      // figures highlighted in the previous pages.") So we also exclude
-      // them here — otherwise the breakdown's total would exceed the
-      // chart's "Other" count when OiC leaders happen to be in Other.
+      // OiC arrangements are listed in the Page 5 directory but EXCLUDED
+      // from charts (PPT footnote). Filter them here too so the
+      // breakdown total never exceeds the chart's "Other" count.
       var pos = String(lead.position || "").toLowerCase();
       if (pos.indexOf("oic") !== -1) return;
 
@@ -92,10 +94,7 @@ var DisclosureAgency = (function () {
         unknownLeaders.push(lead.name || "(unnamed)");
         return;
       }
-      countedLeaders += 1;
       var cleaned = cleanAgencyName(raw);
-      // Skip leaders whose agency IS one of the explicit chart buckets —
-      // they're not in "Other".
       if (bucketsLower.indexOf(cleaned.toLowerCase()) !== -1) return;
       if (!groups[cleaned]) groups[cleaned] = { count: 0, names: [] };
       groups[cleaned].count += 1;
@@ -110,68 +109,128 @@ var DisclosureAgency = (function () {
     });
 
     return {
-      namedBuckets: namedBuckets,
-      otherCountFromChart: otherCountFromChart,
       breakdown: breakdown,
-      countedLeaders: countedLeaders,
+      otherCountFromChart: otherCountFromChart,
       unknownLeaders: unknownLeaders
     };
   }
 
-  /**
-   * Render (or update) the disclosure panel inside the agency chart card.
-   * If `isOpen` is false the panel is hidden but the DOM stays around so
-   * a future click re-opens cheaply.
-   */
-  function render(state, isOpen) {
-    var panel = document.getElementById("chart-agency-disclosure");
-    if (!panel) return;
-    panel.hidden = !isOpen;
-    panel.setAttribute("aria-hidden", isOpen ? "false" : "true");
-    if (!isOpen) return;
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
 
+  /** Populate the tooltip element with the current breakdown HTML. */
+  function fillTooltip(tip, state) {
     var info = compute(state);
     var sumCounted = info.breakdown.reduce(function (s, g) { return s + g.count; }, 0);
     var partial = sumCounted < info.otherCountFromChart;
-
-    // Build markup
     var headerNote = partial
-      ? sumCounted + " of " + info.otherCountFromChart + " leaders shown — "
-        + info.unknownLeaders.length + " not yet enriched in Tab 9"
-      : sumCounted + " leaders, " + info.breakdown.length + " agencies";
+      ? sumCounted + " of " + info.otherCountFromChart + " leaders shown"
+      : sumCounted + " leaders · " + info.breakdown.length + " agencies";
 
     var rows = info.breakdown.map(function (g) {
-      // Tooltip on the count cell shows the leader names for context.
-      var titleAttr = g.names.length ? ' title="' + escapeHtml(g.names.join(", ")) + '"' : '';
+      var titleAttr = g.names.length
+        ? ' title="' + escapeHtml(g.names.join(", ")) + '"' : '';
       return '<dt class="agency-name">' + escapeHtml(g.label) + '</dt>'
            + '<dd class="agency-count"' + titleAttr + '>' + g.count + '</dd>';
     }).join("");
 
-    panel.innerHTML =
-      '<div class="chart-disclosure__head">' +
-        '<span class="chart-disclosure__kicker">What\'s in &ldquo;Other&rdquo;</span>' +
-        '<span class="chart-disclosure__meta">' + headerNote + '</span>' +
-        '<button type="button" class="chart-disclosure__close" aria-label="Close">&times;</button>' +
+    tip.innerHTML =
+      '<div class="chart-tooltip__head">' +
+        '<span class="chart-tooltip__kicker">In &ldquo;Other&rdquo;</span>' +
+        '<span class="chart-tooltip__meta">' + escapeHtml(headerNote) + '</span>' +
       '</div>' +
       (info.breakdown.length
-        ? '<dl class="chart-disclosure__list">' + rows + '</dl>'
-        : '<p class="chart-disclosure__empty">No agency data available yet — Tab 9 needs enrichment first.</p>');
-
-    var closeBtn = panel.querySelector(".chart-disclosure__close");
-    if (closeBtn) {
-      closeBtn.addEventListener("click", function () {
-        render(state, false);
-      });
-    }
+        ? '<dl class="chart-tooltip__list">' + rows + '</dl>'
+        : '<p class="chart-tooltip__empty">No agency data available yet.</p>');
   }
 
-  function escapeHtml(s) {
-    return String(s)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
+  /** Position the tooltip next to (or below) the row inside the chart card. */
+  function positionTooltip(tip, rowEl, cardEl) {
+    var rowBox  = rowEl.getBoundingClientRect();
+    var cardBox = cardEl.getBoundingClientRect();
+    // Default position: just below the row, left-aligned with the
+    // chart's plot area (~the row's left edge minus a small offset).
+    var top  = rowBox.bottom - cardBox.top + 8;
+    var left = rowBox.left   - cardBox.left;
+    // Keep inside the card. If the tooltip would overflow the right
+    // edge, pull it left. If below would push off the card, flip above.
+    tip.style.top = top + "px";
+    tip.style.left = left + "px";
+    // Allow CSS max-width to clip; the JS just sets origin.
   }
 
-  return { compute: compute, render: render };
+  function showTooltip(tip, rowEl, cardEl, state) {
+    if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+    fillTooltip(tip, state);
+    tip.hidden = false;
+    tip.setAttribute("aria-hidden", "false");
+    // Position after fillTooltip so the layout knows the real size.
+    requestAnimationFrame(function () { positionTooltip(tip, rowEl, cardEl); });
+  }
+
+  function scheduleHide(tip) {
+    if (hideTimer) clearTimeout(hideTimer);
+    hideTimer = setTimeout(function () {
+      tip.hidden = true;
+      tip.setAttribute("aria-hidden", "true");
+      hideTimer = null;
+    }, HIDE_DELAY_MS);
+  }
+
+  function cancelHide() {
+    if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+  }
+
+  /**
+   * Attach hover / tap / focus listeners to the "Other" row of the
+   * agency hbar chart, wiring the tooltip to it. Idempotent: removes
+   * any prior listeners (via flag) before attaching new ones, so it
+   * is safe to call on every re-render.
+   */
+  function attach(state) {
+    var chartEl = document.getElementById("chart-agency");
+    var tip     = document.getElementById("chart-agency-tooltip");
+    if (!chartEl || !tip) return;
+    var cardEl  = chartEl.closest(".chart-card");
+    if (!cardEl) return;
+
+    // Find the "Other" row's <g>. The hbar renderer tags it with
+    // data-bar-label when an onBarClick callback was provided. The
+    // calling code (render/charts.js) sets that callback for this chart.
+    var rowEl = chartEl.querySelector('[data-bar-label="Other"]');
+    if (!rowEl) return;
+
+    // Avoid stacking duplicate listeners on re-render.
+    if (rowEl.__hl_disclosureBound) return;
+    rowEl.__hl_disclosureBound = true;
+
+    rowEl.addEventListener("mouseenter", function () { showTooltip(tip, rowEl, cardEl, state); });
+    rowEl.addEventListener("mouseleave", function () { scheduleHide(tip); });
+    rowEl.addEventListener("focus",      function () { showTooltip(tip, rowEl, cardEl, state); });
+    rowEl.addEventListener("blur",       function () { scheduleHide(tip); });
+
+    // Touch / mobile: tap toggles. Listeners on the tooltip prevent it
+    // from disappearing while the user is reading.
+    tip.addEventListener("mouseenter", cancelHide);
+    tip.addEventListener("mouseleave", function () { scheduleHide(tip); });
+
+    // Escape key + outside click dismiss (mobile / keyboard).
+    document.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape" && !tip.hidden) {
+        tip.hidden = true;
+        tip.setAttribute("aria-hidden", "true");
+      }
+    });
+    document.addEventListener("click", function (ev) {
+      if (tip.hidden) return;
+      if (rowEl.contains(ev.target) || tip.contains(ev.target)) return;
+      tip.hidden = true;
+      tip.setAttribute("aria-hidden", "true");
+    });
+  }
+
+  return { compute: compute, attach: attach };
 })();

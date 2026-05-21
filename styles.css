@@ -1266,96 +1266,90 @@ a:hover { text-decoration: underline; }
   vertical-align: middle;
   border-radius: 1px;
 }
-/* ── Click-driven chart disclosure ─────────────────────────────
- * Drill-down panel that appears inside a chart card when the user
- * clicks a specific bar / segment. Used today by the agency chart's
- * "Other" bar (Page 3, Fig 3.4) — see render/disclosure-agency.js.
+/* ── Hover/tap chart tooltip ─────────────────────────────────────
+ * Anchored tooltip that appears next to a specific chart row when
+ * hovered or tapped. Used today by the agency chart's "Other" bar
+ * (Page 3, Fig 3.4) — see render/disclosure-agency.js.
  *
- * Layout: full-width inside the chart card, hairline top rule, small
- * kicker label, agency-vs-count definition list, dismissable. Reads
- * as a quiet editorial footnote, not a modal interruption. */
-.chart-disclosure {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border-soft);
+ * Positioning: absolute inside .chart-card (which is position: relative
+ * by virtue of .chart-card establishing a stacking context via flex).
+ * The JS sets `top` / `left` based on the anchor row's bounding box.
+ *
+ * Style: small white card, hairline border, condensed kicker + tight
+ * dl listing of agency-vs-count. Reads as a quiet annotation, not a
+ * modal. Fades in/out cheaply via the `hidden` attribute. */
+.chart-card { position: relative; }   /* anchor for the absolute tooltip */
+.chart-tooltip {
+  position: absolute;
+  z-index: 10;
+  min-width: 220px;
+  max-width: 320px;
+  background: #fff;
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-2);
+  padding: 10px 12px 12px;
   font-family: var(--font-sans);
   color: var(--text);
+  pointer-events: auto;   /* needed so mouseenter on tooltip keeps it open */
 }
-.chart-disclosure[hidden] { display: none; }
-.chart-disclosure__head {
+.chart-tooltip[hidden] { display: none; }
+.chart-tooltip__head {
   display: flex;
   align-items: baseline;
-  gap: 12px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 6px;
 }
-.chart-disclosure__kicker {
+.chart-tooltip__kicker {
   font-family: var(--font-cond);
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: .18em;
   text-transform: uppercase;
   color: var(--text-title);
 }
-.chart-disclosure__meta {
-  font-size: 11px;
+.chart-tooltip__meta {
+  font-size: 10.5px;
   color: var(--text-muted);
   flex: 1;
 }
-.chart-disclosure__close {
-  background: transparent;
-  border: 0;
-  font-size: 16px;
-  line-height: 1;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 0;
-}
-.chart-disclosure__close:hover { color: var(--text-title); }
-.chart-disclosure__close:focus-visible {
-  outline: 2px solid var(--brand-primary--light);
-  outline-offset: 2px;
-}
-/* Definition list — agency name on the left, count on the right,
- * hairline rule between rows. Hover on the count cell shows leader
- * names via the native title attribute. */
-.chart-disclosure__list {
+.chart-tooltip__list {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 4px 16px;
+  column-gap: 14px;
+  row-gap: 2px;
   margin: 0;
-  font-size: 12px;
+  font-size: 11.5px;
 }
-.chart-disclosure__list .agency-name {
+.chart-tooltip__list .agency-name {
   margin: 0;
-  padding: 4px 0;
+  padding: 3px 0;
   border-bottom: 1px solid var(--border-soft);
   font-family: var(--font-cond);
   color: var(--text-title);
   font-weight: 500;
 }
-.chart-disclosure__list .agency-count {
+.chart-tooltip__list .agency-count {
   margin: 0;
-  padding: 4px 0;
+  padding: 3px 0;
   border-bottom: 1px solid var(--border-soft);
   font-variant-numeric: tabular-nums;
   font-weight: 700;
   color: var(--text-title);
   text-align: right;
-  cursor: help;     /* signals the names-on-hover tooltip */
+  cursor: help;     /* signals the names-on-hover native title attribute */
 }
-.chart-disclosure__list .agency-name:last-of-type,
-.chart-disclosure__list .agency-count:last-of-type { border-bottom: 0; }
-.chart-disclosure__empty {
+.chart-tooltip__list .agency-name:last-of-type,
+.chart-tooltip__list .agency-count:last-of-type { border-bottom: 0; }
+.chart-tooltip__empty {
   margin: 0;
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--text-muted);
   font-style: italic;
 }
 
-/* Clickable hbar rows — gives a quiet hover state so the user knows
- * the row is interactive. Applied only when ChartHbar gets an
- * onBarClick callback (the JS adds the `c-row--clickable` class). */
+/* Clickable hbar rows — quiet hover state so the user knows the row
+ * is interactive. Applied only when ChartHbar gets an onBarClick
+ * callback (the JS adds the `c-row--clickable` class). */
 .c-row--clickable .c-bar { transition: opacity .12s ease; }
 .c-row--clickable:hover .c-bar { opacity: 0.78; }
 .c-row--clickable:focus-visible {
